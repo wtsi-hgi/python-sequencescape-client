@@ -1,4 +1,4 @@
-from sequencescape._models import Study
+from sequencescape.model import Study
 from sequencescape._query import *
 
 

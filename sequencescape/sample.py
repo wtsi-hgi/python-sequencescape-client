@@ -1,4 +1,4 @@
-from sequencescape._models import Sample
+from sequencescape.model import Sample
 from sequencescape._query import *
 
 

@@ -1,4 +1,4 @@
-from sequencescape._models import Well
+from sequencescape.model import Well
 from sequencescape._query import *
 
 

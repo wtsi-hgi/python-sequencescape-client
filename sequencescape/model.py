@@ -2,10 +2,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
 
-Base = declarative_base()
+_Base = declarative_base()
 
 
-class Sample(Base):
+class Sample(_Base):
     __tablename__ = 'current_samples'
 
     internal_id = Column(Integer, primary_key=True)
@@ -19,7 +19,6 @@ class Sample(Base):
     cohort = Column(String)
     country_of_origin = Column(String)
     geographical_region = Column(String)
-
     is_current = Column(Integer)
 
     def __eq__(self, other):
@@ -37,7 +36,7 @@ class Sample(Base):
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class Study(Base):
+class Study(_Base):
     __tablename__ = 'current_studies'
 
     internal_id = Column(Integer, primary_key=True)
@@ -48,7 +47,6 @@ class Study(Base):
     study_title = Column(String)
     study_visibility = Column(String)
     faculty_sponsor = Column(String)
-
     is_current = Column(Integer)
 
     def __eq__(self, other):
@@ -66,13 +64,12 @@ class Study(Base):
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class Library(Base):
+class Library(_Base):
     __tablename__ = 'current_library_tubes'
 
     internal_id = Column(Integer, primary_key=True)
     name = Column(String)
     library_type = Column(String)
-
     is_current = Column(Integer)
 
     def __eq__(self, other):
@@ -88,12 +85,12 @@ class Library(Base):
         return "{ internal_id=%s, name=%s }" % (self.internal_id, self.name)
 
 
-class Well(Base):
+# TODO: doesn't look like this model name fits the domain very well (Wells?)
+class Well(_Base):
     __tablename__ = 'current_wells'
 
     internal_id = Column(Integer, primary_key=True)
     name = Column(String)
-
     is_current = Column(Integer)
 
     def __eq__(self, other):
@@ -109,12 +106,11 @@ class Well(Base):
         return self.__str__()
 
 
-class MultiplexedLibrary(Base):
+class MultiplexedLibrary(_Base):
     __tablename__ = 'current_multiplexed_library_tubes'
 
     internal_id = Column(Integer, primary_key=True)
     name = Column(String)
-
     is_current = Column(Integer)
 
     def __eq__(self, other):
@@ -130,13 +126,12 @@ class MultiplexedLibrary(Base):
         return "{ internal_id=%s, name=%s }" % (self.internal_id, self.name)
 
 
-class StudySamplesLink(Base):
+class StudySamplesLink(_Base):
     __tablename__ = 'current_study_samples'
 
     internal_id = Column(Integer, primary_key=True)
     sample_internal_id = Column(Integer)
     study_internal_id = Column(Integer)
-
     is_current = Column(Integer)
 
     def __eq__(self, other):
