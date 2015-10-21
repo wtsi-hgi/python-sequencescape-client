@@ -31,7 +31,7 @@ class Mapper(Generic[_T, _S], metaclass=ABCMeta):
         return self._database_connector
 
     @abstractmethod
-    def get_one(self, name: str=None, accession_number: str=None, internal_id: str=None) -> _T:
+    def get_one(self, name: str=None, accession_number: str=None, internal_id: str=None) -> _S:
         """
         This function queries on the entity of type type, by one (and only one) of the identifiers:
         name, accession_number, internal_id and returns the results found in Seqscape corresponding to
@@ -57,7 +57,7 @@ class Mapper(Generic[_T, _S], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many(self, ids_as_tuples: List[Tuple[IDType, str]]) -> List[_T]:
+    def get_many(self, ids_as_tuples: List[Tuple[IDType, str]]) -> List[_S]:
         """
         TODO
         :param model_type:
@@ -67,7 +67,7 @@ class Mapper(Generic[_T, _S], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_given_id(self, ids: List[str], id_type: IDType) -> List[_T]:
+    def get_many_by_given_id(self, ids: List[str], id_type: IDType) -> List[_S]:
         """
         This function is for internal use - it queries seqscape for all the entities or type type
         and returns a list of results.
@@ -87,7 +87,7 @@ class Mapper(Generic[_T, _S], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_name(self, names: List[str]) -> List[_T]:
+    def get_many_by_name(self, names: List[str]) -> List[_S]:
         """
         This function queries the database for all the entity names given as parameter as a batch.
         Parameters
@@ -106,7 +106,7 @@ class Mapper(Generic[_T, _S], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_internal_id(self, internal_ids: List[str]) -> List[_T]:
+    def get_many_by_internal_id(self, internal_ids: List[str]) -> List[_S]:
         """
         This function queries the database for all the entity internal ids given as parameter as a batch.
         Parameters
@@ -125,7 +125,7 @@ class Mapper(Generic[_T, _S], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_accession_number(self, accession_numbers: List[str]) -> List[_T]:
+    def get_many_by_accession_number(self, accession_numbers: List[str]) -> List[_S]:
         """
         This function queries the database for all the entity accession_number given as parameter as a batch.
         Parameters
