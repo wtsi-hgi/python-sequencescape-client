@@ -17,9 +17,8 @@ class Mapper(Generic[_T, _S], metaclass=ABCMeta):
         Default constructor.
         :param database_connector: the object through which database connections can be made
         """
-        print("Constructor called")
         if not database_connector:
-            raise ValueError("database_connnector must be specified")
+            raise ValueError("`database_connnector` must be specified")
         self._database_connector = database_connector
 
     def get_database_connector(self) -> _T:

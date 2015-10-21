@@ -3,11 +3,11 @@ from typing import TypeVar, List
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel
 from sequencescape.enums import IDType
 from sequencescape.mapper import Mapper
-from sequencescape.database_connector import SQLAlchemyDatabaseConnector
+from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
+from sequencescape.sqlalchemy._sqlalchemy_model_converter import *
+
 
 _T = TypeVar('T', bound=SQLAlchemyModel)
-_S = TypeVar('S', bound=str)
-_P = TypeVar('P', bound=int)
 
 
 # class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, SQLAlchemyModel]):
@@ -36,10 +36,9 @@ class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
                 print("Multiple entities with the same id found in the DB")
             else:
                 if result_matching_qu:
-                    results.append(result_matching_qu[0])
+                    results.append(result_matching_qu)
         return results
 
-    # XXX: Is this function required?
     # @wrappers.check_args_not_none
     def get_many_by_given_id(self, ids, id_type):
         if not ids:
@@ -51,11 +50,10 @@ class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
         elif id_type == IDType.INTERNAL_ID:
             return self.get_many_by_internal_id(ids)
         else:
-            #TODO: refer to IDType in error message
-            raise ValueError("The id_type parameter can only be one of the following: internal_id, accession_number, name.")
+            raise ValueError("The id_type parameter must be a value linked to by an IDType enum.")
 
     # @wrappers.check_args_not_none
-    def get_many_by_name(self, names: List[str]):
+    def get_many_by_name(self, names):
         if not names:
             return []
         session = self.get_database_connector().create_session()
@@ -63,7 +61,7 @@ class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
             filter(_T.name.in_(names)). \
             filter(_T.is_current == 1).all()
         session.close()
-        return result
+        return convert_to_popo_model(result)
 
     # @wrappers.check_args_not_none
     def get_many_by_internal_id(self, internal_ids):
@@ -74,7 +72,7 @@ class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
             filter(_T.internal_id.in_(internal_ids)). \
             filter(_T.is_current == 1).all()
         session.close()
-        return result
+        return convert_to_popo_model(result)
 
     # @wrappers.check_args_not_none
     def get_many_by_accession_number(self, accession_numbers):
@@ -85,7 +83,7 @@ class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
             filter(_T.accession_number.in_(accession_numbers)). \
             filter(_T.is_current == 1).all()
         session.close()
-        return result
+        return convert_to_popo_model(result)
 
     # @wrappers.check_args_not_none
     # def __query_for_study_ids_by_sample_ids(self, sample_internal_ids):

@@ -1,9 +1,17 @@
-# TODO: Make abstract
-class Model:
+from abc import ABCMeta, abstractmethod
+
+
+class Model(metaclass=ABCMeta):
+    """
+    Superclass that all POPOs (Plain Old Python Objects) must inherit from in order to be mapped to the database
+    """
     pass
 
 
 class Sample(Model):
+    """
+    TODO
+    """
     internal_id = None
     name = None
     accession_number = None
@@ -33,6 +41,9 @@ class Sample(Model):
 
 
 class Study(Model):
+    """
+    TODO
+    """
     internal_id = None
     name = None
     accession_number = None
@@ -58,7 +69,10 @@ class Study(Model):
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class Library():
+class Library(Model):
+    """
+    TODO
+    """
     internal_id = None
     name = None
     library_type = None
@@ -67,18 +81,27 @@ class Library():
 
 # TODO: doesn't look like this model name fits the domain very well (Wells?)
 class Well(Model):
+    """
+    TODO
+    """
     internal_id = None
     name = None
     is_current = None
 
 
 class MultiplexedLibrary(Model):
+    """
+    TODO
+    """
     internal_id = None
     name = None
     is_current = None
 
 
-class StudySamplesLink():
+class StudySamplesLink(Model):
+    """
+    TODO
+    """
     internal_id = None
     sample_internal_id = None
     study_internal_id = None
