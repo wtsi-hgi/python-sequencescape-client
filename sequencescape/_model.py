@@ -2,10 +2,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
 
-_Base = declarative_base()
+SQLAlchemyModel = declarative_base()
 
 
-class Sample(_Base):
+class Sample(SQLAlchemyModel):
     __tablename__ = 'current_samples'
 
     internal_id = Column(Integer, primary_key=True)
@@ -36,7 +36,7 @@ class Sample(_Base):
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class Study(_Base):
+class Study(SQLAlchemyModel):
     __tablename__ = 'current_studies'
 
     internal_id = Column(Integer, primary_key=True)
@@ -64,7 +64,7 @@ class Study(_Base):
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class Library(_Base):
+class Library(SQLAlchemyModel):
     __tablename__ = 'current_library_tubes'
 
     internal_id = Column(Integer, primary_key=True)
@@ -86,7 +86,7 @@ class Library(_Base):
 
 
 # TODO: doesn't look like this model name fits the domain very well (Wells?)
-class Well(_Base):
+class Well(SQLAlchemyModel):
     __tablename__ = 'current_wells'
 
     internal_id = Column(Integer, primary_key=True)
@@ -106,7 +106,7 @@ class Well(_Base):
         return self.__str__()
 
 
-class MultiplexedLibrary(_Base):
+class MultiplexedLibrary(SQLAlchemyModel):
     __tablename__ = 'current_multiplexed_library_tubes'
 
     internal_id = Column(Integer, primary_key=True)
@@ -126,7 +126,7 @@ class MultiplexedLibrary(_Base):
         return "{ internal_id=%s, name=%s }" % (self.internal_id, self.name)
 
 
-class StudySamplesLink(_Base):
+class StudySamplesLink(SQLAlchemyModel):
     __tablename__ = 'current_study_samples'
 
     internal_id = Column(Integer, primary_key=True)

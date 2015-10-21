@@ -1,6 +1,6 @@
-from sequencescape.model import Library, MultiplexedLibrary
-from sequencescape._query import *
+from sequencescape._model import Library, MultiplexedLibrary
 from sequencescape._mapper import Mapper
+from sequencescape.common import wrappers
 
 
 class LibraryMapper(Mapper):
@@ -37,23 +37,23 @@ class LibraryMapper(Mapper):
         ValueError: if there are more than 1 library matching a query on one of the ids.
         """
         return self.__get_many(Library, ids_as_tuples)
-    #
-    # @wrappers.check_args_not_none
-    # def find_libraries_with_property_values(self, ids, id_type):
-    #     """
-    #         Parameters
-    #         ----------
-    #         ids : list
-    #             A list of library ids (probably strings)
-    #         id_type : str
-    #             The type of the identifier i.e. what do the library_ids represent
-    #         Returns
-    #         -------
-    #         A list of libraries, where a library is a seqscape model
-    #     """
-    #     return self.__query_all_as_batch(Library, ids, id_type)
+
+    @wrappers.check_args_not_none
+    def get_libraries_with_property_values(self, ids, id_type):
+        """
+            Parameters
+            ----------
+            ids : list
+                A list of library ids (probably strings)
+            id_type : str
+                The type of the identifier i.e. what do the library_ids represent
+            Returns
+            -------
+            A list of libraries, where a library is a seqscape model
+        """
+        return self.__get_many_by_given_id(Library, ids, id_type)
 
     # TODO: Find out what this means in the domain
     @wrappers.check_args_not_none
     def query_all_multiplexed_libraries_as_batch(self, ids, id_type):
-        return self.__query_all_as_batch(MultiplexedLibrary, ids, id_type)
+        return self.__get_many_by_given_id(MultiplexedLibrary, ids, id_type)

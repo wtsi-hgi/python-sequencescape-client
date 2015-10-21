@@ -1,7 +1,14 @@
-from sequencescape.model import Well
-from sequencescape._query import *
+from sequencescape._mapper import *
+from sequencescape._model import Well
 
 
-@wrappers.check_args_not_none
-def query_all_wells_as_batch(ids, id_type):
-    return query_all_as_batch(Well, ids, id_type)
+class StudyMapper(Mapper):
+    @wrappers.check_args_not_none
+    def query_all_wells_as_batch(self, ids, id_type):
+        """
+        TODO
+        :param ids:
+        :param id_type:
+        :return:
+        """
+        return self.__get_many(Well, ids, id_type)

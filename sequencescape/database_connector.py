@@ -1,8 +1,17 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from abc import ABCMeta, abstractmethod
 
 
-class DatabaseConnector():
+class DatabaseConnector(metaclass=ABCMeta):
+    @abstractmethod
+    def create_session(self):
+        """
+        """
+        pass
+
+
+class SQLAlchemyDatabaseConnector(DatabaseConnector):
     """
     Internal database engine used by the ORM.
     """
