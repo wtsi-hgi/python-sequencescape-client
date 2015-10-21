@@ -1,4 +1,4 @@
-from sequencescape._model import Library, MultiplexedLibrary
+from sequencescape._sqlalchemy_model import Library, MultiplexedLibrary
 from sequencescape._mapper import Mapper
 from sequencescape.common import wrappers
 

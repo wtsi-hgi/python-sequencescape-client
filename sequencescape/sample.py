@@ -1,5 +1,5 @@
 from sequencescape._mapper import *
-from sequencescape._model import Sample
+from sequencescape._sqlalchemy_model import Sample
 
 
 class SampleMapper(Mapper):

@@ -1,5 +1,5 @@
 from sequencescape._mapper import *
-from sequencescape._model import Study
+from sequencescape._sqlalchemy_model import Study
 
 
 class StudyMapper(Mapper):

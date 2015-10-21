@@ -11,6 +11,11 @@ class DatabaseConnector(metaclass=ABCMeta):
         pass
 
 
+class DummyDatabaseConnector(DatabaseConnector):
+    def create_session(self):
+        print("Dummy database connnector doesn't do anything")
+
+
 class SQLAlchemyDatabaseConnector(DatabaseConnector):
     """
     Internal database engine used by the ORM.
@@ -40,4 +45,3 @@ class SQLAlchemyDatabaseConnector(DatabaseConnector):
         Session = sessionmaker(bind=self._engine)
         session = Session()
         return session
-
