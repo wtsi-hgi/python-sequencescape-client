@@ -6,23 +6,23 @@ from sqlalchemy import Column, Integer, String
 SQLAlchemyModel = declarative_base()
 
 
-class NamedModel(metaclass=ABCMeta):
+class SQLAlchemyNamed(metaclass=ABCMeta):
     name = Column(String)
 
 
-class InternalIDModel(metaclass=ABCMeta):
+class SQLAlchemyInternalID(metaclass=ABCMeta):
     internal_id = Column(Integer, primary_key=True)
 
 
-class AccessionNumberModel(metaclass=ABCMeta):
+class SQLAlchemyAccessionNumber(metaclass=ABCMeta):
     accession_number = Column(String)
 
 
-class IsCurrentModel(metaclass=ABCMeta):
+class SQLAlchemyIsCurrent(metaclass=ABCMeta):
     is_current = Column(Integer)
 
 
-class SampleSQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, AccessionNumberModel, IsCurrentModel):
+class SQLAlchemySample(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyAccessionNumber, SQLAlchemyIsCurrent):
     __tablename__ = 'current_samples'
 
     organism = Column(String)
@@ -49,7 +49,7 @@ class SampleSQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, Access
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class StudySQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, AccessionNumberModel, IsCurrentModel):
+class SQLAlchemyStudy(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyAccessionNumber, SQLAlchemyIsCurrent):
     __tablename__ = 'current_studies'
 
     study_type = Column(String)
@@ -73,7 +73,7 @@ class StudySQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, Accessi
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class LibrarySQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, IsCurrentModel):
+class SQLAlchemyLibrary(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
     __tablename__ = 'current_library_tubes'
 
     library_type = Column(String)
@@ -92,7 +92,7 @@ class LibrarySQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, IsCur
 
 
 # TODO: doesn't look like this model name fits the domain very well (Wells?)
-class WellSQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, IsCurrentModel):
+class SQLAlchemyWell(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
     __tablename__ = 'current_wells'
 
     def __eq__(self, other):
@@ -108,7 +108,7 @@ class WellSQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, IsCurren
         return self.__str__()
 
 
-class MultiplexedLibrarySQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDModel, IsCurrentModel):
+class SQLAlchemyMultiplexedLibrary(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
     __tablename__ = 'current_multiplexed_library_tubes'
 
     def __eq__(self, other):
@@ -124,7 +124,7 @@ class MultiplexedLibrarySQLAlchemyModel(SQLAlchemyModel, NamedModel, InternalIDM
         return "{ internal_id=%s, name=%s }" % (self.internal_id, self.name)
 
 
-class StudySamplesLinkSQLAlchemyModel(SQLAlchemyModel, InternalIDModel, IsCurrentModel):
+class SQLAlchemyStudySamplesLink(SQLAlchemyModel, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
     __tablename__ = 'current_study_samples'
 
     sample_internal_id = Column(Integer)

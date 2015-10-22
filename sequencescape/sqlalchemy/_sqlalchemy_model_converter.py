@@ -3,12 +3,12 @@ from sequencescape.model import *
 
 
 _SQLALCHEMY_TO_POPO_CONVERSIONS = {
-    SampleSQLAlchemyModel: Sample,
-    StudySQLAlchemyModel: Study,
-    LibrarySQLAlchemyModel: Library,
-    WellSQLAlchemyModel: Well,
-    MultiplexedLibrarySQLAlchemyModel: MultiplexedLibrary,
-    StudySamplesLinkSQLAlchemyModel: Study
+    SQLAlchemySample: Sample,
+    SQLAlchemyStudy: Study,
+    SQLAlchemyLibrary: Library,
+    SQLAlchemyWell: Well,
+    SQLAlchemyMultiplexedLibrary: MultiplexedLibrary,
+    SQLAlchemyStudySamplesLink: Study
 }
 
 

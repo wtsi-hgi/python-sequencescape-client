@@ -18,7 +18,7 @@ IS_CURRENT = "IS_CURRENT123"
 
 class TestAutoConvertToPopoModel(unittest.TestCase):
     def test_convert_sample(self):
-        alchemy_model = SampleSQLAlchemyModel()
+        alchemy_model = SQLAlchemySample()
         alchemy_model.internal_id = INTERNAL_ID
         alchemy_model.name = NAME
         alchemy_model.accession_number = ACCESSION_NUMBER

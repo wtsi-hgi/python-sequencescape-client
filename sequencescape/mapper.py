@@ -1,26 +1,24 @@
 from abc import ABCMeta, abstractmethod
 from typing import List, Tuple
-from sequencescape.database_connector import DatabaseConnector
 from sequencescape.enums import IDType
+from sequencescape.model import Model
 
 
 #XXX: This whole class should use generics (pep-0484). Unfortunately they are not good enough/the documentation is not
 #     good enough to use them yet.
 class Mapper(metaclass=ABCMeta):
-    _database_connector = None
     _model_type = None
 
-    def __init__(self, database_connector: DatabaseConnector, model_type: type) -> None:
+    #XXX: model_type should be type hinted to a type of subclass Model
+    def __init__(self, model_type: type) -> None:
         """
         Default constructor.
-        :param database_connector: the object through which database connections can be made
         :param model_type: the type of the model that the mapper is used for
         """
-        if not database_connector:
-            raise ValueError("Data connector must be specified through `database_connnector`")
         if not model_type:
             raise ValueError("Model type must be specified through `model_type` parameter")
-        self._database_connector = database_connector
+        if not issubclass(model_type, Model):
+            raise ValueError("Model type must be a subclass of Model")
         self._model_type = model_type
 
     @abstractmethod
@@ -135,14 +133,6 @@ class Mapper(metaclass=ABCMeta):
         Returns a list of objects of type type found to match the accession_number given as parameter.
         """
         pass
-
-    def __get_database_connector(self):
-        """
-        Gets the object through which database connections can be made.
-        :return: the database connector
-        """
-        assert self._database_connector
-        return self._database_connector
 
     def __get_model_type(self) -> type:
         """

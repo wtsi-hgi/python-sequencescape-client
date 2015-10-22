@@ -1,9 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sequencescape.database_connector import *
 
 
-class SQLAlchemyDatabaseConnector(DatabaseConnector):
+class SQLAlchemyDatabaseConnector():
     _engine = None
     _database_url = None
 
