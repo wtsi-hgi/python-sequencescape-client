@@ -1,12 +1,13 @@
-from sequencescape.enums import IDType
-from sequencescape.mapper import Mapper
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import *
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
+from sequencescape.sqlalchemy._sqlalchemy_model import *
+from sequencescape.mapper import *
 
 
-class SQLAlchemyMapper(Mapper):
+class _SQLAlchemyMapper(Mapper):
     _database_connector = None
     _type_cache = None
+    _model_type = None
 
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type) -> None:
         """
@@ -14,7 +15,11 @@ class SQLAlchemyMapper(Mapper):
         :param database_connector: the object through which database connections can be made
         :param model_type: the type of the model that the mapper is used for
         """
-        super(SQLAlchemyMapper, self).__init__(model_type)
+        if not model_type:
+            raise ValueError("Model type must be specified through `model_type` parameter")
+        if not issubclass(model_type, Model):
+            raise ValueError("Model type must be a subclass of Model")
+        self._model_type = model_type
 
     def get_one(self, name=None, accession_number=None, internal_id=None):
         if name:
@@ -134,3 +139,73 @@ class SQLAlchemyMapper(Mapper):
             assert issubclass(self._type_cache, SQLAlchemyModel)
         return self._type_cache
 
+    def __get_model_type(self) -> type:
+        """
+        Gets the type of models that this mapper deals with
+        :return: the type of models that this mapper deals with
+        """
+        assert self._model_type
+        return self._model_type
+
+
+class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        TODO
+        :param database_connector:
+        :return:
+        """
+        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, SQLAlchemyStudy)
+
+
+class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        TODO
+        :param database_connector:
+        :return:
+        """
+        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, SQLAlchemyMultiplexedLibrary)
+
+
+class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        TODO
+        :param database_connector:
+        :return:
+        """
+        super(SQLAlchemySampleMapper, self).__init__(database_connector, SQLAlchemySample)
+
+
+class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        TODO
+        :param database_connector:
+        :return:
+        """
+        super(SQLAlchemyWellMapper, self).__init__(database_connector, SQLAlchemyWell)
+
+
+class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        TODO
+        :param database_connector:
+        :return:
+        """
+        super(SQLAlchemyStudyMapper, self).__init__(database_connector, SQLAlchemyStudy)
+
+    def get_many_associated_with_samples(self, sample_internal_ids: str) -> Study:
+        session = self.__get_database_connector().create_session()
+
+        studies_samples = session.query(SQLAlchemyStudySamplesLink). \
+            filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_internal_ids)). \
+            filter(SQLAlchemyStudySamplesLink.is_current == 1).all()
+
+        if not studies_samples:
+            return []
+
+        study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
+        return self.get_many_by_internal_id(study_ids)
