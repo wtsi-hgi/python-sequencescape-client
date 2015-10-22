@@ -1,17 +1,14 @@
-from typing import TypeVar, List
-
-from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel
+from typing import Union
+from sequencescape.sqlalchemy._sqlalchemy_model import *
 from sequencescape.enums import IDType
 from sequencescape.mapper import Mapper
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import *
 
 
-_T = TypeVar('T', bound=SQLAlchemyModel)
+class SQLAlchemyMapper(Mapper):
+    _type_cache = None
 
-
-# class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, SQLAlchemyModel]):
-class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
     # @wrappers.check_args_not_none
     def get_one(self, name=None, accession_number=None, internal_id=None):
         if name:
@@ -31,7 +28,7 @@ class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
         results = []
         for id_type, id_val in ids_as_tuples:
             try:
-                result_matching_qu = self.get_one(**{'type': _T, id_type: id_val})
+                result_matching_qu = self.get_one(**{'type': self._get_sqlalchemy_model_type(), id_type: id_val})
             except ValueError:
                 print("Multiple entities with the same id found in the DB")
             else:
@@ -56,34 +53,76 @@ class SQLAlchemyMapper(Mapper[SQLAlchemyDatabaseConnector, _T]):
     def get_many_by_name(self, names):
         if not names:
             return []
-        session = self.get_database_connector().create_session()
-        result = session.query(_T). \
-            filter(_T.name.in_(names)). \
-            filter(_T.is_current == 1).all()
+
+        session = self.__get_database_connector().create_session()
+        # XXX: Given generics aren't possible, should hint type with # type: XXX comment. However, it is unclear how
+        #      to hint multiple interfaces!
+        model_type = self._get_sqlalchemy_model_type()
+        if not issubclass(model_type, NamedModel):
+            raise ValueError(
+                "Not possible to get instances of type %s by name as they do not have that property" % self.__get_model_type())
+        if not issubclass(model_type, IsCurrentModel):
+            raise ValueError(
+                "Not possible to get instances of type %s by name as the query required `is_current` property"
+                    % self.__get_model_type())
+
+        result = session.query(model_type). \
+            filter(model_type.name.in_(names)). \
+            filter(model_type.is_current == 1).all()
         session.close()
+
         return convert_to_popo_model(result)
 
     # @wrappers.check_args_not_none
     def get_many_by_internal_id(self, internal_ids):
         if not internal_ids:
             return []
-        session = self.get_database_connector().create_session()
-        result = session.query(_T). \
-            filter(_T.internal_id.in_(internal_ids)). \
-            filter(_T.is_current == 1).all()
+
+        session = self.__get_database_connector().create_session()
+        model_type = self._get_sqlalchemy_model_type()
+        if not issubclass(model_type, NamedModel):
+            raise ValueError(
+                "Not possible to get instances of type %s by internal ID as they do not have that property" % self.__get_model_type())
+        if not issubclass(model_type, IsCurrentModel):
+            raise ValueError(
+                "Not possible to get instances of type %s by internal ID as the query requires `is_current` property" % self.__get_model_type())
+
+        result = session.query(model_type). \
+            filter(model_type.internal_id.in_(internal_ids)). \
+            filter(model_type.is_current == 1).all()
         session.close()
+
         return convert_to_popo_model(result)
 
     # @wrappers.check_args_not_none
     def get_many_by_accession_number(self, accession_numbers):
         if not accession_numbers:
             return []
-        session = self.get_database_connector().create_session()
-        result = session.query(_T). \
-            filter(_T.accession_number.in_(accession_numbers)). \
-            filter(_T.is_current == 1).all()
+
+        session = self.__get_database_connector().create_session()
+        model_type = self._get_sqlalchemy_model_type()
+        if not issubclass(model_type, NamedModel):
+            raise ValueError(
+                "Not possible to get instances of type %s by accession number as they do not have that property" % self.__get_model_type())
+        if not issubclass(model_type, IsCurrentModel):
+            raise ValueError(
+                "Not possible to get instances of type %s by accession number as the query requires `is_current` property" % self.__get_model_type())
+
+        result = session.query(model_type). \
+            filter(model_type.accession_number.in_(accession_numbers)). \
+            filter(model_type.is_current == 1).all()
         session.close()
+
         return convert_to_popo_model(result)
+
+    def _get_sqlalchemy_model_type(self):
+        """
+        TODO
+        :return:
+        """
+        if not self._type_cache:
+            self._type_cache = get_equivalent_sqlalchemy_model_type(self.__get_model_type())
+        return self._type_cache
 
     # @wrappers.check_args_not_none
     # def __query_for_study_ids_by_sample_ids(self, sample_internal_ids):
