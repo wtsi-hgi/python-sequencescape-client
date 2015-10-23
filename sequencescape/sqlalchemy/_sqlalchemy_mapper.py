@@ -18,10 +18,22 @@ class _SQLAlchemyMapper(Mapper):
         if not model_type:
             raise ValueError("Model type must be specified through `model_type` parameter")
         if not issubclass(model_type, Model):
-            raise ValueError("Model type must be a subclass of Model")
+            raise ValueError("Model type (%s) must be a subclass of Model" % model_type)
         self._model_type = model_type
+        self._database_connector = database_connector
 
-    def get_one(self, name=None, accession_number=None, internal_id=None):
+    # TODO: Put in interface
+    def add(self, model):
+        if not issubclass(model.__class__, self.__get_model_type()):
+            raise ValueError(
+                "Mapper is for objects of type `%s`; type `%s` given" % (self.__get_model_type(), model.__class__))
+        sqlalchemy_model = convert_to_sqlalchemy_model(model)
+
+        session = self.__get_database_connector().create_session()
+        session.add(sqlalchemy_model)
+        session.commit()
+
+    def get(self, name=None, accession_number=None, internal_id=None):
         if name:
             result = self.get_many_by_name([name])
         elif accession_number:
@@ -30,15 +42,19 @@ class _SQLAlchemyMapper(Mapper):
             result = self.get_many_by_internal_id([internal_id])
         else:
             raise ValueError("No identifier provided to query on.")
-        if len(result) > 1:
+
+        if len(result) == 0:
+            return None
+        elif len(result) > 1:
             raise ValueError("This query has more than one row associated in SEQSCAPE: %s" % [s.name for s in result])
+
         return result[0]
 
     def get_many(self, ids_as_tuples):
         results = []
         for id_type, id_val in ids_as_tuples:
             try:
-                result_matching_qu = self.get_one(**{'type': self._get_sqlalchemy_model_type(), id_type: id_val})
+                result_matching_qu = self.get(**{'type': self._get_sqlalchemy_model_type(), id_type: id_val})
             except ValueError:
                 print("Multiple entities with the same id found in the DB")
             else:
@@ -62,8 +78,7 @@ class _SQLAlchemyMapper(Mapper):
         if not names:
             return []
 
-        session = self.__get_database_connector().create_session()
-        # XXX: Given generics aren't possible, should hint type with # type: XXX comment. However, it is unclear how
+        # XXX: Given generics aren't possible, should hint type with `# type: XXX` comment. However, it is unclear how
         #      to hint multiple interfaces!
         model_type = self._get_sqlalchemy_model_type()
         if not issubclass(model_type, SQLAlchemyNamed):
@@ -74,18 +89,18 @@ class _SQLAlchemyMapper(Mapper):
                 "Not possible to get instances of type %s by name as the query required `is_current` property"
                     % self.__get_model_type())
 
+        session = self.__get_database_connector().create_session()
         result = session.query(model_type). \
             filter(model_type.name.in_(names)). \
             filter(model_type.is_current == 1).all()
         session.close()
 
-        return convert_to_popo_model(result)
+        return convert_to_popo_models(result)
 
     def get_many_by_internal_id(self, internal_ids):
         if not internal_ids:
             return []
 
-        session = self.__get_database_connector().create_session()
         model_type = self._get_sqlalchemy_model_type()
         if not issubclass(model_type, SQLAlchemyNamed):
             raise ValueError(
@@ -94,18 +109,18 @@ class _SQLAlchemyMapper(Mapper):
             raise ValueError(
                 "Not possible to get instances of type %s by internal ID as the query requires `is_current` property" % self.__get_model_type())
 
+        session = self.__get_database_connector().create_session()
         result = session.query(model_type). \
             filter(model_type.internal_id.in_(internal_ids)). \
             filter(model_type.is_current == 1).all()
         session.close()
 
-        return convert_to_popo_model(result)
+        return convert_to_popo_models(result)
 
     def get_many_by_accession_number(self, accession_numbers):
         if not accession_numbers:
             return []
 
-        session = self.__get_database_connector().create_session()
         model_type = self._get_sqlalchemy_model_type()
         if not issubclass(model_type, SQLAlchemyNamed):
             raise ValueError(
@@ -114,12 +129,13 @@ class _SQLAlchemyMapper(Mapper):
             raise ValueError(
                 "Not possible to get instances of type %s by accession number as the query requires `is_current` property" % self.__get_model_type())
 
+        session = self.__get_database_connector().create_session()
         result = session.query(model_type). \
             filter(model_type.accession_number.in_(accession_numbers)). \
             filter(model_type.is_current == 1).all()
         session.close()
 
-        return convert_to_popo_model(result)
+        return convert_to_popo_models(result)
 
     def __get_database_connector(self):
         """
@@ -155,7 +171,7 @@ class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
         :param database_connector:
         :return:
         """
-        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, SQLAlchemyStudy)
+        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
 
 
 class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMapper):
@@ -165,7 +181,7 @@ class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMa
         :param database_connector:
         :return:
         """
-        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, SQLAlchemyMultiplexedLibrary)
+        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)
 
 
 class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
@@ -175,7 +191,7 @@ class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
         :param database_connector:
         :return:
         """
-        super(SQLAlchemySampleMapper, self).__init__(database_connector, SQLAlchemySample)
+        super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
 
 class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
@@ -185,7 +201,7 @@ class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
         :param database_connector:
         :return:
         """
-        super(SQLAlchemyWellMapper, self).__init__(database_connector, SQLAlchemyWell)
+        super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
 
 
 class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
@@ -195,7 +211,7 @@ class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
         :param database_connector:
         :return:
         """
-        super(SQLAlchemyStudyMapper, self).__init__(database_connector, SQLAlchemyStudy)
+        super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
     def get_many_associated_with_samples(self, sample_internal_ids: str) -> Study:
         session = self.__get_database_connector().create_session()

@@ -8,7 +8,7 @@ from sequencescape.enums import IDType
 #     good enough to use them yet.
 class Mapper(metaclass=ABCMeta):
     @abstractmethod
-    def get_one(self, name: str=None, accession_number: str=None, internal_id: str=None) :
+    def get(self, name: str=None, accession_number: str=None, internal_id: str=None) :
         """
         This function queries on the entity of type type, by one (and only one) of the identifiers:
         name, accession_number, internal_id and returns the results found in Seqscape corresponding to

@@ -3,18 +3,31 @@ from abc import ABCMeta
 
 class Model(metaclass=ABCMeta):
     """
-    Superclass that all POPOs (Plain Old Python Objects) must inherit from in order to be mapped to the database
+    Superclass that all POPOs (Plain Old Python Objects) must implement.
     """
     pass
 
 
-class Sample(Model):
+class Named(metaclass=ABCMeta):
+    name = None
+
+
+class InternalID(metaclass=ABCMeta):
+    internal_id = None
+
+
+class AccessionNumber(metaclass=ABCMeta):
+    accession_number = None
+
+
+class IsCurrent(metaclass=ABCMeta):
+    is_current = None
+
+
+class Sample(Model, Named, InternalID, AccessionNumber, IsCurrent):
     """
     TODO
     """
-    internal_id = None
-    name = None
-    accession_number = None
     organism = None
     common_name = None
     taxon_id = None
@@ -23,7 +36,6 @@ class Sample(Model):
     cohort = None
     country_of_origin = None
     geographical_region = None
-    is_current = None
 
     def __eq__(self, other):
         return self.name == other.name and \
@@ -40,19 +52,15 @@ class Sample(Model):
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class Study(Model):
+class Study(Model, Named, InternalID, AccessionNumber, IsCurrent):
     """
     TODO
     """
-    internal_id = None
-    name = None
-    accession_number = None
     study_type = None
     description = None
     study_title = None
     study_visibility = None
     faculty_sponsor = None
-    is_current = None
 
     def __eq__(self, other):
         return self.name == other.name and \
@@ -69,41 +77,31 @@ class Study(Model):
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
 
-class Library(Model):
+class Library(Model, Named, InternalID, IsCurrent):
     """
     TODO
     """
-    internal_id = None
-    name = None
     library_type = None
-    is_current = None
 
 
-# TODO: doesn't look like this model name fits the domain very well (Wells?)
-class Well(Model):
+class Well(Model, Named, InternalID, IsCurrent):
     """
     TODO
     """
-    internal_id = None
-    name = None
-    is_current = None
+    pass
 
 
-class MultiplexedLibrary(Model):
+class MultiplexedLibrary(Model, Named, InternalID, IsCurrent):
     """
     TODO
     """
-    internal_id = None
-    name = None
-    is_current = None
+    pass
 
 
-class StudySamplesLink(Model):
+class StudySamplesLink(Model, InternalID, IsCurrent):
     """
     TODO
     """
-    internal_id = None
     sample_internal_id = None
     study_internal_id = None
-    is_current = None
 

@@ -1,22 +1,20 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
+
+from sequencescape.sqlalchemy._sqlalchemy_model import *
 
 
 class SQLAlchemyDatabaseConnector():
     _engine = None
-    _database_url = None
+    _database_uri = None
 
-    def __init__(self, host: str, port: int, database: str, user: str, dialect: str='mysql'):
+    def __init__(self, uri : str):
         """
         TODO
-        :param host:
-        :param port:
-        :param database:
-        :param user:
-        :param dialect:
+        :param uri:
         :return:
         """
-        self._database_url = '%s://%s:@%s:%s/%s' % (dialect, user, host, port, database)
+        self._database_uri = uri
 
     def create_session(self):
         """
@@ -24,7 +22,8 @@ class SQLAlchemyDatabaseConnector():
         :return:
         """
         if not self._engine:
-            self._engine = create_engine(self._database_url)
+            self._engine = create_engine(self._database_uri)
+
         Session = sessionmaker(bind=self._engine)
         session = Session()
         return session

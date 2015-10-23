@@ -6,19 +6,23 @@ from sqlalchemy import Column, Integer, String
 SQLAlchemyModel = declarative_base()
 
 
-class SQLAlchemyNamed(metaclass=ABCMeta):
+class SQLAlchemyNamed():
+    __metaclass__ = ABCMeta
     name = Column(String)
 
 
-class SQLAlchemyInternalID(metaclass=ABCMeta):
+class SQLAlchemyInternalID():
+    __metaclass__ = ABCMeta
     internal_id = Column(Integer, primary_key=True)
 
 
-class SQLAlchemyAccessionNumber(metaclass=ABCMeta):
+class SQLAlchemyAccessionNumber():
+    __metaclass__ = ABCMeta
     accession_number = Column(String)
 
 
-class SQLAlchemyIsCurrent(metaclass=ABCMeta):
+class SQLAlchemyIsCurrent():
+    __metaclass__ = ABCMeta
     is_current = Column(Integer)
 
 
