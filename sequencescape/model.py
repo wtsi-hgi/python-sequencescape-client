@@ -37,6 +37,7 @@ class Sample(Model, Named, InternalID, AccessionNumber, IsCurrent):
     country_of_origin = None
     geographical_region = None
 
+    #TODO: Does a POPO model need these (how does Python do equality)
     def __eq__(self, other):
         return self.name == other.name and \
                self.accession_number == other.accession_number and \

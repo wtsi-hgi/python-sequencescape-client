@@ -41,7 +41,7 @@ class SQLAlchemySample(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, S
     def __eq__(self, other):
         return self.name == other.name and \
                self.accession_number == other.accession_number and \
-               self.internal_id == other.internal_id
+               str(self.internal_id) == str(other.internal_id)
 
     def __hash__(self):
         return hash(self.name)
@@ -65,7 +65,7 @@ class SQLAlchemyStudy(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQ
     def __eq__(self, other):
         return self.name == other.name and \
                self.accession_number == other.accession_number and \
-               self.internal_id == other.internal_id
+               str(self.internal_id) == str(other.internal_id)
 
     def __hash__(self):
         return hash(self.name)
@@ -83,7 +83,8 @@ class SQLAlchemyLibrary(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, 
     library_type = Column(String)
 
     def __eq__(self, other):
-        return self.name == other.name and self.internal_id == other.internal_id
+        return self.name == other.name and \
+               str(self.internal_id) == str(other.internal_id)
 
     def __hash__(self):
         return hash(self.name)
@@ -100,7 +101,7 @@ class SQLAlchemyWell(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQL
     __tablename__ = 'current_wells'
 
     def __eq__(self, other):
-        return self.internal_id == other.internal_id
+        return str(self.internal_id) == str(other.internal_id)
 
     def __hash__(self):
         return hash(self.internal_id)
@@ -116,7 +117,8 @@ class SQLAlchemyMultiplexedLibrary(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyI
     __tablename__ = 'current_multiplexed_library_tubes'
 
     def __eq__(self, other):
-        return self.name == other.name and self.internal_id == other.internal_id
+        return self.name == other.name and \
+               str(self.internal_id) == str(other.internal_id)
 
     def __hash__(self):
         return hash(self.name)
@@ -135,7 +137,8 @@ class SQLAlchemyStudySamplesLink(SQLAlchemyModel, SQLAlchemyInternalID, SQLAlche
     study_internal_id = Column(Integer)
 
     def __eq__(self, other):
-        return self.sample_internal_id == other.sample_internal_id and self.internal_id == other.internal_id
+        return self.sample_internal_id == other.sample_internal_id and \
+               str(self.internal_id) == str(other.internal_id)
 
     def __hash__(self):
         return hash(self.sample_internal_id) + hash(self.study_internal_id)

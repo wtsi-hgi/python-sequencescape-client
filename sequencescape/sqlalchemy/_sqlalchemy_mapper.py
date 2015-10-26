@@ -33,6 +33,12 @@ class _SQLAlchemyMapper(Mapper):
         session.add(sqlalchemy_model)
         session.commit()
 
+    # TODO: Put in interface
+    def add_all(self, models):
+        #XXX: This implementation is very inefficient
+        for model in models:
+            self.add(model)
+
     def get(self, name=None, accession_number=None, internal_id=None):
         if name:
             result = self.get_many_by_name([name])

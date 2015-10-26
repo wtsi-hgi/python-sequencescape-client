@@ -60,29 +60,6 @@ def create_database():
         """
     )
     connection.commit()
-
-    # connector = SQLAlchemyDatabaseConnector("%s:///%s" % (dialect, database_file_path))
-    #
-    # sample_mapper = SQLAlchemySampleMapper(connector)
-    # sample_mapper.add(create_mock_sample())
-    #
-    # study_mapper = SQLAlchemyStudyMapper(connector)
-    # study_mapper.add(create_mock_study())
-    #
-    # library_mapper = SQLAlchemyLibraryMapper(connector)
-    # library_mapper.add(create_mock_library())
-    #
-    # well_mapper = SQLAlchemyWellMapper(connector)
-    # well_mapper.add(create_mock_well())
-    #
-    # multiplexed_library_mapper = SQLAlchemyMultiplexedLibraryMapper(connector)
-    # multiplexed_library_mapper.add(create_mock_multiplexed_library())
-
-
-    # cursor.execute("SELECT * FROM current_samples")
-    # print(cursor.fetchone())
-
-
     connection.close()
 
 
