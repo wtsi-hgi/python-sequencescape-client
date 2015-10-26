@@ -1,3 +1,4 @@
+from multimethods import multimethod
 from typing import Callable, Any
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import *
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
@@ -23,84 +24,100 @@ class _SQLAlchemyMapper(Mapper):
         self._model_type = model_type
         self._database_connector = database_connector
 
-    def add(self, model):
-        if not issubclass(model.__class__, self._get_model_type()):
-            raise ValueError(
-                "Mapper is for objects of type `%s`; type `%s` given" % (self._get_model_type(), model.__class__))
-        sqlalchemy_model = convert_to_sqlalchemy_model(model)
+    def add(self, models: Union[Model, List[Model]]):
+        if not isinstance(models, list):
+            models = [models]
 
-        session = self.__get_database_connector().create_session()
-        session.add(sqlalchemy_model)
+        session = self._get_database_connector().create_session()
+        for model in models:
+            sqlalchemy_model = convert_to_sqlalchemy_model(model)
+            session.add(sqlalchemy_model)
         session.commit()
 
-    def add_all(self, models):
-        #XXX: This implementation is very inefficient
-        for model in models:
-            self.add(model)
-
     #XXX: This method is as good as redundant
-    def get(self, name=None, accession_number=None, internal_id=None):
-        selector_count = 0
-        if name:
-            selector_count += 1
-            result = self.get_many_by_names([name])
-        if accession_number:
-            selector_count += 1
-            result = self.get_many_by_accession_numbers([accession_number])
-        if internal_id:
-            selector_count += 1
-            result = self.get_many_by_internal_ids([internal_id])
+    # def get(self, name=None, accession_number=None, internal_id=None):
+    #     selector_count = 0
+    #     if name:
+    #         selector_count += 1
+    #         result = self.get_by_name([name])
+    #     if accession_number:
+    #         selector_count += 1
+    #         result = self.get_by_accession_number([accession_number])
+    #     if internal_id:
+    #         selector_count += 1
+    #         result = self.get_by_id([internal_id])
+    #
+    #     if selector_count == 0:
+    #         raise ValueError("No identifier provided to query on.")
+    #     elif selector_count > 1:
+    #         raise ValueError("Only one identifier to query on must be given.")
+    #
+    #     if len(result) == 0:
+    #         return None
+    #     elif len(result) > 1:
+    #         raise ValueError("This query has more than one row associated in SEQSCAPE: %s" % [s.name for s in result])
+    #
+    #     return result[0]
 
-        if selector_count == 0:
-            raise ValueError("No identifier provided to query on.")
-        elif selector_count > 1:
-            raise ValueError("Only one identifier to query on must be given.")
-
-        if len(result) == 0:
-            return None
-        elif len(result) > 1:
-            raise ValueError("This query has more than one row associated in SEQSCAPE: %s" % [s.name for s in result])
-
-        return result[0]
-
-    def get_all(self):
+    def get_all(self) -> List[Model]:
         query_model = self._get_sqlalchemy_model_type()
-        session = self.__get_database_connector().create_session()
+        session = self._get_database_connector().create_session()
         result = session.query(query_model). \
             filter(query_model.is_current == 1).all()
         session.close()
         assert isinstance(result, list)
         return result
 
-    def get_many(self, ids_as_tuples):
+    def get_by_name(self, names):
+        if not isinstance(names, list):
+            names = [names]
+        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
+        if len(names) == 1:
+            return convert_to_popo_model(result[0])
+        else:
+            return convert_to_popo_models(result)
+
+    def get_by_id(self, internal_ids):
+        if not isinstance(internal_ids, list):
+            internal_ids = [internal_ids]
+        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.internal_id, internal_ids)
+        if len(internal_ids) == 1:
+            return convert_to_popo_model(result[0])
+        else:
+            return convert_to_popo_models(result)
+
+    def get_by_accession_number(self, accession_numbers):
+        if not isinstance(accession_numbers, list):
+            accession_numbers = [accession_numbers]
+        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.accession_number, accession_numbers)
+        if len(accession_numbers) == 1:
+            return convert_to_popo_model(result[0])
+        else:
+            return convert_to_popo_models(result)
+
+    def _get_by_property_value_list(self, property: Property, values: List[Any]):
+        if not isinstance(values, list):
+            values = [values]
+        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__[property], values)
+        if len(values) == 1:
+            return convert_to_popo_model(result[0])
+        else:
+            return convert_to_popo_models(result)
+
+    def _get_by_property_value_tuple(self, property_value_tuples: Union[Tuple[Property, Any], List[Tuple[Property, Any]]]):
+        if not isinstance(property_value_tuples, list):
+            property_value_tuples = [property_value_tuples]
         results = []
-        for id_type, id_val in ids_as_tuples:
+        for property, value in property_value_tuples:
             try:
-                result_matching_query = self.get(**{'type': self._get_sqlalchemy_model_type(), id_type: id_val})
+                result = self.get_by_property_value(property, value)
             except ValueError:
                 print("Multiple entities with the same id found in the database")
             else:
-                if result_matching_query:
-                    results.append(result_matching_query)
-        return results
+                results.append(result)
+        return results[0] if len(property_value_tuples) == 1 else results
 
-    def get_many_with_property_values(self, ids, id_type):
-        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__[id_type], ids)
-        return convert_to_popo_models(result)
-
-    def get_many_by_names(self, names):
-        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
-        return convert_to_popo_models(result)
-
-    def get_many_by_internal_ids(self, internal_ids):
-        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.internal_id, internal_ids)
-        return convert_to_popo_models(result)
-
-    def get_many_by_accession_numbers(self, accession_numbers):
-        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.accession_number, accession_numbers)
-        return convert_to_popo_models(result)
-
-    def __get_database_connector(self) -> SQLAlchemyDatabaseConnector:
+    def _get_database_connector(self) -> SQLAlchemyDatabaseConnector:
         """
         Gets the object through which database connections can be made.
         :return: the database connector
@@ -127,7 +144,7 @@ class _SQLAlchemyMapper(Mapper):
         return self._model_type
 
     #XXX: Should this always limit `is_current` to 1?
-    def _get_many_by_property(self, property_selector: Callable[[SQLAlchemyModel], Column], required_value: Any):
+    def _get_by_property(self, property_selector: Callable[[SQLAlchemyModel], Column], required_value: List[Any]):
         """
         Gets many that have a property, defined by a given property selector, that matches a given value.
         :param property_selector: selects the property on which the value should be matched to the given required value
@@ -140,7 +157,7 @@ class _SQLAlchemyMapper(Mapper):
                     % self._get_model_type())
 
         query_model = self._get_sqlalchemy_model_type()
-        session = self.__get_database_connector().create_session()
+        session = self._get_database_connector().create_session()
 
         result = session.query(query_model). \
             filter(property_selector(query_model).in_(required_value)). \
@@ -148,6 +165,7 @@ class _SQLAlchemyMapper(Mapper):
         session.close()
         assert isinstance(result, list)
         return result
+
 
 class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
@@ -193,8 +211,8 @@ class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
         """
         super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
-    def get_many_associated_with_samples(self, sample_internal_ids: str) -> Study:
-        session = self.__get_database_connector().create_session()
+    def get_associated_with_sample(self, sample_internal_ids: str) -> Study:
+        session = self._get_database_connector().create_session()
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
             filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_internal_ids)). \
@@ -204,4 +222,4 @@ class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
             return []
 
         study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
-        return self.get_many_by_internal_ids(study_ids)
+        return self.get_by_id(study_ids)

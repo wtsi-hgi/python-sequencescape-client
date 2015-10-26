@@ -26,7 +26,19 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         mapper = self.__create_mapper(Sample)
         self.assertRaises(ValueError, mapper.add, Mapper)
 
-    def test_add_with_valid(self):
+    def test_add_with_empty_list(self):
+        """
+        TODO
+        """
+        model = create_mock_sample()
+
+        mapper = self.__create_mapper(model.__class__)
+        mapper.add([])
+
+        retrieved_models = mapper.get_all()
+        self.assertEquals(len(retrieved_models), 0)
+
+    def test_add_with_model(self):
         """
         TODO
         """
@@ -39,19 +51,7 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.assertEquals(len(retrieved_models), 1)
         self.assertEquals(retrieved_models[0], model)
 
-    def test_add_all_with_empty(self):
-        """
-        TODO
-        """
-        model = create_mock_sample()
-
-        mapper = self.__create_mapper(model.__class__)
-        mapper.add_all([])
-
-        retrieved_models = mapper.get_all()
-        self.assertEquals(len(retrieved_models), 0)
-
-    def test_add_all_with_valid(self):
+    def test_add_with_model_list(self):
         """
         TODO
         """
@@ -60,14 +60,14 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
             models[i].internal_id = i
 
         mapper = self.__create_mapper(models[0].__class__)
-        mapper.add_all(models)
+        mapper.add(models)
 
         retrieved_models = mapper.get_all()
         self.assertEquals(len(retrieved_models), len(models))
         for retrieved_model in retrieved_models:
             self.assertIn(retrieved_model, models)
 
-    def test_get_using_name_parameter(self):
+    def test_get_by_name_with_name(self):
         """
         TODO
         """
@@ -77,33 +77,9 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.__check_get(
             models,
             named_model,
-            lambda mapper: mapper.get(name=named_model.name))
+            lambda mapper: mapper.get_by_name(named_model.name))
 
-    def test_get_using_accession_number_parameter(self):
-        """
-        TODO
-        """
-        accession_number_model = create_mock_sample()
-        accession_number_model.accession_number = "EGAN00000000000"
-        models = [create_mock_sample(), accession_number_model, create_mock_sample()]
-        self.__check_get(
-            models,
-            accession_number_model,
-            lambda mapper: mapper.get(accession_number=accession_number_model.accession_number))
-
-    def test_get_using_internal_id_parameter(self):
-        """
-        TODO
-        """
-        internal_id_model = create_mock_sample()
-        internal_id_model.internal_id = 5511223
-        models = [create_mock_sample(), internal_id_model, create_mock_sample()]
-        self.__check_get(
-            models,
-            internal_id_model,
-            lambda mapper: mapper.get(internal_id=internal_id_model.internal_id))
-
-    def test_get_many_by_name(self):
+    def test_get_by_name_with_name_list(self):
         """
         TODO
         """
@@ -116,10 +92,22 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.__check_get_many(
             models,
             [models[0], models[2]],
-            lambda mapper: mapper.get_many_by_names([names[0], names[2]])
+            lambda mapper: mapper.get_by_name([names[0], names[2]])
         )
 
-    def test_get_many_by_internal_ids(self):
+    def test_get_by_id_with_id(self):
+        """
+        TODO
+        """
+        internal_id_model = create_mock_sample()
+        internal_id_model.internal_id = 5511223
+        models = [create_mock_sample(), internal_id_model, create_mock_sample()]
+        self.__check_get(
+            models,
+            internal_id_model,
+            lambda mapper: mapper.get_by_id(internal_id_model.internal_id))
+
+    def test_get_by_id_with_id_list(self):
         """
         TODO
         """
@@ -131,10 +119,22 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.__check_get_many(
             models,
             [models[0], models[2]],
-            lambda mapper: mapper.get_many_by_internal_ids([ids[0], ids[2]])
+            lambda mapper: mapper.get_by_id([ids[0], ids[2]])
         )
 
-    def test_get_many_by_accession_numbers(self):
+    def test_get_by_accession_number_with_accession_number(self):
+        """
+        TODO
+        """
+        accession_number_model = create_mock_sample()
+        accession_number_model.accession_number = "EGAN00000000000"
+        models = [create_mock_sample(), accession_number_model, create_mock_sample()]
+        self.__check_get(
+            models,
+            accession_number_model,
+            lambda mapper: mapper.get_by_accession_number(accession_number_model.accession_number))
+
+    def test_get_by_accession_number_with_accession_number_list(self):
         """
         TODO
         """
@@ -147,7 +147,53 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.__check_get_many(
             models,
             [models[0], models[2]],
-            lambda mapper: mapper.get_many_by_accession_numbers([accession_numbers[0], accession_numbers[2]])
+            lambda mapper: mapper.get_by_accession_number([accession_numbers[0], accession_numbers[2]])
+        )
+
+    def test_get_by_property_value_with_property_value(self):
+        """
+        TODO
+        """
+        named_model = create_mock_sample()
+        named_model.name = "expected_model"
+        models = [create_mock_sample(), named_model, create_mock_sample()]
+        self.__check_get(
+            models,
+            named_model,
+            lambda mapper: mapper.get_by_property_value("name", named_model.name))
+
+    def test_get_by_property_value_with_property_value_list(self):
+        """
+        TODO
+        """
+        names = ["test_name1", "test_name2", "test_name3"]
+        models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
+        for i in range(len(models)):
+            models[i].internal_id = i
+            models[i].name = names[i]
+
+        self.__check_get_many(
+            models,
+            [models[0], models[2]],
+            lambda mapper: mapper.get_by_property_value("name", [names[0], names[2]])
+        )
+
+    def test_get_by_property_value_with_property_tuples_of_different_properties(self):
+        """
+        TODO
+        """
+        names = ["test_name1", "test_name2", "test_name3"]
+        accession_numbers = ["test_accession_number1", "test_accession_number2", "test_accession_number3"]
+        models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
+        for i in range(len(models)):
+            models[i].internal_id = i + 1
+            models[i].name = names[i]
+            models[i].accession_number = accession_numbers[i]
+
+        self.__check_get_many(
+            models,
+            [models[0], models[2]],
+            lambda mapper: mapper.get_by_property_value([("name", names[1]), ("accession_number", accession_numbers[2])])
         )
 
     def __check_get(self, models: List[Model], expected_model: Model, mapper_get_function: Callable[[Mapper], Model]):
@@ -176,9 +222,12 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         assert issubclass(model_type, Model)
 
         mapper = self.__create_mapper(model_type)
-        mapper.add_all(models)
+        mapper.add(models)
         models_retrieved = mapper_get(mapper)
         self.assertEquals(len(models_retrieved), len(expected_models))
+
+        print(models_retrieved)
+        print(models)
 
         for model_retrieved in models_retrieved:
             matched_model = [x for x in expected_models if x == model_retrieved]
