@@ -44,7 +44,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_given_id(self, ids: List[str], id_type: IDType):
+    def get_many_by_given_ids(self, ids: List[str], id_type: IDType):
         """
         This function is for internal use - it queries seqscape for all the entities or type type
         and returns a list of results.
@@ -64,7 +64,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_name(self, names: List[str]):
+    def get_many_by_names(self, names: List[str]):
         """
         This function queries the database for all the entity names given as parameter as a batch.
         Parameters
@@ -83,7 +83,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_internal_id(self, internal_ids: List[str]):
+    def get_many_by_internal_ids(self, internal_ids: List[str]):
         """
         This function queries the database for all the entity internal ids given as parameter as a batch.
         Parameters
@@ -102,7 +102,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_accession_number(self, accession_numbers: List[str]):
+    def get_many_by_accession_numbers(self, accession_numbers: List[str]):
         """
         This function queries the database for all the entity accession_number given as parameter as a batch.
         Parameters

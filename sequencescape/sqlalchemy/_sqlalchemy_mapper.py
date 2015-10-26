@@ -4,6 +4,8 @@ from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
 from sequencescape.sqlalchemy._sqlalchemy_model import *
 from sequencescape.mapper import *
 
+from sqlalchemy import text
+
 
 class _SQLAlchemyMapper(Mapper):
     _database_connector = None
@@ -19,7 +21,7 @@ class _SQLAlchemyMapper(Mapper):
         if not model_type:
             raise ValueError("Model type must be specified through `model_type` parameter")
         if not issubclass(model_type, Model):
-            raise ValueError("Model type (%s) must be a subclass of Model" % model_type)
+            raise ValueError("Model type (%s) must be a subclass of `Model`" % model_type)
         self._model_type = model_type
         self._database_connector = database_connector
 
@@ -41,14 +43,21 @@ class _SQLAlchemyMapper(Mapper):
             self.add(model)
 
     def get(self, name=None, accession_number=None, internal_id=None):
+        selector_count = 0
         if name:
-            result = self.get_many_by_name([name])
-        elif accession_number:
-            result = self.get_many_by_accession_number([accession_number])
-        elif internal_id:
-            result = self.get_many_by_internal_id([internal_id])
-        else:
+            selector_count += 1
+            result = self.get_many_by_names([name])
+        if accession_number:
+            selector_count += 1
+            result = self.get_many_by_accession_numbers([accession_number])
+        if internal_id:
+            selector_count += 1
+            result = self.get_many_by_internal_ids([internal_id])
+
+        if selector_count == 0:
             raise ValueError("No identifier provided to query on.")
+        elif selector_count > 1:
+            raise ValueError("Only one identifier to query on must be given.")
 
         if len(result) == 0:
             return None
@@ -61,35 +70,37 @@ class _SQLAlchemyMapper(Mapper):
         results = []
         for id_type, id_val in ids_as_tuples:
             try:
-                result_matching_qu = self.get(**{'type': self._get_sqlalchemy_model_type(), id_type: id_val})
+                result_matching_query = self.get(**{'type': self._get_sqlalchemy_model_type(), id_type: id_val})
             except ValueError:
-                print("Multiple entities with the same id found in the DB")
+                print("Multiple entities with the same id found in the database")
             else:
-                if result_matching_qu:
-                    results.append(result_matching_qu)
+                if result_matching_query:
+                    results.append(result_matching_query)
         return results
 
-    def get_many_by_given_id(self, ids, id_type):
-        if not ids:
-            return []
-        if id_type == IDType.NAME:
-            return self.get_many_by_name(ids)
-        elif id_type == IDType.ACCESSION_NUMBER:
-            return self.get_many_by_accession_number(ids)
-        elif id_type == IDType.INTERNAL_ID:
-            return self.get_many_by_internal_id(ids)
-        else:
-            raise ValueError("The id_type parameter must be a value linked to by an IDType enum.")
+    def get_many_by_given_ids(self, ids, id_type):
+        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__['id_type'], ids)
+        return convert_to_popo_models(result)
+        # if not ids:
+        #     return []
+        # if id_type == IDType.NAME:
+        #     return self.get_many_by_name(ids)
+        # elif id_type == IDType.ACCESSION_NUMBER:
+        #     return self.get_many_by_accession_number(ids)
+        # elif id_type == IDType.INTERNAL_ID:
+        #     return self.get_many_by_internal_id(ids)
+        # else:
+        #     raise ValueError("The id_type parameter must be a value linked to by an IDType enum.")
 
-    def get_many_by_name(self, names):
+    def get_many_by_names(self, names):
         result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
         return convert_to_popo_models(result)
 
-    def get_many_by_internal_id(self, internal_ids):
+    def get_many_by_internal_ids(self, internal_ids):
         result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.internal_id, internal_ids)
         return convert_to_popo_models(result)
 
-    def get_many_by_accession_number(self, accession_numbers):
+    def get_many_by_accession_numbers(self, accession_numbers):
         result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.accession_number, accession_numbers)
         return convert_to_popo_models(result)
 
@@ -103,8 +114,8 @@ class _SQLAlchemyMapper(Mapper):
 
     def _get_sqlalchemy_model_type(self) -> SQLAlchemyModel:
         """
-        TODO
-        :return:
+        Gets the SQLAlchemy model for which this mapper uses to perform queries with.
+        :return: the SQLAlchemy model used by this mapper
         """
         if not self._type_cache:
             self._type_cache = get_equivalent_sqlalchemy_model_type(self._get_model_type())
@@ -121,10 +132,10 @@ class _SQLAlchemyMapper(Mapper):
 
     def _get_many_by_property(self, property_selector: Callable[[SQLAlchemyModel], Column], required_value: Any):
         """
-        TODO
-        :param property_selector:
-        :param required_value:
-        :return:
+        Gets many that have a property, defined by a given property selector, that matches a given value.
+        :param property_selector: selects the property on which the value should be matched to the given required value
+        :param required_value: the property must match this value to be selected
+        :return: models of the rows that are matched
         """
         if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
             raise ValueError(
@@ -133,6 +144,7 @@ class _SQLAlchemyMapper(Mapper):
 
         query_model = self._get_sqlalchemy_model_type()
         session = self.__get_database_connector().create_session()
+
         result = session.query(query_model). \
             filter(property_selector(query_model).in_(required_value)). \
             filter(query_model.is_current == 1).all()
@@ -142,9 +154,8 @@ class _SQLAlchemyMapper(Mapper):
 class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        TODO
-        :param database_connector:
-        :return:
+        Default constructor.
+        :param database_connector: the database connector
         """
         super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
 
@@ -152,9 +163,8 @@ class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
 class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        TODO
-        :param database_connector:
-        :return:
+        Default constructor.
+        :param database_connector: the database connector
         """
         super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)
 
@@ -162,9 +172,8 @@ class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMa
 class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        TODO
-        :param database_connector:
-        :return:
+        Default constructor.
+        :param database_connector: the database connector
         """
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
@@ -172,9 +181,8 @@ class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
 class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        TODO
-        :param database_connector:
-        :return:
+        Default constructor.
+        :param database_connector: the database connector
         """
         super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
 
@@ -182,9 +190,8 @@ class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
 class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        TODO
-        :param database_connector:
-        :return:
+        Default constructor.
+        :param database_connector: the database connector
         """
         super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
@@ -199,4 +206,4 @@ class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
             return []
 
         study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
-        return self.get_many_by_internal_id(study_ids)
+        return self.get_many_by_internal_ids(study_ids)
