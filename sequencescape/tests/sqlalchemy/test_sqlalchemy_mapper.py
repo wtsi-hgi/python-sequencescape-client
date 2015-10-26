@@ -193,7 +193,7 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.__check_get_many(
             models,
             [models[0], models[2]],
-            lambda mapper: mapper.get_by_property_value([("name", names[1]), ("accession_number", accession_numbers[2])])
+            lambda mapper: mapper.get_by_property_value([("name", names[0]), ("accession_number", accession_numbers[2])])
         )
 
     def __check_get(self, models: List[Model], expected_model: Model, mapper_get_function: Callable[[Mapper], Model]):
@@ -225,9 +225,6 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         mapper.add(models)
         models_retrieved = mapper_get(mapper)
         self.assertEquals(len(models_retrieved), len(expected_models))
-
-        print(models_retrieved)
-        print(models)
 
         for model_retrieved in models_retrieved:
             matched_model = [x for x in expected_models if x == model_retrieved]
