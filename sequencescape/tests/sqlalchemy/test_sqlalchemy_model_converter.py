@@ -1,6 +1,7 @@
 import unittest
+
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import *
-from sequencescape.tests.unit_tests.mocks import *
+from sequencescape.tests.mocks import *
 
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):

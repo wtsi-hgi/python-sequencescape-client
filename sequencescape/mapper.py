@@ -8,6 +8,24 @@ from sequencescape.enums import IDType
 #     good enough to use them yet.
 class Mapper(metaclass=ABCMeta):
     @abstractmethod
+    def add(self, model):
+        """
+        TODO
+        :param model:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def add_all(self, models):
+        """
+        TODO
+        :param models:
+        :return:
+        """
+        pass
+
+    @abstractmethod
     def get(self, name: str=None, accession_number: str=None, internal_id: str=None) :
         """
         This function queries on the entity of type type, by one (and only one) of the identifiers:
@@ -33,6 +51,13 @@ class Mapper(metaclass=ABCMeta):
         """
         pass
 
+    def get_all(self):
+        """
+        TODO
+        :return:
+        """
+        pass
+
     @abstractmethod
     def get_many(self, ids_as_tuples: List[Tuple[IDType, str]]):
         """
@@ -44,7 +69,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_many_by_given_ids(self, ids: List[str], id_type: IDType):
+    def get_many_with_property_values(self, ids: List[str], id_type: IDType):
         """
         This function is for internal use - it queries seqscape for all the entities or type type
         and returns a list of results.

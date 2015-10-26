@@ -4,8 +4,6 @@ from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
 from sequencescape.sqlalchemy._sqlalchemy_model import *
 from sequencescape.mapper import *
 
-from sqlalchemy import text
-
 
 class _SQLAlchemyMapper(Mapper):
     _database_connector = None
@@ -25,7 +23,6 @@ class _SQLAlchemyMapper(Mapper):
         self._model_type = model_type
         self._database_connector = database_connector
 
-    # TODO: Put in interface
     def add(self, model):
         if not issubclass(model.__class__, self._get_model_type()):
             raise ValueError(
@@ -36,12 +33,12 @@ class _SQLAlchemyMapper(Mapper):
         session.add(sqlalchemy_model)
         session.commit()
 
-    # TODO: Put in interface
     def add_all(self, models):
         #XXX: This implementation is very inefficient
         for model in models:
             self.add(model)
 
+    #XXX: This method is as good as redundant
     def get(self, name=None, accession_number=None, internal_id=None):
         selector_count = 0
         if name:
@@ -66,6 +63,15 @@ class _SQLAlchemyMapper(Mapper):
 
         return result[0]
 
+    def get_all(self):
+        query_model = self._get_sqlalchemy_model_type()
+        session = self.__get_database_connector().create_session()
+        result = session.query(query_model). \
+            filter(query_model.is_current == 1).all()
+        session.close()
+        assert isinstance(result, list)
+        return result
+
     def get_many(self, ids_as_tuples):
         results = []
         for id_type, id_val in ids_as_tuples:
@@ -78,19 +84,9 @@ class _SQLAlchemyMapper(Mapper):
                     results.append(result_matching_query)
         return results
 
-    def get_many_by_given_ids(self, ids, id_type):
-        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__['id_type'], ids)
+    def get_many_with_property_values(self, ids, id_type):
+        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__[id_type], ids)
         return convert_to_popo_models(result)
-        # if not ids:
-        #     return []
-        # if id_type == IDType.NAME:
-        #     return self.get_many_by_name(ids)
-        # elif id_type == IDType.ACCESSION_NUMBER:
-        #     return self.get_many_by_accession_number(ids)
-        # elif id_type == IDType.INTERNAL_ID:
-        #     return self.get_many_by_internal_id(ids)
-        # else:
-        #     raise ValueError("The id_type parameter must be a value linked to by an IDType enum.")
 
     def get_many_by_names(self, names):
         result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
@@ -119,7 +115,7 @@ class _SQLAlchemyMapper(Mapper):
         """
         if not self._type_cache:
             self._type_cache = get_equivalent_sqlalchemy_model_type(self._get_model_type())
-            assert issubclass(self._type_cache, SQLAlchemyModel)
+        assert issubclass(self._type_cache, SQLAlchemyModel)
         return self._type_cache
 
     def _get_model_type(self) -> type:
@@ -130,6 +126,7 @@ class _SQLAlchemyMapper(Mapper):
         assert self._model_type
         return self._model_type
 
+    #XXX: Should this always limit `is_current` to 1?
     def _get_many_by_property(self, property_selector: Callable[[SQLAlchemyModel], Column], required_value: Any):
         """
         Gets many that have a property, defined by a given property selector, that matches a given value.
@@ -149,6 +146,7 @@ class _SQLAlchemyMapper(Mapper):
             filter(property_selector(query_model).in_(required_value)). \
             filter(query_model.is_current == 1).all()
         session.close()
+        assert isinstance(result, list)
         return result
 
 class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):

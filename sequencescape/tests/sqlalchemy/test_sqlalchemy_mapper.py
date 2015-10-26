@@ -1,17 +1,13 @@
 import unittest
-import sqlite3
 from typing import Callable
 
-from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
 from sequencescape.sqlalchemy._sqlalchemy_mapper import _SQLAlchemyMapper
+from sequencescape.mapper import *
+from sequencescape.tests.mocks import *
+from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
+from sequencescape.tests.sqlalchemy.setup_database import *
 
-from sequencescape.tests.unit_tests.setup_database import *
-from sequencescape.model import *
-from sequencescape.tests.unit_tests.mocks import *
 
-
-
-# TODO: Generalise for use with any mapper implementation
 class Test_SQLAlchemyMapper(unittest.TestCase):
     """
     TODO
@@ -20,17 +16,15 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         """
         TODO
         """
-        connector = Test_SQLAlchemyMapper.__create_connector()
-        mapper = _SQLAlchemyMapper(connector, Sample)
+        mapper = self.__create_mapper(Sample)
         self.assertRaises(ValueError, mapper.add, None)
 
     def test_add_with_non_model(self):
         """
         TODO
         """
-        connector = Test_SQLAlchemyMapper.__create_connector()
-        mapper = _SQLAlchemyMapper(connector, Sample)
-        self.assertRaises(ValueError, mapper.add, SQLAlchemySample)
+        mapper = self.__create_mapper(Sample)
+        self.assertRaises(ValueError, mapper.add, Mapper)
 
     def test_add_with_valid(self):
         """
@@ -38,20 +32,12 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         """
         model = create_mock_sample()
 
-        connector, database_file_path = Test_SQLAlchemyMapper.__create_connector()
-        mapper = _SQLAlchemyMapper(connector, model.__class__)
+        mapper = self.__create_mapper(model.__class__)
         mapper.add(model)
 
-        connection = sqlite3.connect(database_file_path)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM %s" % convert_to_sqlalchemy_model(model).__tablename__)
-        results = cursor.fetchall()
-        self.assertEquals(len(results), 1)
-
-        result = [x for x in list(results[0])]
-
-        for property_name, value in vars(model).items():
-            self.assertIn(value, result)
+        retrieved_models = mapper.get_all()
+        self.assertEquals(len(retrieved_models), 1)
+        self.assertEquals(retrieved_models[0], model)
 
     def test_add_all_with_empty(self):
         """
@@ -59,32 +45,27 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         """
         model = create_mock_sample()
 
-        connector, database_file_path = Test_SQLAlchemyMapper.__create_connector()
-        mapper = _SQLAlchemyMapper(connector, model.__class__)
+        mapper = self.__create_mapper(model.__class__)
         mapper.add_all([])
 
-        connection = sqlite3.connect(database_file_path)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM %s" % convert_to_sqlalchemy_model(model).__tablename__)
-        results = cursor.fetchall()
-        self.assertEquals(len(results), 0)
+        retrieved_models = mapper.get_all()
+        self.assertEquals(len(retrieved_models), 0)
 
     def test_add_all_with_valid(self):
         """
         TODO
         """
         models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
+        for i in range(len(models)):
+            models[i].internal_id = i
 
-        connector, database_file_path = Test_SQLAlchemyMapper.__create_connector()
-        mapper = _SQLAlchemyMapper(connector, models[0].__class__)
+        mapper = self.__create_mapper(models[0].__class__)
         mapper.add_all(models)
 
-        connection = sqlite3.connect(database_file_path)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM %s" % convert_to_sqlalchemy_model(models[0]).__tablename__)
-        results = cursor.fetchall()
-        self.assertEquals(len(results), len(models))
-        #TODO: Should make the test more extensive...
+        retrieved_models = mapper.get_all()
+        self.assertEquals(len(retrieved_models), len(models))
+        for retrieved_model in retrieved_models:
+            self.assertIn(retrieved_model, models)
 
     def test_get_using_name_parameter(self):
         """
@@ -194,8 +175,7 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
                 raise ValueError("All models must be of the same type")
         assert issubclass(model_type, Model)
 
-        connector, database_file_path = Test_SQLAlchemyMapper.__create_connector()
-        mapper = _SQLAlchemyMapper(connector, model_type)
+        mapper = self.__create_mapper(model_type)
         mapper.add_all(models)
         models_retrieved = mapper_get(mapper)
         self.assertEquals(len(models_retrieved), len(expected_models))
@@ -211,7 +191,17 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
                 self.assertEquals(model_retrieved.__dict__[property_name], value, '`%s` mismatch' % property_name)
 
     @staticmethod
-    def __create_connector() -> (SQLAlchemyDatabaseConnector, str):
+    def __create_mapper(model_type: type) -> _SQLAlchemyMapper:
+        """
+        TODO
+        :param model_type:
+        :return:
+        """
+        connector, database_file_path = Test_SQLAlchemyMapper._create_connector()
+        return _SQLAlchemyMapper(connector, model_type)
+
+    @staticmethod
+    def _create_connector() -> (SQLAlchemyDatabaseConnector, str):
         """
         TODO
         :return:
@@ -223,6 +213,3 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-

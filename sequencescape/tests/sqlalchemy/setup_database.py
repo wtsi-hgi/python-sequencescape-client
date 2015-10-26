@@ -1,8 +1,6 @@
 import tempfile
 import sqlite3
-from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
-from sequencescape.sqlalchemy._sqlalchemy_mapper import *
-from sequencescape.tests.unit_tests.mocks import *
+
 
 def create_database():
     # Note: Not using an in-memory database because the ORM closes connections to it, hence destroying it, which is
