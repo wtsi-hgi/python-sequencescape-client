@@ -1,3 +1,4 @@
+from typing import Callable, Any
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import *
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
 from sequencescape.sqlalchemy._sqlalchemy_model import *
@@ -24,9 +25,9 @@ class _SQLAlchemyMapper(Mapper):
 
     # TODO: Put in interface
     def add(self, model):
-        if not issubclass(model.__class__, self.__get_model_type()):
+        if not issubclass(model.__class__, self._get_model_type()):
             raise ValueError(
-                "Mapper is for objects of type `%s`; type `%s` given" % (self.__get_model_type(), model.__class__))
+                "Mapper is for objects of type `%s`; type `%s` given" % (self._get_model_type(), model.__class__))
         sqlalchemy_model = convert_to_sqlalchemy_model(model)
 
         session = self.__get_database_connector().create_session()
@@ -81,69 +82,18 @@ class _SQLAlchemyMapper(Mapper):
             raise ValueError("The id_type parameter must be a value linked to by an IDType enum.")
 
     def get_many_by_name(self, names):
-        if not names:
-            return []
-
-        # XXX: Given generics aren't possible, should hint type with `# type: XXX` comment. However, it is unclear how
-        #      to hint multiple interfaces!
-        model_type = self._get_sqlalchemy_model_type()
-        if not issubclass(model_type, SQLAlchemyNamed):
-            raise ValueError(
-                "Not possible to get instances of type %s by name as they do not have that property" % self.__get_model_type())
-        if not issubclass(model_type, SQLAlchemyIsCurrent):
-            raise ValueError(
-                "Not possible to get instances of type %s by name as the query required `is_current` property"
-                    % self.__get_model_type())
-
-        session = self.__get_database_connector().create_session()
-        result = session.query(model_type). \
-            filter(model_type.name.in_(names)). \
-            filter(model_type.is_current == 1).all()
-        session.close()
-
+        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
         return convert_to_popo_models(result)
 
     def get_many_by_internal_id(self, internal_ids):
-        if not internal_ids:
-            return []
-
-        model_type = self._get_sqlalchemy_model_type()
-        if not issubclass(model_type, SQLAlchemyNamed):
-            raise ValueError(
-                "Not possible to get instances of type %s by internal ID as they do not have that property" % self.__get_model_type())
-        if not issubclass(model_type, SQLAlchemyIsCurrent):
-            raise ValueError(
-                "Not possible to get instances of type %s by internal ID as the query requires `is_current` property" % self.__get_model_type())
-
-        session = self.__get_database_connector().create_session()
-        result = session.query(model_type). \
-            filter(model_type.internal_id.in_(internal_ids)). \
-            filter(model_type.is_current == 1).all()
-        session.close()
-
+        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.internal_id, internal_ids)
         return convert_to_popo_models(result)
 
     def get_many_by_accession_number(self, accession_numbers):
-        if not accession_numbers:
-            return []
-
-        model_type = self._get_sqlalchemy_model_type()
-        if not issubclass(model_type, SQLAlchemyNamed):
-            raise ValueError(
-                "Not possible to get instances of type %s by accession number as they do not have that property" % self.__get_model_type())
-        if not issubclass(model_type, SQLAlchemyIsCurrent):
-            raise ValueError(
-                "Not possible to get instances of type %s by accession number as the query requires `is_current` property" % self.__get_model_type())
-
-        session = self.__get_database_connector().create_session()
-        result = session.query(model_type). \
-            filter(model_type.accession_number.in_(accession_numbers)). \
-            filter(model_type.is_current == 1).all()
-        session.close()
-
+        result = self._get_many_by_property(lambda sqlalchemy_model: sqlalchemy_model.accession_number, accession_numbers)
         return convert_to_popo_models(result)
 
-    def __get_database_connector(self):
+    def __get_database_connector(self) -> SQLAlchemyDatabaseConnector:
         """
         Gets the object through which database connections can be made.
         :return: the database connector
@@ -151,17 +101,17 @@ class _SQLAlchemyMapper(Mapper):
         assert self._database_connector
         return self._database_connector
 
-    def _get_sqlalchemy_model_type(self):
+    def _get_sqlalchemy_model_type(self) -> SQLAlchemyModel:
         """
         TODO
         :return:
         """
         if not self._type_cache:
-            self._type_cache = get_equivalent_sqlalchemy_model_type(self.__get_model_type())
+            self._type_cache = get_equivalent_sqlalchemy_model_type(self._get_model_type())
             assert issubclass(self._type_cache, SQLAlchemyModel)
         return self._type_cache
 
-    def __get_model_type(self) -> type:
+    def _get_model_type(self) -> type:
         """
         Gets the type of models that this mapper deals with
         :return: the type of models that this mapper deals with
@@ -169,6 +119,25 @@ class _SQLAlchemyMapper(Mapper):
         assert self._model_type
         return self._model_type
 
+    def _get_many_by_property(self, property_selector: Callable[[SQLAlchemyModel], Column], required_value: Any):
+        """
+        TODO
+        :param property_selector:
+        :param required_value:
+        :return:
+        """
+        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
+            raise ValueError(
+                "Not possible to get instances of type %s by name as the query required `is_current` property"
+                    % self._get_model_type())
+
+        query_model = self._get_sqlalchemy_model_type()
+        session = self.__get_database_connector().create_session()
+        result = session.query(query_model). \
+            filter(property_selector(query_model).in_(required_value)). \
+            filter(query_model.is_current == 1).all()
+        session.close()
+        return result
 
 class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
