@@ -1,7 +1,7 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABCMeta
 from typing import List, Tuple, Union, Any, Optional
 
-from sequencescape.model import *
+from sequencescape.model import Model, Study
 from sequencescape.enums import Property
 
 

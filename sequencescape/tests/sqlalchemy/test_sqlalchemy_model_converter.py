@@ -1,7 +1,14 @@
 import unittest
 
-from sequencescape.sqlalchemy._sqlalchemy_model_converter import *
-from sequencescape.tests.mocks import *
+from sequencescape.model import Sample, Study, Library, Well, MultiplexedLibrary, StudySamplesLink
+from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
+    SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink
+from sequencescape.sqlalchemy._sqlalchemy_model_converter import get_equivalent_popo_model_type, \
+    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model
+from sequencescape.tests.mocks import create_mock_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
+    TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_mock_study, \
+    STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_mock_library, LIBRARY_TYPE, \
+    create_mock_well, create_mock_multiplexed_library, create_mock_study_samples_link
 
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):
