@@ -1,6 +1,6 @@
 from abc import abstractmethod
-from multimethods import multimethod
 from typing import List, Tuple, Union, Any, Optional
+
 from sequencescape.model import *
 from sequencescape.enums import Property
 
@@ -81,7 +81,10 @@ class Mapper(metaclass=ABCMeta):
         """
         pass
 
-    def get_by_property_value(self, property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]], value: Optional[Union[Any, List[Any]]]=None):
+    def get_by_property_value(
+            self,
+            property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]],
+            values: Optional[Union[Any, List[Any]]]=None) -> Union[Model, List[Model]]:
         """
         This function is for internal use - it queries seqscape for all the entities or type type
         and returns a list of results.
@@ -101,16 +104,17 @@ class Mapper(metaclass=ABCMeta):
         if isinstance(property, tuple) or isinstance(property, list):
             return self._get_by_property_value_tuple(property)
         elif isinstance(property, str):
-            if isinstance(value, list):
-                return self._get_by_property_value_list(property, value)
+            if isinstance(values, list):
+                return self._get_by_property_value_list(property, values)
             else:
                 #XXX: If limited to Property enums, would not allow custom properties. If not, why do they exist?
-                return self._get_by_property_value_list(property, value)
+                return self._get_by_property_value_list(property, values)
         else:
             raise ValueError("Invalid arguments")
 
     @abstractmethod
-    def _get_by_property_value_list(self, property: Property, value: Union[Any, List[Any]]):
+    def _get_by_property_value_list(
+            self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:
         """
         TODO
         :param property_value_tuples:
@@ -119,7 +123,8 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _get_by_property_value_tuple(self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]):
+    def _get_by_property_value_tuple(
+            self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]) -> Union[Model, List[Model]]:
         """
         TODO
         :param property_value_tuples:

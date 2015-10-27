@@ -1,10 +1,11 @@
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
-
-from sequencescape.sqlalchemy._sqlalchemy_model import *
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
 
 
-class SQLAlchemyDatabaseConnector():
+class SQLAlchemyDatabaseConnector:
+    """
+    TODO
+    """
     _engine = None
     _database_uri = None
 
@@ -16,7 +17,7 @@ class SQLAlchemyDatabaseConnector():
         """
         self._database_uri = uri
 
-    def create_session(self):
+    def create_session(self) -> Session:
         """
         TODO
         :return:

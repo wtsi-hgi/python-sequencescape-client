@@ -4,11 +4,9 @@ import sqlite3
 
 def create_database():
     # Note: Not using an in-memory database because the ORM closes connections to it, hence destroying it, which is
-    #       not desired in some situations.
+    #       not desired in this testing.
     file_handle, database_file_path = tempfile.mkstemp()
-    
     dialect = "sqlite"
-
     connection = sqlite3.connect(database_file_path)
 
     cursor = connection.cursor()

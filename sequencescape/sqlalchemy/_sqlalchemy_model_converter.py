@@ -1,6 +1,7 @@
+from typing import List
+
 from sequencescape.sqlalchemy._sqlalchemy_model import *
 from sequencescape.model import *
-from typing import List
 
 
 # TODO: Move this to model module and make public?
