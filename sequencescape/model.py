@@ -9,33 +9,39 @@ class Model(metaclass=ABCMeta):
 
 
 class Named(metaclass=ABCMeta):
-    name = None
+    def __init__(self):
+        self.name = None
 
 
 class InternalID(metaclass=ABCMeta):
-    internal_id = None
+    def __init__(self):
+        self.internal_id = None
 
 
 class AccessionNumber(metaclass=ABCMeta):
-    accession_number = None
+    def __init__(self):
+        self.accession_number = None
 
 
 class IsCurrent(metaclass=ABCMeta):
-    is_current = None
+    def __init__(self):
+        self.is_current = None
 
 
 class Sample(Model, Named, InternalID, AccessionNumber, IsCurrent):
     """
     TODO
     """
-    organism = None
-    common_name = None
-    taxon_id = None
-    gender = None
-    ethnicity = None
-    cohort = None
-    country_of_origin = None
-    geographical_region = None
+    def __init__(self):
+        super(Sample, self).__init__()
+        self.organism = None
+        self.common_name = None
+        self.taxon_id = None
+        self.gender = None
+        self.ethnicity = None
+        self.cohort = None
+        self.country_of_origin = None
+        self.geographical_region = None
 
     #TODO: Does a POPO model need these (how does Python do equality?)
     #FIXME: This is not reflective, symmetric, non-null, etc.
@@ -58,11 +64,13 @@ class Study(Model, Named, InternalID, AccessionNumber, IsCurrent):
     """
     TODO
     """
-    study_type = None
-    description = None
-    study_title = None
-    study_visibility = None
-    faculty_sponsor = None
+    def __init__(self):
+        super(Study, self).__init__()
+        self.study_type = None
+        self.description = None
+        self.study_title = None
+        self.study_visibility = None
+        self.faculty_sponsor = None
 
     def __eq__(self, other):
         return self.name == other.name and \
@@ -83,27 +91,33 @@ class Library(Model, Named, InternalID, IsCurrent):
     """
     TODO
     """
-    library_type = None
+    def __init__(self):
+        super(Library, self).__init__()
+        self.library_type = None
 
 
 class Well(Model, Named, InternalID, IsCurrent):
     """
     TODO
     """
-    pass
+    def __init__(self):
+        super(Well, self).__init__()
 
 
 class MultiplexedLibrary(Model, Named, InternalID, IsCurrent):
     """
     TODO
     """
-    pass
+    def __init__(self):
+        super(MultiplexedLibrary, self).__init__()
 
 
 class StudySamplesLink(Model, InternalID, IsCurrent):
     """
     TODO
     """
-    sample_internal_id = None
-    study_internal_id = None
+    def __init__(self):
+        super(StudySamplesLink, self).__init__()
+        self.sample_internal_id = None
+        self.study_internal_id = None
 

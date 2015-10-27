@@ -6,15 +6,13 @@ class SQLAlchemyDatabaseConnector:
     """
     TODO
     """
-    _engine = None
-    _database_uri = None
-
     def __init__(self, uri : str):
         """
         TODO
         :param uri:
         :return:
         """
+        self._engine = None
         self._database_uri = uri
 
     def create_session(self) -> Session:

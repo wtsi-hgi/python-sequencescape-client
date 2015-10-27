@@ -6,12 +6,6 @@ class Connection():
     """
     TODO
     """
-    sample = None
-    study = None
-    well = None
-    multiplexed_library = None
-    library = None
-
     def __init__(self, database_uri: str):
         """
         TODO
@@ -25,6 +19,11 @@ class Connection():
         self.multiplexed_library = SQLAlchemyMultiplexedLibraryMapper(database_connector)
         self.library = SQLAlchemyLibraryMapper(database_connector)
         self.well = SQLAlchemyWellMapper(database_connector)
+
+        a = Sample()
+        a.name = 1
+
+
 
 
 def connect_to_sequencescape(database_uri: str) -> Connection:

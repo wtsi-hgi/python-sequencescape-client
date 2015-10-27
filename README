@@ -14,3 +14,8 @@ sequencescape.sample.get_by_property_value(property, property_value)
 sequencescape.sample.get_by_property_value([(property, property_value), (other_property, property_value)])
 sequencescape.sample.get_by_property_value(property, [property_value, other_property_value])
 ```
+
+In /requirements.txt
+```
+git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master
+```

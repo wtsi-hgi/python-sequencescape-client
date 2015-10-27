@@ -7,13 +7,6 @@ from sequencescape.mapper import *
 
 
 class _SQLAlchemyMapper(Mapper):
-    """
-    TODO
-    """
-    _database_connector = None
-    _type_cache = None
-    _model_type = None
-
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
         """
         Default constructor.
@@ -24,6 +17,8 @@ class _SQLAlchemyMapper(Mapper):
             raise ValueError("Model type must be specified through `model_type` parameter")
         if not issubclass(model_type, Model):
             raise ValueError("Model type (%s) must be a subclass of `Model`" % model_type)
+
+        self._type_cache = None
         self._model_type = model_type
         self._database_connector = database_connector
 
