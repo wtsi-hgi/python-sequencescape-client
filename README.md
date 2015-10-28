@@ -1,4 +1,5 @@
 # Sequencescape Python Client
+[![Build Status](https://travis-ci.org/wtsi-hgi/sequencescape-python-client.svg)](https://travis-ci.org/wtsi-hgi/sequencescape-python-client)
 
 ### How To Include:
 In ``/requirements.txt`` or in your ``/setup.py`` script:
@@ -25,4 +26,3 @@ sequencescape.sample.get_by_value(property, value)
 sequencescape.sample.get_by_value([(property, value), (other_property, value)])
 sequencescape.sample.get_by_value(property, [value, other_value])
 ```
-
