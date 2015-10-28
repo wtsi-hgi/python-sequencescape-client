@@ -5,8 +5,8 @@ from sqlalchemy import Column
 from sequencescape.enums import Property
 from sequencescape.mapper import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
 from sequencescape.model import Model, Library, MultiplexedLibrary, Sample, Well, Study
-from sequencescape.sqlalchemy._sqlalchemy_model_converter import convert_to_sqlalchemy_model, convert_to_popo_model, convert_to_popo_models, \
-    get_equivalent_sqlalchemy_model_type
+from sequencescape.sqlalchemy._sqlalchemy_model_converter import convert_to_sqlalchemy_model, convert_to_popo_model, \
+    convert_to_popo_models, get_equivalent_sqlalchemy_model_type
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrent
 

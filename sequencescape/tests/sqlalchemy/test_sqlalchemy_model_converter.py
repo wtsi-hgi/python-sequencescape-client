@@ -13,7 +13,7 @@ from sequencescape.tests.mocks import create_mock_sample, INTERNAL_ID, NAME, ACC
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):
     """
-    Unit tests for `get_equivalent_popo_model_type`.
+    Unit testing for `get_equivalent_popo_model_type`.
     """
     def test_none_with_unsupported_type(self):
         self.assertIsNone(get_equivalent_popo_model_type(str))
@@ -39,7 +39,7 @@ class TestGetEquivalentPopoModelType(unittest.TestCase):
 
 class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
     """
-    Unit tests for `get_equivalent_sqlalchemy_model_type`.
+    Unit testing for `get_equivalent_sqlalchemy_model_type`.
     """
     def test_none_with_unsupported_type(self):
         self.assertIsNone(get_equivalent_sqlalchemy_model_type(str))
@@ -65,7 +65,7 @@ class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
 
 class TestConvertToSQLAlchemyModel(unittest.TestCase):
     """
-    Unit tests for `convert_to_sqlalchemy_model`.
+    Unit testing for `convert_to_sqlalchemy_model`.
     """
     def test_convert_sample(self):
         model = create_mock_sample()
@@ -133,7 +133,7 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
 
 class TestConvertToPopoModel(unittest.TestCase):
     """
-    Unit tests for `convert_to_popo_model`.
+    Unit testing for `convert_to_popo_model`.
     """
     def test_convert_sample(self):
         alchemy_model = convert_to_sqlalchemy_model(create_mock_sample())
