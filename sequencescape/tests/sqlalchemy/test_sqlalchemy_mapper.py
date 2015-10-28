@@ -1,5 +1,5 @@
 import unittest
-from typing import Callable, List
+from typing import Callable, List, Union
 
 from sequencescape.mapper import Mapper
 from sequencescape.model import Sample, Model
@@ -68,6 +68,16 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         for retrieved_model in retrieved_models:
             self.assertIn(retrieved_model, models)
 
+    def test_get_by_name_with_name_of_non_existent(self):
+        """
+        TODO
+        """
+        models = [create_mock_sample(), create_mock_sample()]
+        self.__check_get(
+            models,
+            None,
+            lambda mapper: mapper.get_by_name("invalid"))
+
     def test_get_by_name_with_name(self):
         """
         TODO
@@ -96,6 +106,16 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
             lambda mapper: mapper.get_by_name([names[0], names[2]])
         )
 
+    def test_get_by_id_with_id_of_non_existent(self):
+        """
+        TODO
+        """
+        models = [create_mock_sample(), create_mock_sample()]
+        self.__check_get(
+            models,
+            None,
+            lambda mapper: mapper.get_by_id("invalid"))
+
     def test_get_by_id_with_id(self):
         """
         TODO
@@ -122,6 +142,16 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
             [models[0], models[2]],
             lambda mapper: mapper.get_by_id([ids[0], ids[2]])
         )
+
+    def test_get_by_accession_number_with_accession_number_of_non_existent(self):
+        """
+        TODO
+        """
+        models = [create_mock_sample(), create_mock_sample()]
+        self.__check_get(
+            models,
+            None,
+            lambda mapper: mapper.get_by_accession_number("invalid"))
 
     def test_get_by_accession_number_with_accession_number(self):
         """
@@ -150,6 +180,16 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
             [models[0], models[2]],
             lambda mapper: mapper.get_by_accession_number([accession_numbers[0], accession_numbers[2]])
         )
+
+    def test_get_by_property_value_with_property_value_of_non_existent(self):
+        """
+        TODO
+        """
+        models = [create_mock_sample(), create_mock_sample()]
+        self.__check_get(
+            models,
+            None,
+            lambda mapper: mapper.get_by_property_value("name", "invalid"))
 
     def test_get_by_property_value_with_property_value(self):
         """
@@ -197,7 +237,7 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
             lambda mapper: mapper.get_by_property_value([("name", names[0]), ("accession_number", accession_numbers[2])])
         )
 
-    def __check_get(self, models: List[Model], expected_model: Model, mapper_get_function: Callable[[Mapper], Model]):
+    def __check_get(self, models: List[Model], expected_model: Union[Model, None], mapper_get_function: Callable[[Mapper], Model]):
         """
         TODO
         :param model:
@@ -207,7 +247,7 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.__check_get_many(models, [expected_model], lambda mapper: [mapper_get_function(mapper)])
 
     def __check_get_many(
-            self, models: List[Model], expected_models: List[Model], mapper_get: Callable[[Mapper], List[Model]]):
+            self, models: List[Model], expected_models: List[Union[Model, None]], mapper_get: Callable[[Mapper], List[Model]]):
         """
         TODO
         :param model:
