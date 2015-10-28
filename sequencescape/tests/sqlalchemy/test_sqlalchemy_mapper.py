@@ -37,7 +37,7 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         mapper.add([])
 
         retrieved_models = mapper.get_all()
-        self.assertEquals(len(retrieved_models), 0)
+        self.assertEqual(len(retrieved_models), 0)
 
     def test_add_with_model(self):
         """
@@ -49,8 +49,8 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         mapper.add(model)
 
         retrieved_models = mapper.get_all()
-        self.assertEquals(len(retrieved_models), 1)
-        self.assertEquals(retrieved_models[0], model)
+        self.assertEqual(len(retrieved_models), 1)
+        self.assertEqual(retrieved_models[0], model)
 
     def test_add_with_model_list(self):
         """
@@ -64,7 +64,7 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         mapper.add(models)
 
         retrieved_models = mapper.get_all()
-        self.assertEquals(len(retrieved_models), len(models))
+        self.assertEqual(len(retrieved_models), len(models))
         for retrieved_model in retrieved_models:
             self.assertIn(retrieved_model, models)
 
@@ -225,17 +225,17 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         mapper = self.__create_mapper(model_type)
         mapper.add(models)
         models_retrieved = mapper_get(mapper)
-        self.assertEquals(len(models_retrieved), len(expected_models))
+        self.assertEqual(len(models_retrieved), len(expected_models))
 
         for model_retrieved in models_retrieved:
             matched_model = [x for x in expected_models if x == model_retrieved]
 
-            self.assertEquals(len(matched_model), 1, "If `0 != 1`, expected model was not retrieved from database")
+            self.assertEqual(len(matched_model), 1, "If `0 != 1`, expected model was not retrieved from database")
             model = matched_model[0]
 
             # Check all properties (may be different to object equality)
             for property_name, value in vars(model).items():
-                self.assertEquals(model_retrieved.__dict__[property_name], value, '`%s` mismatch' % property_name)
+                self.assertEqual(model_retrieved.__dict__[property_name], value, '`%s` mismatch' % property_name)
 
     @staticmethod
     def __create_mapper(model_type: type) -> _SQLAlchemyMapper:
