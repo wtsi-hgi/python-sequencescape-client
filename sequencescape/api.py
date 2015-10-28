@@ -3,7 +3,6 @@ from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemySampleMapper, 
     SQLAlchemyLibraryMapper, SQLAlchemyWellMapper
 from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemyStudyMapper
 
-
 class Connection():
     """
     TODO

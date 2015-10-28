@@ -1,16 +1,14 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name="sequencescape-python-client",
 
-    version="0.1.0",
+    version="0.1.4",
 
     author="Colin Nolan",
     author_email="hgi@sanger.ac.uk",
 
-    packages=["sequencescape", "sequencescape.sqlalchemy"],
-
-    include_package_data=False,
+    packages=find_packages(exclude=["tests"]),
 
     url="https://github.com/wtsi-hgi/sequencescape-python-client",
 
@@ -24,5 +22,5 @@ setup(
         "mysqlclient==1.3.6"
     ],
 
-    test_suite="sequencescape/tests"
+    test_suite="sequencescape.tests"
 )
