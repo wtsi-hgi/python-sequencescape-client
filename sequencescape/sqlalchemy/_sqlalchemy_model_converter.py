@@ -1,10 +1,12 @@
 from typing import List
 
-from sequencescape.sqlalchemy._sqlalchemy_model import *
-from sequencescape.model import *
+from sequencescape.model import Study, Sample, Well, MultiplexedLibrary, StudySamplesLink, Model
+from sequencescape.model import Library
+from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
+    SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink, SQLAlchemyModel
 
 
-# TODO: Move this to model module and make public?
+# TODO: Move this to model module and make "public"?
 _SQLALCHEMY_TO_POPO_CONVERSIONS = {
     SQLAlchemySample: Sample,
     SQLAlchemyStudy: Study,

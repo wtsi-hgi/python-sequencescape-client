@@ -1,5 +1,7 @@
-from sequencescape.sqlalchemy._sqlalchemy_mapper import *
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
+from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemySampleMapper, SQLAlchemyMultiplexedLibraryMapper, \
+    SQLAlchemyLibraryMapper, SQLAlchemyWellMapper
+from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemyStudyMapper
 
 
 class Connection():
@@ -19,11 +21,6 @@ class Connection():
         self.multiplexed_library = SQLAlchemyMultiplexedLibraryMapper(database_connector)
         self.library = SQLAlchemyLibraryMapper(database_connector)
         self.well = SQLAlchemyWellMapper(database_connector)
-
-        a = Sample()
-        a.name = 1
-
-
 
 
 def connect_to_sequencescape(database_uri: str) -> Connection:

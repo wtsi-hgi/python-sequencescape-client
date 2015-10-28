@@ -1,11 +1,12 @@
 import unittest
-from typing import Callable
+from typing import Callable, List
 
+from sequencescape.mapper import Mapper
+from sequencescape.model import Sample, Model
+from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape.sqlalchemy._sqlalchemy_mapper import _SQLAlchemyMapper
-from sequencescape.mapper import *
-from sequencescape.tests.mocks import *
-from sequencescape.sqlalchemy._sqlalchemy_database_connector import *
-from sequencescape.tests.sqlalchemy.setup_database import *
+from sequencescape.tests.mocks import create_mock_sample
+from sequencescape.tests.sqlalchemy.setup_database import create_database
 
 
 class Test_SQLAlchemyMapper(unittest.TestCase):
