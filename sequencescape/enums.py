@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class Property(Enum):
+class Property():
     """
     TODO
     """

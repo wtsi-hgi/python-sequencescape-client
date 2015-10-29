@@ -84,6 +84,7 @@ class Mapper(metaclass=ABCMeta):
         """
         pass
 
+    # TODO: This method needs to be tested
     def get_by_property_value(
             self,
             property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]],

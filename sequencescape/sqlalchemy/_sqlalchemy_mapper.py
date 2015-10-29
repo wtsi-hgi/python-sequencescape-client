@@ -49,31 +49,13 @@ class SQLAlchemyMapper(Mapper):
         return result
 
     def get_by_name(self, names: Union[str, List[str]]) -> Union[Model, List[Model]]:
-        if not isinstance(names, list):
-            names = [names]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
-        if len(names) == 1:
-            return convert_to_popo_model(result[0] if len(result) > 0 else None)
-        else:
-            return convert_to_popo_models(result)
+        return self.get_by_property_value(Property.NAME, names)
 
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
-        if not isinstance(internal_ids, list):
-            internal_ids = [internal_ids]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.internal_id, internal_ids)
-        if len(internal_ids) == 1:
-            return convert_to_popo_model(result[0] if len(result) > 0 else None)
-        else:
-            return convert_to_popo_models(result)
+        return self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
 
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> Union[Model, List[Model]]:
-        if not isinstance(accession_numbers, list):
-            accession_numbers = [accession_numbers]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.accession_number, accession_numbers)
-        if len(accession_numbers) == 1:
-            return convert_to_popo_model(result[0] if len(result) > 0 else None)
-        else:
-            return convert_to_popo_models(result)
+        return self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
 
     def _get_by_property_value_list(
             self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:
