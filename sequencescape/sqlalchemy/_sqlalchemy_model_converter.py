@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from sequencescape.model import Study, Sample, Well, MultiplexedLibrary, StudySamplesLink, Model
 from sequencescape.model import Library
@@ -17,7 +17,7 @@ _SQLALCHEMY_TO_POPO_CONVERSIONS = {
 }
 
 
-def get_equivalent_popo_model_type(sqlalchemy_type: type) -> type:
+def get_equivalent_popo_model_type(sqlalchemy_type: Union[type, None]) -> type:
     """
     TODO
     :param sqlalchemy_type:
@@ -29,7 +29,7 @@ def get_equivalent_popo_model_type(sqlalchemy_type: type) -> type:
     return _SQLALCHEMY_TO_POPO_CONVERSIONS[sqlalchemy_type]
 
 
-def get_equivalent_sqlalchemy_model_type(popo_type: type) -> type:
+def get_equivalent_sqlalchemy_model_type(popo_type: Union[type, None]) -> type:
     """
     TODO
     :param popo_type:
@@ -47,6 +47,9 @@ def convert_to_popo_model(sqlalchemy_model: SQLAlchemyModel) -> Model:
     :param sqlalchemy_model:
     :return:
     """
+    if sqlalchemy_model is None:
+        return None
+
     type = sqlalchemy_model.__class__
     convert_to_type = get_equivalent_popo_model_type(type)
 
@@ -78,6 +81,9 @@ def convert_to_sqlalchemy_model(model: Model) -> SQLAlchemyModel:
     :param model:
     :return:
     """
+    if model is None:
+        return None
+
     type = model.__class__
     convert_to_type = get_equivalent_sqlalchemy_model_type(type)
 

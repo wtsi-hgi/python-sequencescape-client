@@ -10,21 +10,25 @@ class Model(metaclass=ABCMeta):
 
 class Named(metaclass=ABCMeta):
     def __init__(self):
+        super(Named, self).__init__()
         self.name = None
 
 
 class InternalID(metaclass=ABCMeta):
     def __init__(self):
+        super(InternalID, self).__init__()
         self.internal_id = None
 
 
 class AccessionNumber(metaclass=ABCMeta):
     def __init__(self):
+        super(AccessionNumber, self).__init__()
         self.accession_number = None
 
 
 class IsCurrent(metaclass=ABCMeta):
     def __init__(self):
+        super(IsCurrent, self).__init__()
         self.is_current = None
 
 
@@ -54,6 +58,7 @@ class Sample(Model, Named, InternalID, AccessionNumber, IsCurrent):
         return hash(self.name)
 
     def __str__(self):
+        print(self.__dict__)
         return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
 
     def __repr__(self):
@@ -120,4 +125,3 @@ class StudySamplesLink(Model, InternalID, IsCurrent):
         super(StudySamplesLink, self).__init__()
         self.sample_internal_id = None
         self.study_internal_id = None
-

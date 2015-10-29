@@ -11,7 +11,7 @@ from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDa
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrent
 
 
-class _SQLAlchemyMapper(Mapper):
+class SQLAlchemyMapper(Mapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
         """
         Default constructor.
@@ -28,6 +28,8 @@ class _SQLAlchemyMapper(Mapper):
         self._database_connector = database_connector
 
     def add(self, models: Union[Model, List[Model]]):
+        if models is None:
+            raise ValueError("Cannot add `None`")
         if not isinstance(models, list):
             models = [models]
 
@@ -46,40 +48,13 @@ class _SQLAlchemyMapper(Mapper):
         assert isinstance(result, list)
         return result
 
-    def get_by_name(self, names: Union[str, List[str]]) -> Union[Model, List[Model]]:
-        if not isinstance(names, list):
-            names = [names]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
-        if len(names) == 1:
-            return convert_to_popo_model(result[0])
-        else:
-            return convert_to_popo_models(result)
-
-    def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
-        if not isinstance(internal_ids, list):
-            internal_ids = [internal_ids]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.internal_id, internal_ids)
-        if len(internal_ids) == 1:
-            return convert_to_popo_model(result[0])
-        else:
-            return convert_to_popo_models(result)
-
-    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> Union[Model, List[Model]]:
-        if not isinstance(accession_numbers, list):
-            accession_numbers = [accession_numbers]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.accession_number, accession_numbers)
-        if len(accession_numbers) == 1:
-            return convert_to_popo_model(result[0])
-        else:
-            return convert_to_popo_models(result)
-
     def _get_by_property_value_list(
             self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:
         if not isinstance(values, list):
             values = [values]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__[property], values)
+        result = self._get_by_property(property, values)
         if len(values) == 1:
-            return convert_to_popo_model(result[0])
+            return convert_to_popo_model(result[0] if len(result) > 0 else None)
         else:
             return convert_to_popo_models(result)
 
@@ -96,6 +71,31 @@ class _SQLAlchemyMapper(Mapper):
             else:
                 results.append(result)
         return results[0] if len(property_value_tuples) == 1 else results
+
+    def _get_by_property(self, property: Property, required_property_values: List[Any]) -> List[Model]:
+        """
+        Gets many that have a property, defined by a given property selector, that matches a given value.
+        :param property: TODO
+        :param required_property_values: the property must match this value to be selected
+        :return: models of the rows that are matched
+        """
+        # FIXME: Should this always limit `is_current` to 1?
+        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
+            raise ValueError(
+                "Not possible to get instances of type %s by name as the query required `is_current` property"
+                    % self._get_model_type())
+
+        query_model = self._get_sqlalchemy_model_type()
+        session = self._get_database_connector().create_session()
+
+        # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel.
+        query_column = query_model.__dict__[property]
+        result = session.query(query_model). \
+            filter(query_column.in_(required_property_values)). \
+            filter(query_model.is_current == 1).all()
+        session.close()
+        assert isinstance(result, list)
+        return result
 
     def _get_database_connector(self) -> SQLAlchemyDatabaseConnector:
         """
@@ -123,32 +123,8 @@ class _SQLAlchemyMapper(Mapper):
         assert self._model_type
         return self._model_type
 
-    #XXX: Should this always limit `is_current` to 1?
-    def _get_by_property(
-            self, property_selector: Callable[[SQLAlchemyModel], Column], required_value: List[Any]) -> List[Model]:
-        """
-        Gets many that have a property, defined by a given property selector, that matches a given value.
-        :param property_selector: selects the property on which the value should be matched to the given required value
-        :param required_value: the property must match this value to be selected
-        :return: models of the rows that are matched
-        """
-        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
-            raise ValueError(
-                "Not possible to get instances of type %s by name as the query required `is_current` property"
-                    % self._get_model_type())
 
-        query_model = self._get_sqlalchemy_model_type()
-        session = self._get_database_connector().create_session()
-
-        result = session.query(query_model). \
-            filter(property_selector(query_model).in_(required_value)). \
-            filter(query_model.is_current == 1).all()
-        session.close()
-        assert isinstance(result, list)
-        return result
-
-
-class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
+class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -157,7 +133,7 @@ class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
         super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
 
 
-class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMapper):
+class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -166,7 +142,7 @@ class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMa
         super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)
 
 
-class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
+class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -175,7 +151,7 @@ class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
 
-class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
+class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -184,7 +160,7 @@ class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
         super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
 
 
-class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
+class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
