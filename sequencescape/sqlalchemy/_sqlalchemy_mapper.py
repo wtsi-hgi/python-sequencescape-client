@@ -48,15 +48,6 @@ class SQLAlchemyMapper(Mapper):
         assert isinstance(result, list)
         return result
 
-    def get_by_name(self, names: Union[str, List[str]]) -> Union[Model, List[Model]]:
-        return self.get_by_property_value(Property.NAME, names)
-
-    def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
-        return self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
-
-    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> Union[Model, List[Model]]:
-        return self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
-
     def _get_by_property_value_list(
             self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:
         if not isinstance(values, list):

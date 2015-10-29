@@ -27,7 +27,6 @@ class Mapper(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
     def get_by_name(self, names: Union[str, List[str]]) -> Union[Model, List[Model]]:
         """
         This function queries the database for all the entity names given as parameter as a batch.
@@ -44,9 +43,8 @@ class Mapper(metaclass=ABCMeta):
         obj_list
         Returns a list of objects of type type found to match the keys given as parameter.
         """
-        pass
+        return self.get_by_property_value(Property.NAME, names)
 
-    @abstractmethod
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
         """
         This function queries the database for all the entity internal ids given as parameter as a batch.
@@ -63,9 +61,8 @@ class Mapper(metaclass=ABCMeta):
         obj_list
         Returns a list of objects of type type found to match the internal_ids given as parameter.
         """
-        pass
+        return self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
 
-    @abstractmethod
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> Union[Model, List[Model]]:
         """
         This function queries the database for all the entity accession_number given as parameter as a batch.
@@ -82,7 +79,7 @@ class Mapper(metaclass=ABCMeta):
         obj_list
         Returns a list of objects of type type found to match the accession_number given as parameter.
         """
-        pass
+        return self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
 
     # TODO: This method needs to be tested
     def get_by_property_value(
