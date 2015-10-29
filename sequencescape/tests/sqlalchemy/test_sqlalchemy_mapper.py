@@ -82,24 +82,14 @@ class TestAdd(_TestSQLAlchemyMapper):
     Tests for `SQLAlchemyMapper.add`.
     """
     def test_add_with_none(self):
-        """
-        Tests that it is not possible to add `None`.
-        """
         mapper = _TestSQLAlchemyMapper._create_mapper(Sample)
         self.assertRaises(ValueError, mapper.add, None)
 
     def test_add_with_non_model(self):
-        """
-        Tests that it is not possible to add any object other than a class/subclass of the type of model the mapper is
-        designed for.
-        """
         mapper = _TestSQLAlchemyMapper._create_mapper(Sample)
         self.assertRaises(ValueError, mapper.add, Mapper)
 
     def test_add_with_empty_list(self):
-        """
-        Tests that an empty list can be added.
-        """
         model = create_mock_sample()
 
         mapper = _TestSQLAlchemyMapper._create_mapper(model.__class__)
@@ -109,9 +99,6 @@ class TestAdd(_TestSQLAlchemyMapper):
         self.assertEqual(len(retrieved_models), 0)
 
     def test_add_with_model(self):
-        """
-        Tests that a model of the same type of the mapper can be added.
-        """
         model = create_mock_sample()
 
         mapper = _TestSQLAlchemyMapper._create_mapper(model.__class__)
@@ -122,9 +109,6 @@ class TestAdd(_TestSQLAlchemyMapper):
         self.assertEqual(retrieved_models[0], model)
 
     def test_add_with_model_list(self):
-        """
-        Tests that multiple models given in a list can be added.
-        """
         models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
         for i in range(len(models)):
             models[i].internal_id = i
@@ -143,9 +127,6 @@ class TestGetByName(_TestSQLAlchemyMapper):
     Tests for `SQLAlchemyMapper.get_by_name`.
     """
     def test_get_by_name_with_name_of_non_existent(self):
-        """
-        Tests that attempting to get a non-existant entry returns `None`.
-        """
         models = [create_mock_sample(), create_mock_sample()]
         self._check_get(
             models,
@@ -153,9 +134,6 @@ class TestGetByName(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_name("invalid"))
 
     def test_get_by_name_with_name(self):
-        """
-        Tests that getting a valid model works.
-        """
         named_model = create_mock_sample()
         named_model.name = "expected_model"
         models = [create_mock_sample(), named_model, create_mock_sample()]
@@ -165,9 +143,6 @@ class TestGetByName(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_name(named_model.name))
 
     def test_get_by_name_with_name_list(self):
-        """
-        Tests that getting a number of valid models works.
-        """
         names = ["test_name1", "test_name2", "test_name3"]
         models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
         for i in range(len(models)):
@@ -186,9 +161,6 @@ class TestGetById(_TestSQLAlchemyMapper):
     Tests for `SQLAlchemyMapper.get_by_id`.
     """
     def test_get_by_id_with_id_of_non_existent(self):
-        """
-        Tests that attempting to get a non-existant entry returns `None`.
-        """
         models = [create_mock_sample(), create_mock_sample()]
         self._check_get(
             models,
@@ -196,9 +168,6 @@ class TestGetById(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_id("invalid"))
 
     def test_get_by_id_with_id(self):
-        """
-        Tests that getting a valid model works.
-        """
         internal_id_model = create_mock_sample()
         internal_id_model.internal_id = 5511223
         models = [create_mock_sample(), internal_id_model, create_mock_sample()]
@@ -208,9 +177,6 @@ class TestGetById(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_id(internal_id_model.internal_id))
 
     def test_get_by_id_with_id_list(self):
-        """
-        Tests that getting a number of valid models works.
-        """
         ids = [1, 2, 3]
         models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
         for i in range(len(models)):
@@ -228,9 +194,6 @@ class TestGetByAccessionNumber(_TestSQLAlchemyMapper):
     Tests for `SQLAlchemyMapper.get_by_accession_number`.
     """
     def test_get_by_accession_number_with_accession_number_of_non_existent(self):
-        """
-        Tests that attempting to get a non-existant entry returns `None`.
-        """
         models = [create_mock_sample(), create_mock_sample()]
         self._check_get(
             models,
@@ -238,9 +201,6 @@ class TestGetByAccessionNumber(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_accession_number("invalid"))
 
     def test_get_by_accession_number_with_accession_number(self):
-        """
-        Tests that getting a valid model works.
-        """
         accession_number_model = create_mock_sample()
         accession_number_model.accession_number = "EGAN00000000000"
         models = [create_mock_sample(), accession_number_model, create_mock_sample()]
@@ -250,9 +210,6 @@ class TestGetByAccessionNumber(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_accession_number(accession_number_model.accession_number))
 
     def test_get_by_accession_number_with_accession_number_list(self):
-        """
-        Tests that getting a number of valid models works.
-        """
         accession_numbers = ["test_accession_number1", "test_accession_number2", "test_accession_number3"]
         models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
         for i in range(len(models)):
@@ -271,9 +228,6 @@ class TestGetByPropertyValue(_TestSQLAlchemyMapper):
     Tests for `SQLAlchemyMapper.get_by_property_value`.
     """
     def test_get_by_property_value_with_property_value_of_non_existent(self):
-        """
-        Tests that attempting to get a non-existant entry returns `None`.
-        """
         models = [create_mock_sample(), create_mock_sample()]
         self._check_get(
             models,
@@ -281,9 +235,6 @@ class TestGetByPropertyValue(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_property_value("name", "invalid"))
 
     def test_get_by_property_value_with_property_value(self):
-        """
-        Tests that getting a valid model works.
-        """
         named_model = create_mock_sample()
         named_model.name = "expected_model"
         models = [create_mock_sample(), named_model, create_mock_sample()]
@@ -293,9 +244,6 @@ class TestGetByPropertyValue(_TestSQLAlchemyMapper):
             lambda mapper: mapper.get_by_property_value("name", named_model.name))
 
     def test_get_by_property_value_with_property_value_list(self):
-        """
-        Tests that getting a number of valid models works.
-        """
         names = ["test_name1", "test_name2", "test_name3"]
         models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
         for i in range(len(models)):
@@ -309,9 +257,6 @@ class TestGetByPropertyValue(_TestSQLAlchemyMapper):
         )
 
     def test_get_by_property_value_with_property_tuples_of_different_properties(self):
-        """
-        Tests that getting a number of valid models using tuples works.
-        """
         names = ["test_name1", "test_name2", "test_name3"]
         accession_numbers = ["test_accession_number1", "test_accession_number2", "test_accession_number3"]
         models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]

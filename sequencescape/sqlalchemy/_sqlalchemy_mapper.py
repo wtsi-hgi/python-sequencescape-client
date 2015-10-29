@@ -52,7 +52,7 @@ class SQLAlchemyMapper(Mapper):
             self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:
         if not isinstance(values, list):
             values = [values]
-        result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__[property], values)
+        result = self._get_by_property(property, values)
         if len(values) == 1:
             return convert_to_popo_model(result[0] if len(result) > 0 else None)
         else:
@@ -71,6 +71,31 @@ class SQLAlchemyMapper(Mapper):
             else:
                 results.append(result)
         return results[0] if len(property_value_tuples) == 1 else results
+
+    def _get_by_property(self, property: Property, required_property_values: List[Any]) -> List[Model]:
+        """
+        Gets many that have a property, defined by a given property selector, that matches a given value.
+        :param property: TODO
+        :param required_property_values: the property must match this value to be selected
+        :return: models of the rows that are matched
+        """
+        # FIXME: Should this always limit `is_current` to 1?
+        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
+            raise ValueError(
+                "Not possible to get instances of type %s by name as the query required `is_current` property"
+                    % self._get_model_type())
+
+        query_model = self._get_sqlalchemy_model_type()
+        session = self._get_database_connector().create_session()
+
+        # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel.
+        query_column = query_model.__dict__[property]
+        result = session.query(query_model). \
+            filter(query_column.in_(required_property_values)). \
+            filter(query_model.is_current == 1).all()
+        session.close()
+        assert isinstance(result, list)
+        return result
 
     def _get_database_connector(self) -> SQLAlchemyDatabaseConnector:
         """
@@ -97,30 +122,6 @@ class SQLAlchemyMapper(Mapper):
         """
         assert self._model_type
         return self._model_type
-
-    #XXX: Should this always limit `is_current` to 1?
-    def _get_by_property(
-            self, property_selector: Callable[[SQLAlchemyModel], Column], required_value: List[Any]) -> List[Model]:
-        """
-        Gets many that have a property, defined by a given property selector, that matches a given value.
-        :param property_selector: selects the property on which the value should be matched to the given required value
-        :param required_value: the property must match this value to be selected
-        :return: models of the rows that are matched
-        """
-        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
-            raise ValueError(
-                "Not possible to get instances of type %s by name as the query required `is_current` property"
-                    % self._get_model_type())
-
-        query_model = self._get_sqlalchemy_model_type()
-        session = self._get_database_connector().create_session()
-
-        result = session.query(query_model). \
-            filter(property_selector(query_model).in_(required_value)). \
-            filter(query_model.is_current == 1).all()
-        session.close()
-        assert isinstance(result, list)
-        return result
 
 
 class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
