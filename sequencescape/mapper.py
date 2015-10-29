@@ -5,29 +5,34 @@ from sequencescape.model import Model, Study
 from sequencescape.enums import Property
 
 
-#XXX: This interface should use generics (pep-0484). Unfortunately they are not good enough/the documentation is not
-#     good enough to use them yet.
+# XXX: This interface should use generics (pep-0484). Unfortunately they are not good enough/the documentation is not
+#      good enough to use them yet.
 class Mapper(metaclass=ABCMeta):
     """
-    TODO
+    A data mapper as defined by Martin Fowler (see: http://martinfowler.com/eaaCatalog/dataMapper.html) that moves data
+    between objects and a Sequencescape database, while keeping them independent of each other and the mapper itself.
     """
     @abstractmethod
     def add(self, model: Union[Model, List[Model]]):
         """
-        TODO
-        :param model:
-        :return:
+        Adds data in the given model (of the type this data mapper deals with) to the database.
+        :param model: the model containing that data to be transferred
         """
         pass
 
     def get_all(self) -> List[Model]:
         """
-        TODO
-        :return:
+        Gets all the data of the type this data mapper deals with in the Sequencescape database.
+        :return: a list of models representing each piece of data in the database of the type this data mapper deals with
         """
         pass
 
-    def get_by_name(self, names: Union[str, List[str]]) -> Union[Model, List[Model]]:
+    def get_by_name(self, names: Union[str, List[str]]) -> List[Model]:
+        """
+        Gets a model(s) (of the type this data mapper deals with) of data that has the given name(s).
+        :param names: the name or list of names to entries get models of
+        :return: list of models of data with the given name(s)
+        """
         """
         This function queries the database for all the entity names given as parameter as a batch.
         Parameters
@@ -43,8 +48,11 @@ class Mapper(metaclass=ABCMeta):
         obj_list
         Returns a list of objects of type type found to match the keys given as parameter.
         """
-        return self.get_by_property_value(Property.NAME, names)
+        results = self.get_by_property_value(Property.NAME, names)
+        assert isinstance(results, list)
+        return results
 
+    # TODO: This method needs to be tested separately
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
         """
         This function queries the database for all the entity internal ids given as parameter as a batch.
@@ -61,9 +69,21 @@ class Mapper(metaclass=ABCMeta):
         obj_list
         Returns a list of objects of type type found to match the internal_ids given as parameter.
         """
-        return self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
+        # TODO: Note that for consistency, array with single internal_id even though can only be of length 0 or 1
+        results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
+        too_many_results_error = "Retrieved multiple entries (%s) with the same internal ID; it has been defined that" \
+                                 "this property value should be unqiue. To bypass this check, use:" \
+                                 "`get_by_property_value(Property.INTERNAL_ID, internal_ids)`." % results
+        if not isinstance(internal_ids, list):
+            if len(results) > 1:
+                raise ValueError(too_many_results_error)
+        else:
+            if len(results) > len(internal_ids):
+                raise ValueError(too_many_results_error)
+        assert isinstance(results, list)
+        return results
 
-    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> Union[Model, List[Model]]:
+    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[Model]:
         """
         This function queries the database for all the entity accession_number given as parameter as a batch.
         Parameters
@@ -79,13 +99,15 @@ class Mapper(metaclass=ABCMeta):
         obj_list
         Returns a list of objects of type type found to match the accession_number given as parameter.
         """
-        return self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
+        results = self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
+        assert isinstance(results, list)
+        return results
 
-    # TODO: This method needs to be tested
+    # TODO: This method needs to be tested separately
     def get_by_property_value(
             self,
             property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]],
-            values: Optional[Union[Any, List[Any]]]=None) -> Union[Model, List[Model]]:
+            values: Optional[Union[Any, List[Any]]]=None) -> List[Model]:
         """
         This function is for internal use - it queries seqscape for all the entities or type type
         and returns a list of results.
@@ -103,19 +125,21 @@ class Mapper(metaclass=ABCMeta):
         A list of objects returned by the query of type models.*
         """
         if isinstance(property, tuple) or isinstance(property, list):
-            return self._get_by_property_value_tuple(property)
+            results = self._get_by_property_value_tuple(property)
         elif isinstance(property, str):
             if isinstance(values, list):
-                return self._get_by_property_value_list(property, values)
+                results = self._get_by_property_value_list(property, values)
             else:
-                #XXX: If limited to Property enums, would not allow custom properties. If not, why do they exist?
-                return self._get_by_property_value_list(property, values)
+                # XXX: If limited to Property enums, would not allow custom properties. If not, why do they exist?
+                results = self._get_by_property_value_list(property, values)
         else:
             raise ValueError("Invalid arguments")
+        assert isinstance(results, list)
+        return results
 
     @abstractmethod
     def _get_by_property_value_list(
-            self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:
+            self, property: Property, values: Union[Any, List[Any]]) -> List[Model]:
         """
         TODO
         :param property_value_tuples:
@@ -125,7 +149,7 @@ class Mapper(metaclass=ABCMeta):
 
     @abstractmethod
     def _get_by_property_value_tuple(
-            self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]) -> Union[Model, List[Model]]:
+            self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]) -> List[Model]:
         """
         TODO
         :param property_value_tuples:

@@ -1,4 +1,4 @@
-from typing import Callable, Union, List, Any, Tuple
+from typing import Union, List, Any, Tuple
 
 from sqlalchemy import Column
 
@@ -53,10 +53,7 @@ class SQLAlchemyMapper(Mapper):
         if not isinstance(values, list):
             values = [values]
         result = self._get_by_property(property, values)
-        if len(values) == 1:
-            return convert_to_popo_model(result[0] if len(result) > 0 else None)
-        else:
-            return convert_to_popo_models(result)
+        return convert_to_popo_models(result)
 
     def _get_by_property_value_tuple(
             self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]) -> Union[Model, List[Model]]:
@@ -69,8 +66,8 @@ class SQLAlchemyMapper(Mapper):
             except ValueError:
                 print("Multiple entities with the same id found in the database")
             else:
-                results.append(result)
-        return results[0] if len(property_value_tuples) == 1 else results
+                results += result
+        return results
 
     def _get_by_property(self, property: Property, required_property_values: List[Any]) -> List[Model]:
         """
@@ -88,8 +85,8 @@ class SQLAlchemyMapper(Mapper):
         query_model = self._get_sqlalchemy_model_type()
         session = self._get_database_connector().create_session()
 
-        # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel.
-        query_column = query_model.__dict__[property]
+        # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel
+        query_column = query_model.__dict__[property]   # type: Column
         result = session.query(query_model). \
             filter(query_column.in_(required_property_values)). \
             filter(query_model.is_current == 1).all()
