@@ -4,12 +4,16 @@ from typing import Callable, List, Union
 from sequencescape.mapper import Mapper
 from sequencescape.model import Sample, Model
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_mapper import _SQLAlchemyMapper
+from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemyMapper
 from sequencescape.tests.mocks import create_mock_sample
 from sequencescape.tests.sqlalchemy.setup_database import create_database
 
 
-class Test_SQLAlchemyMapper(unittest.TestCase):
+# class Test
+
+
+
+class TestSQLAlchemyMapper(unittest.TestCase):
     """
     TODO
     """
@@ -279,14 +283,14 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
                     self.assertEqual(model_retrieved.__dict__[property_name], value, '`%s` mismatch' % property_name)
 
     @staticmethod
-    def __create_mapper(model_type: type) -> _SQLAlchemyMapper:
+    def __create_mapper(model_type: type) -> SQLAlchemyMapper:
         """
         TODO
         :param model_type:
         :return:
         """
-        connector, database_file_path = Test_SQLAlchemyMapper._create_connector()
-        return _SQLAlchemyMapper(connector, model_type)
+        connector, database_file_path = TestSQLAlchemyMapper._create_connector()
+        return SQLAlchemyMapper(connector, model_type)
 
     @staticmethod
     def _create_connector() -> (SQLAlchemyDatabaseConnector, str):

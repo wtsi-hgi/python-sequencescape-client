@@ -8,6 +8,9 @@ from sequencescape.enums import Property
 #XXX: This interface should use generics (pep-0484). Unfortunately they are not good enough/the documentation is not
 #     good enough to use them yet.
 class Mapper(metaclass=ABCMeta):
+    """
+    TODO
+    """
     @abstractmethod
     def add(self, model: Union[Model, List[Model]]):
         """
@@ -134,22 +137,37 @@ class Mapper(metaclass=ABCMeta):
 
 
 class LibraryMapper(Mapper, metaclass=ABCMeta):
+    """
+    TODO
+    """
     pass
 
 
 class MultiplexedLibraryMapper(Mapper, metaclass=ABCMeta):
+    """
+    TODO
+    """
     pass
 
 
 class SampleMapper(Mapper, metaclass=ABCMeta):
+    """
+    TODO
+    """
     pass
 
 
 class WellMapper(Mapper, metaclass=ABCMeta):
+    """
+    TODO
+    """
     pass
 
 
 class StudyMapper(Mapper, metaclass=ABCMeta):
+    """
+    TODO
+    """
     @abstractmethod
     def get_associated_with_sample(self, sample_internal_ids: str) -> Study:
         """

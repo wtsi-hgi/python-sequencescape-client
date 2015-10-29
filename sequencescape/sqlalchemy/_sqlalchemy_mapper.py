@@ -11,7 +11,7 @@ from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDa
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrent
 
 
-class _SQLAlchemyMapper(Mapper):
+class SQLAlchemyMapper(Mapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
         """
         Default constructor.
@@ -150,7 +150,7 @@ class _SQLAlchemyMapper(Mapper):
         return result
 
 
-class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
+class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -159,7 +159,7 @@ class SQLAlchemyLibraryMapper(_SQLAlchemyMapper, LibraryMapper):
         super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
 
 
-class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMapper):
+class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -168,7 +168,7 @@ class SQLAlchemyMultiplexedLibraryMapper(_SQLAlchemyMapper, MultiplexedLibraryMa
         super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)
 
 
-class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
+class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -177,7 +177,7 @@ class SQLAlchemySampleMapper(_SQLAlchemyMapper, SampleMapper):
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
 
-class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
+class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -186,7 +186,7 @@ class SQLAlchemyWellMapper(_SQLAlchemyMapper, WellMapper):
         super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
 
 
-class SQLAlchemyStudyMapper(_SQLAlchemyMapper, StudyMapper):
+class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
