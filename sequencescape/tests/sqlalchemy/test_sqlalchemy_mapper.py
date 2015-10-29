@@ -268,14 +268,15 @@ class Test_SQLAlchemyMapper(unittest.TestCase):
         self.assertEqual(len(models_retrieved), len(expected_models))
 
         for model_retrieved in models_retrieved:
-            matched_model = [x for x in expected_models if x == model_retrieved]
+            matched_models = [x for x in expected_models if x == model_retrieved]
 
-            self.assertEqual(len(matched_model), 1, "If `0 != 1`, expected model was not retrieved from database")
-            model = matched_model[0]
+            self.assertEqual(len(matched_models), 1, "If `0 != 1`, expected model was not retrieved from database")
+            model = matched_models[0]
 
-            # Check all properties (may be different to object equality)
-            for property_name, value in vars(model).items():
-                self.assertEqual(model_retrieved.__dict__[property_name], value, '`%s` mismatch' % property_name)
+            if model is not None:
+                # Check all properties (may be different to object equality)
+                for property_name, value in vars(model).items():
+                    self.assertEqual(model_retrieved.__dict__[property_name], value, '`%s` mismatch' % property_name)
 
     @staticmethod
     def __create_mapper(model_type: type) -> _SQLAlchemyMapper:

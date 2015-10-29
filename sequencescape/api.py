@@ -6,7 +6,7 @@ from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemyStudyMapper
 
 class Connection():
     """
-    TODO
+    Connection manager for queries to the Sequencescape database.
     """
     def __init__(self, database_uri: str):
         """

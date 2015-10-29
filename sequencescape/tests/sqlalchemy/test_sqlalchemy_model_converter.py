@@ -18,6 +18,9 @@ class TestGetEquivalentPopoModelType(unittest.TestCase):
     def test_none_with_unsupported_type(self):
         self.assertIsNone(get_equivalent_popo_model_type(str))
 
+    def test_correct_with_none(self):
+        self.assertEqual(get_equivalent_popo_model_type(None), None)
+
     def test_correct_with_sample(self):
         self.assertEqual(get_equivalent_popo_model_type(SQLAlchemySample), Sample)
 
@@ -43,6 +46,9 @@ class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
     """
     def test_none_with_unsupported_type(self):
         self.assertIsNone(get_equivalent_sqlalchemy_model_type(str))
+
+    def test_correct_with_none(self):
+        self.assertEqual(get_equivalent_sqlalchemy_model_type(None), None)
 
     def test_correct_with_sample(self):
         self.assertEqual(get_equivalent_sqlalchemy_model_type(Sample), SQLAlchemySample)

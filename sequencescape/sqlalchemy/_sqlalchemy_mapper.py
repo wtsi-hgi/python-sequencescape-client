@@ -28,6 +28,8 @@ class _SQLAlchemyMapper(Mapper):
         self._database_connector = database_connector
 
     def add(self, models: Union[Model, List[Model]]):
+        if models is None:
+            raise ValueError("Cannot add `None`")
         if not isinstance(models, list):
             models = [models]
 
@@ -51,7 +53,7 @@ class _SQLAlchemyMapper(Mapper):
             names = [names]
         result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.name, names)
         if len(names) == 1:
-            return convert_to_popo_model(result[0])
+            return convert_to_popo_model(result[0] if len(result) > 0 else None)
         else:
             return convert_to_popo_models(result)
 
@@ -60,7 +62,7 @@ class _SQLAlchemyMapper(Mapper):
             internal_ids = [internal_ids]
         result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.internal_id, internal_ids)
         if len(internal_ids) == 1:
-            return convert_to_popo_model(result[0])
+            return convert_to_popo_model(result[0] if len(result) > 0 else None)
         else:
             return convert_to_popo_models(result)
 
@@ -69,7 +71,7 @@ class _SQLAlchemyMapper(Mapper):
             accession_numbers = [accession_numbers]
         result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.accession_number, accession_numbers)
         if len(accession_numbers) == 1:
-            return convert_to_popo_model(result[0])
+            return convert_to_popo_model(result[0] if len(result) > 0 else None)
         else:
             return convert_to_popo_models(result)
 
@@ -79,7 +81,7 @@ class _SQLAlchemyMapper(Mapper):
             values = [values]
         result = self._get_by_property(lambda sqlalchemy_model: sqlalchemy_model.__dict__[property], values)
         if len(values) == 1:
-            return convert_to_popo_model(result[0])
+            return convert_to_popo_model(result[0] if len(result) > 0 else None)
         else:
             return convert_to_popo_models(result)
 
