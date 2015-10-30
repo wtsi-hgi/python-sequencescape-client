@@ -5,34 +5,61 @@ class Model(metaclass=ABCMeta):
     """
     Superclass that all POPOs (Plain Old Python Objects) must implement.
     """
-    pass
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        for property, value in vars(self).items():
+            if other.__dict__[property] != self.__dict__[property]:
+                return False
+        return True
+
+    def __str__(self) -> str:
+        string_builder = []
+        for property, value in vars(self).items():
+            string_builder.append("%s: %s" % (property, value))
+        return "{ %s }" % ', '.join(string_builder)
 
 
-class Named(metaclass=ABCMeta):
+class Named(Model, metaclass=ABCMeta):
+    """
+    TODO
+    """
     def __init__(self):
         super(Named, self).__init__()
         self.name = None
 
 
-class InternalID(metaclass=ABCMeta):
+class InternalID(Model, metaclass=ABCMeta):
+    """
+    TODO
+    """
     def __init__(self):
         super(InternalID, self).__init__()
         self.internal_id = None
 
+    def __hash__(self) -> hash:
+        return hash(self.internal_id)
 
-class AccessionNumber(metaclass=ABCMeta):
+
+class AccessionNumber(Model, metaclass=ABCMeta):
+    """
+    TODO
+    """
     def __init__(self):
         super(AccessionNumber, self).__init__()
         self.accession_number = None
 
 
-class IsCurrent(metaclass=ABCMeta):
+class IsCurrent(Model, metaclass=ABCMeta):
+    """
+    TODO
+    """
     def __init__(self):
         super(IsCurrent, self).__init__()
         self.is_current = None
 
 
-class Sample(Model, Named, InternalID, AccessionNumber, IsCurrent):
+class Sample(Named, InternalID, AccessionNumber, IsCurrent):
     """
     TODO
     """
@@ -47,25 +74,8 @@ class Sample(Model, Named, InternalID, AccessionNumber, IsCurrent):
         self.country_of_origin = None
         self.geographical_region = None
 
-    #TODO: Does a POPO model need these (how does Python do equality?)
-    #FIXME: This is not reflective, symmetric, non-null, etc.
-    def __eq__(self, other):
-        return self.name == other.name and \
-               self.accession_number == other.accession_number and \
-               self.internal_id == other.internal_id
 
-    def __hash__(self):
-        return hash(self.name)
-
-    def __str__(self):
-        print(self.__dict__)
-        return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
-
-    def __repr__(self):
-        return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
-
-
-class Study(Model, Named, InternalID, AccessionNumber, IsCurrent):
+class Study(Named, InternalID, AccessionNumber, IsCurrent):
     """
     TODO
     """
@@ -77,22 +87,8 @@ class Study(Model, Named, InternalID, AccessionNumber, IsCurrent):
         self.study_visibility = None
         self.faculty_sponsor = None
 
-    def __eq__(self, other):
-        return self.name == other.name and \
-               self.accession_number == other.accession_number and \
-               self.internal_id == other.internal_id
 
-    def __hash__(self):
-        return hash(self.name)
-
-    def __str__(self):
-        return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
-
-    def __repr__(self):
-        return "{ internal_id=%s, name=%s, accession_number=%s }" % (self.internal_id, self.name, self.accession_number)
-
-
-class Library(Model, Named, InternalID, IsCurrent):
+class Library(Named, InternalID, IsCurrent):
     """
     TODO
     """
@@ -101,7 +97,7 @@ class Library(Model, Named, InternalID, IsCurrent):
         self.library_type = None
 
 
-class Well(Model, Named, InternalID, IsCurrent):
+class Well(Named, InternalID, IsCurrent):
     """
     TODO
     """
@@ -109,7 +105,7 @@ class Well(Model, Named, InternalID, IsCurrent):
         super(Well, self).__init__()
 
 
-class MultiplexedLibrary(Model, Named, InternalID, IsCurrent):
+class MultiplexedLibrary(Named, InternalID, IsCurrent):
     """
     TODO
     """
@@ -117,7 +113,7 @@ class MultiplexedLibrary(Model, Named, InternalID, IsCurrent):
         super(MultiplexedLibrary, self).__init__()
 
 
-class StudySamplesLink(Model, InternalID, IsCurrent):
+class StudySamplesLink(InternalID, IsCurrent):
     """
     TODO
     """

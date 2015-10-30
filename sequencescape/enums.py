@@ -1,3 +1,4 @@
+# TODO: Are these required anymore?
 class Property():
     """
     TODO

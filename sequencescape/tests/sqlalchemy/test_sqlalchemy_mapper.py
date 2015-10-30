@@ -1,3 +1,4 @@
+from abc import ABCMeta
 import unittest
 from typing import Callable, List, Union
 
@@ -9,7 +10,7 @@ from sequencescape.tests.mocks import create_mock_sample
 from sequencescape.tests.sqlalchemy.setup_database import create_database
 
 
-class _TestSQLAlchemyMapper(unittest.TestCase):
+class _TestSQLAlchemyMapper(unittest.TestCase, metaclass=ABCMeta):
     """
     Base class of all tests for methods in SQLAlchemyMapper.
     """

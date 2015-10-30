@@ -29,24 +29,9 @@ class Mapper(metaclass=ABCMeta):
 
     def get_by_name(self, names: Union[str, List[str]]) -> List[Model]:
         """
-        Gets a model(s) (of the type this data mapper deals with) of data that has the given name(s).
-        :param names: the name or list of names to entries get models of
+        Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
+        :param names: the name or list of names of the data to get models for
         :return: list of models of data with the given name(s)
-        """
-        """
-        This function queries the database for all the entity names given as parameter as a batch.
-        Parameters
-        ----------
-        engine
-        Database engine to run the queries on
-        type
-        A model class - predefined in serapis.seqscape.models e.g. Sample, Study
-        keys
-        A list of keys (name) to run the query for
-        Returns
-        -------
-        obj_list
-        Returns a list of objects of type type found to match the keys given as parameter.
         """
         results = self.get_by_property_value(Property.NAME, names)
         assert isinstance(results, list)
@@ -55,21 +40,13 @@ class Mapper(metaclass=ABCMeta):
     # TODO: This method needs to be tested separately
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
         """
-        This function queries the database for all the entity internal ids given as parameter as a batch.
-        Parameters
-        ----------
-        engine
-        Database engine to run the queries on
-        type
-        A model class - predefined in serapis.seqscape.models e.g. Sample, Study
-        keys
-        A list of internal_ids to run the query for
-        Returns
-        -------
-        obj_list
-        Returns a list of objects of type type found to match the internal_ids given as parameter.
+        Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
+
+        The property values this method uses are unique to each entry. Therefore, invoking this method with a single ID
+        can return at most one model. For consistency, this return will be a list even if a single ID is used.
+        :param internal_ids: the ids or list of ids of the data to get models for
+        :return: list of models of data with the given id(s)
         """
-        # TODO: Note that for consistency, array with single internal_id even though can only be of length 0 or 1
         results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
         too_many_results_error = "Retrieved multiple entries (%s) with the same internal ID; it has been defined that" \
                                  "this property value should be unqiue. To bypass this check, use:" \
@@ -85,19 +62,10 @@ class Mapper(metaclass=ABCMeta):
 
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[Model]:
         """
-        This function queries the database for all the entity accession_number given as parameter as a batch.
-        Parameters
-        ----------
-        engine
-        Database engine to run the queries on
-        type
-        A model class - predefined in serapis.seqscape.models e.g. Sample, Study
-        keys
-        A list of accession_number to run the query for
-        Returns
-        -------
-        obj_list
-        Returns a list of objects of type type found to match the accession_number given as parameter.
+        Gets models (of the type this data mapper deals with) of data from the database that have the given accession
+        number(s).
+        :param accession_numbers: the accession number or list of accession numbers of the data to get models for
+        :return: list of models of data with the given accession number(s)
         """
         results = self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
         assert isinstance(results, list)
@@ -109,20 +77,11 @@ class Mapper(metaclass=ABCMeta):
             property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]],
             values: Optional[Union[Any, List[Any]]]=None) -> List[Model]:
         """
-        This function is for internal use - it queries seqscape for all the entities or type type
-        and returns a list of results.
-        Parameters
-        ----------
-        name_list
-        The list of names for the entities you want to query about
-        accession_number_list
-        The list of accession numbers for all the entities you want to query about
-        internal_id_list
-        The list of internal_ids for all the entities you want to query about
-        Returns
-        -------
-        obj_list
-        A list of objects returned by the query of type models.*
+        Gets models (of the type this data mapper deals with) of data from the database that have the given property
+        values.
+        :param property: TODO
+        :param values: TODO
+        :return: TODO
         """
         if isinstance(property, tuple) or isinstance(property, list):
             results = self._get_by_property_value_tuple(property)
@@ -141,9 +100,11 @@ class Mapper(metaclass=ABCMeta):
     def _get_by_property_value_list(
             self, property: Property, values: Union[Any, List[Any]]) -> List[Model]:
         """
-        TODO
-        :param property_value_tuples:
-        :return:
+        Gets models (of the type this data mapper deals with) of data from the database that have one of the given
+        values as the value of the given property.
+        :param property: the property to match values to
+        :param values: the values of the property to match
+        :return: models that...
         """
         pass
 
@@ -160,35 +121,35 @@ class Mapper(metaclass=ABCMeta):
 
 class LibraryMapper(Mapper, metaclass=ABCMeta):
     """
-    TODO
+    Mapper for `Library` models.
     """
     pass
 
 
 class MultiplexedLibraryMapper(Mapper, metaclass=ABCMeta):
     """
-    TODO
+    Mapper for `MultiplexedLibrary` models.
     """
     pass
 
 
 class SampleMapper(Mapper, metaclass=ABCMeta):
     """
-    TODO
+    Mapper for `Sample` models.
     """
     pass
 
 
 class WellMapper(Mapper, metaclass=ABCMeta):
     """
-    TODO
+    Mapper for `Well` models.
     """
     pass
 
 
 class StudyMapper(Mapper, metaclass=ABCMeta):
     """
-    TODO
+    Mapper for `Study` models.
     """
     @abstractmethod
     def get_associated_with_sample(self, sample_internal_ids: str) -> Study:
