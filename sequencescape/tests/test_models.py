@@ -1,11 +1,14 @@
 from abc import ABCMeta, abstractmethod
+import os
 import unittest
 from sequencescape.model import Model, Named, IsCurrent, InternalID, AccessionNumber
 from sequencescape.tests.mocks import create_mock_library, create_mock_sample, create_mock_study, create_mock_well, \
     create_mock_multiplexed_library, create_mock_study_samples_link
 
+
 class _FakeModel(Model):
     pass
+
 
 class _TestModel(unittest.TestCase, metaclass=ABCMeta):
     """
@@ -152,5 +155,9 @@ class TestStudySamplesLink(_TestInternalID, _TestIsCurrent):
         return create_mock_study_samples_link()
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+# if __name__ == '__main__':
+#     unittest.main()
+
+
+

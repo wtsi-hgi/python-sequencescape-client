@@ -4,6 +4,6 @@ MAINTAINER hgi@sanger.ac.uk
 COPY . /sequencescape-python-client
 WORKDIR sequencescape-python-client
 
-RUN pip install -r requirements.txt
+RUN ./scripts/pip-install-requirements.sh
 
-ENTRYPOINT ["./docker/tests/run.sh"]
+CMD ["./scripts/run-tests.sh"]
