@@ -46,7 +46,7 @@ class SQLAlchemyMapper(Mapper):
             filter(query_model.is_current == 1).all()
         session.close()
         assert isinstance(result, list)
-        return result
+        return convert_to_popo_models(result)
 
     def _get_by_property_value_list(
             self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:

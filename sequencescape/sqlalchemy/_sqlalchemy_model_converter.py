@@ -60,7 +60,8 @@ def convert_to_popo_model(sqlalchemy_model: SQLAlchemyModel) -> Model:
     assert issubclass(converted.__class__, Model)
 
     for property_name, value in vars(sqlalchemy_model).items():
-        converted.__dict__[property_name] = value
+        if property_name in converted.__dict__:
+            converted.__dict__[property_name] = value
 
     return converted
 
