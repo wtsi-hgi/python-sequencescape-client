@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Tuple, Union, Any, Optional
 
-from sequencescape.model import Model, Study, Named, InternalID, AccessionNumber
+from sequencescape.model import Model, Study, NamedModel, InternalIdModel, AccessionNumberModel
 from sequencescape.enums import Property
 
 
@@ -81,7 +81,7 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
     TODO
     """
     # TODO: This method needs to be tested independently of concrete subclass.
-    def get_by_name(self, names: Union[str, List[str]]) -> List[Named]:
+    def get_by_name(self, names: Union[str, List[str]]) -> List[NamedModel]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
         :param names: the name or list of names of the data to get models for
@@ -97,7 +97,7 @@ class InternalIDMapper(Mapper, metaclass=ABCMeta):
     TODO
     """
     # TODO: This method needs to be tested independently of concrete subclass.
-    def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalID]]:
+    def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalIdModel]]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
 
@@ -122,7 +122,7 @@ class InternalIDMapper(Mapper, metaclass=ABCMeta):
 
 class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
     # TODO: This method needs to be tested independently of concrete subclass.
-    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumber]:
+    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumberModel]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given accession
         number(s).

@@ -1,6 +1,6 @@
 import unittest
 
-from sequencescape.model import Sample, Study, Library, Well, MultiplexedLibrary, StudySamplesLink
+from sequencescape.model import Sample, Study, Library, Well, MultiplexedLibrary
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import get_equivalent_popo_model_type, \
@@ -8,7 +8,7 @@ from sequencescape.sqlalchemy._sqlalchemy_model_converter import get_equivalent_
 from sequencescape.tests.mocks import create_mock_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
     TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_mock_study, \
     STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_mock_library, LIBRARY_TYPE, \
-    create_mock_well, create_mock_multiplexed_library, create_mock_study_samples_link
+    create_mock_well, create_mock_multiplexed_library
 
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):
@@ -36,9 +36,6 @@ class TestGetEquivalentPopoModelType(unittest.TestCase):
     def test_correct_with_multiplexed_library(self):
         self.assertEqual(get_equivalent_popo_model_type(SQLAlchemyMultiplexedLibrary), MultiplexedLibrary)
 
-    def test_correct_with_study_samples_link(self):
-        self.assertEqual(get_equivalent_popo_model_type(SQLAlchemyStudySamplesLink), StudySamplesLink)
-
 
 class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
     """
@@ -64,9 +61,6 @@ class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
 
     def test_correct_with_multiplexed_library(self):
         self.assertEqual(get_equivalent_sqlalchemy_model_type(MultiplexedLibrary), SQLAlchemyMultiplexedLibrary)
-
-    def test_correct_with_study_samples_link(self):
-        self.assertEqual(get_equivalent_sqlalchemy_model_type(StudySamplesLink), SQLAlchemyStudySamplesLink)
 
 
 class TestConvertToSQLAlchemyModel(unittest.TestCase):
@@ -133,13 +127,6 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.name, NAME)
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
-    def test_convert_study_samples_link(self):
-        model = create_mock_study_samples_link()
-        converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemyStudySamplesLink
-        self.assertEqual(converted_model.__class__, SQLAlchemyStudySamplesLink)
-        self.assertEqual(converted_model.internal_id, INTERNAL_ID)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
-
 
 class TestConvertToPopoModel(unittest.TestCase):
     """
@@ -203,13 +190,6 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.__class__, MultiplexedLibrary)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
-
-    def test_convert_study_samples_link(self):
-        alchemy_model = convert_to_sqlalchemy_model(create_mock_study_samples_link())
-        converted_model = convert_to_popo_model(alchemy_model)  # type: StudySamplesLink
-        self.assertEqual(converted_model.__class__, StudySamplesLink)
-        self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
 

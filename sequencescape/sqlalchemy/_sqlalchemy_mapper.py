@@ -8,7 +8,7 @@ from sequencescape.model import Model, Library, MultiplexedLibrary, Sample, Well
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_popo_models, get_equivalent_sqlalchemy_model_type
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrent
+from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrentModel
 
 
 class SQLAlchemyMapper(Mapper):
@@ -77,7 +77,7 @@ class SQLAlchemyMapper(Mapper):
         :return: models of the rows that are matched
         """
         # FIXME: Should this always limit `is_current` to 1?
-        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
+        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrentModel):
             raise ValueError(
                 "Not possible to get instances of type %s by name as the query required `is_current` property"
                     % self._get_model_type())

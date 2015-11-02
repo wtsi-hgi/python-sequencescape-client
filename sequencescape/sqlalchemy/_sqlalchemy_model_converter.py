@@ -1,9 +1,9 @@
 from typing import List, Union
 
-from sequencescape.model import Study, Sample, Well, MultiplexedLibrary, StudySamplesLink, Model
+from sequencescape.model import Study, Sample, Well, MultiplexedLibrary, Model
 from sequencescape.model import Library
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
-    SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink, SQLAlchemyModel
+    SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyModel
 
 
 # TODO: Move this to model module and make "public"?
@@ -12,8 +12,7 @@ _SQLALCHEMY_TO_POPO_CONVERSIONS = {
     SQLAlchemyStudy: Study,
     SQLAlchemyLibrary: Library,
     SQLAlchemyWell: Well,
-    SQLAlchemyMultiplexedLibrary: MultiplexedLibrary,
-    SQLAlchemyStudySamplesLink: StudySamplesLink
+    SQLAlchemyMultiplexedLibrary: MultiplexedLibrary
 }
 
 

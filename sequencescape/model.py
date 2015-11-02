@@ -20,48 +20,48 @@ class Model(metaclass=ABCMeta):
         return "{ %s }" % ', '.join(string_builder)
 
 
-class Named(Model, metaclass=ABCMeta):
+class NamedModel(Model, metaclass=ABCMeta):
     """
-    TODO
+    Model that has a name.
     """
     def __init__(self):
-        super(Named, self).__init__()
+        super(NamedModel, self).__init__()
         self.name = None
 
 
-class InternalID(Model, metaclass=ABCMeta):
+class InternalIdModel(Model, metaclass=ABCMeta):
     """
-    TODO
+    Model that has an internal ID.
     """
     def __init__(self):
-        super(InternalID, self).__init__()
+        super(InternalIdModel, self).__init__()
         self.internal_id = None
 
     def __hash__(self) -> hash:
         return hash(self.internal_id)
 
 
-class AccessionNumber(Model, metaclass=ABCMeta):
+class AccessionNumberModel(Model, metaclass=ABCMeta):
     """
-    TODO
+    Model that has an accession number.
     """
     def __init__(self):
-        super(AccessionNumber, self).__init__()
+        super(AccessionNumberModel, self).__init__()
         self.accession_number = None
 
 
-class IsCurrent(Model, metaclass=ABCMeta):
+class IsCurrentModel(Model, metaclass=ABCMeta):
     """
-    TODO
+    Model that has an is_current property.
     """
     def __init__(self):
-        super(IsCurrent, self).__init__()
+        super(IsCurrentModel, self).__init__()
         self.is_current = None
 
 
-class Sample(Named, InternalID, AccessionNumber, IsCurrent):
+class Sample(NamedModel, InternalIdModel, AccessionNumberModel, IsCurrentModel):
     """
-    TODO
+    Model of a sample.
     """
     def __init__(self):
         super(Sample, self).__init__()
@@ -75,9 +75,9 @@ class Sample(Named, InternalID, AccessionNumber, IsCurrent):
         self.geographical_region = None
 
 
-class Study(Named, InternalID, AccessionNumber, IsCurrent):
+class Study(NamedModel, InternalIdModel, AccessionNumberModel, IsCurrentModel):
     """
-    TODO
+    Model of a study.
     """
     def __init__(self):
         super(Study, self).__init__()
@@ -88,37 +88,26 @@ class Study(Named, InternalID, AccessionNumber, IsCurrent):
         self.faculty_sponsor = None
 
 
-class Library(Named, InternalID, IsCurrent):
+class Library(NamedModel, InternalIdModel, IsCurrentModel):
     """
-    TODO
+    Model of a library.
     """
     def __init__(self):
         super(Library, self).__init__()
         self.library_type = None
 
 
-class Well(Named, InternalID, IsCurrent):
+class Well(NamedModel, InternalIdModel, IsCurrentModel):
     """
-    TODO
+    Model of a well.
     """
     def __init__(self):
         super(Well, self).__init__()
 
 
-class MultiplexedLibrary(Named, InternalID, IsCurrent):
+class MultiplexedLibrary(NamedModel, InternalIdModel, IsCurrentModel):
     """
-    TODO
+    Model of a multiplexed library.
     """
     def __init__(self):
         super(MultiplexedLibrary, self).__init__()
-
-
-# FIXME: Required?
-class StudySamplesLink(InternalID, IsCurrent):
-    """
-    TODO
-    """
-    def __init__(self):
-        super(StudySamplesLink, self).__init__()
-        self.sample_internal_id = None
-        self.study_internal_id = None

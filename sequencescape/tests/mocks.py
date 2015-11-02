@@ -23,9 +23,6 @@ FACULTY_SPONSOR = "FACULTY_SPONSOR123"
 
 LIBRARY_TYPE = "LIBRARY_TYPE123"
 
-SAMPLE_INTERNAl_ID = 456
-STUDY_INTERNAL_ID = 789
-
 
 def create_mock_sample() -> Sample:
     sample = Sample()
@@ -81,10 +78,3 @@ def create_mock_multiplexed_library() -> MultiplexedLibrary:
     multiplexed_library.name = NAME
     multiplexed_library.is_current = IS_CURRENT
     return multiplexed_library
-
-
-def create_mock_study_samples_link() -> StudySamplesLink:
-    study_samples_link = StudySamplesLink()
-    study_samples_link.internal_id = INTERNAL_ID
-    study_samples_link.is_current = IS_CURRENT
-    return study_samples_link

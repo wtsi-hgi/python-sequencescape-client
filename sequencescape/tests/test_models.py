@@ -1,9 +1,9 @@
 from abc import ABCMeta, abstractmethod
-import os
 import unittest
-from sequencescape.model import Model, Named, IsCurrent, InternalID, AccessionNumber
+
+from sequencescape.model import Model, NamedModel, IsCurrentModel, InternalIdModel, AccessionNumberModel
 from sequencescape.tests.mocks import create_mock_library, create_mock_sample, create_mock_study, create_mock_well, \
-    create_mock_multiplexed_library, create_mock_study_samples_link
+    create_mock_multiplexed_library
 
 
 class _FakeModel(Model):
@@ -63,7 +63,7 @@ class _TestNamed(_TestModel, metaclass=ABCMeta):
     """
     def test_not_equal_if_different_name(self):
         model1 = self._create_model()    # type: Named
-        assert isinstance(model1, Named)
+        assert isinstance(model1, NamedModel)
         model1.name = "this"
         model2 = self._create_model()    # type: Named
         model2.name = "that"
@@ -76,7 +76,7 @@ class _TestInternalID(_TestModel, metaclass=ABCMeta):
     """
     def test_not_equal_if_different_id(self):
         model1 = self._create_model()    # type: InternalID
-        assert isinstance(model1, InternalID)
+        assert isinstance(model1, InternalIdModel)
         model1.internal_id = 1
         model2 = self._create_model()    # type: InternalID
         model2.internal_id = 2
@@ -89,7 +89,7 @@ class _TestAccessionNumber(_TestModel, metaclass=ABCMeta):
     """
     def test_not_equal_if_different_accession_number(self):
         model1 = self._create_model()    # type: AccessionNumber
-        assert isinstance(model1, AccessionNumber)
+        assert isinstance(model1, AccessionNumberModel)
         model1.accession_number = "abc1"
         model2 = self._create_model()    # type: AccessionNumber
         model2.accession_number = "def2"
@@ -102,7 +102,7 @@ class _TestIsCurrent(_TestModel, metaclass=ABCMeta):
     """
     def test_not_equal_if_different_is_current(self):
         model1 = self._create_model()    # type: IsCurrent
-        assert isinstance(model1, IsCurrent)
+        assert isinstance(model1, IsCurrentModel)
         model1.is_current = 0
         model2 = self._create_model()    # type: IsCurrent
         model2.is_current = 1
@@ -157,17 +157,5 @@ class TestMultiplexedLibrary(_TestNamed, _TestInternalID, _TestIsCurrent):
         return create_mock_multiplexed_library()
 
 
-class TestStudySamplesLink(_TestInternalID, _TestIsCurrent):
-    """
-    TODO
-    """
-    def _create_model(self):
-        return create_mock_study_samples_link()
-
-
-
-# if __name__ == '__main__':
-#     unittest.main()
-
-
-
+if __name__ == '__main__':
+    unittest.main()

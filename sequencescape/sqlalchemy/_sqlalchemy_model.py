@@ -7,27 +7,28 @@ from sqlalchemy import Column, Integer, String
 SQLAlchemyModel = declarative_base()
 
 
-class SQLAlchemyNamed():
+class SQLAlchemyNamedModel():
     __metaclass__ = ABCMeta
     name = Column(String)
 
 
-class SQLAlchemyInternalID():
+class SQLAlchemyInternalIdModel():
     __metaclass__ = ABCMeta
     internal_id = Column(Integer, primary_key=True)
 
 
-class SQLAlchemyAccessionNumber():
+class SQLAlchemyAccessionNumberModel():
     __metaclass__ = ABCMeta
     accession_number = Column(String)
 
 
-class SQLAlchemyIsCurrent():
+class SQLAlchemyIsCurrentModel():
     __metaclass__ = ABCMeta
     is_current = Column(Integer)
 
 
-class SQLAlchemySample(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyAccessionNumber, SQLAlchemyIsCurrent):
+class SQLAlchemySample(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
+                       SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_samples'
     organism = Column(String)
     common_name = Column(String)
@@ -39,7 +40,8 @@ class SQLAlchemySample(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, S
     geographical_region = Column(String)
 
 
-class SQLAlchemyStudy(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyAccessionNumber, SQLAlchemyIsCurrent):
+class SQLAlchemyStudy(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
+                      SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_studies'
     study_type = Column(String)
     description = Column(String)
@@ -48,21 +50,22 @@ class SQLAlchemyStudy(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQ
     faculty_sponsor = Column(String)
 
 
-class SQLAlchemyLibrary(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
+class SQLAlchemyLibrary(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_library_tubes'
     library_type = Column(String)
 
 
 # TODO: doesn't look like this model name fits the domain very well (Wells?)
-class SQLAlchemyWell(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
+class SQLAlchemyWell(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_wells'
 
 
-class SQLAlchemyMultiplexedLibrary(SQLAlchemyModel, SQLAlchemyNamed, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
+class SQLAlchemyMultiplexedLibrary(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel,
+                                   SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_multiplexed_library_tubes'
 
 
-class SQLAlchemyStudySamplesLink(SQLAlchemyModel, SQLAlchemyInternalID, SQLAlchemyIsCurrent):
+class SQLAlchemyStudySamplesLink(SQLAlchemyModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_study_samples'
     sample_internal_id = Column(Integer)
     study_internal_id = Column(Integer)
