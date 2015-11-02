@@ -73,6 +73,10 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
     """
     Unit testing for `convert_to_sqlalchemy_model`.
     """
+    def test_convert_none(self):
+        converted_model = convert_to_sqlalchemy_model(None)  # type: None
+        self.assertIsNone(converted_model)
+
     def test_convert_sample(self):
         model = create_mock_sample()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemySample
@@ -141,6 +145,10 @@ class TestConvertToPopoModel(unittest.TestCase):
     """
     Unit testing for `convert_to_popo_model`.
     """
+    def test_convert_none(self):
+        converted_model = convert_to_popo_model(None)  # type: None
+        self.assertIsNone(converted_model)
+
     def test_convert_sample(self):
         alchemy_model = convert_to_sqlalchemy_model(create_mock_sample())
         converted_model = convert_to_popo_model(alchemy_model)  # type: Sample

@@ -21,22 +21,32 @@ class _TestModel(unittest.TestCase, metaclass=ABCMeta):
         self.assertNotEqual(self._create_model(), _FakeModel())
 
     def test_equal_reflexivity(self):
-        sample = self._create_model()
-        self.assertEqual(sample, sample)
+        model = self._create_model()
+        self.assertEqual(model, model)
 
     def test_equal_symmetry(self):
-        sample1 = self._create_model()
-        sample2 = self._create_model()
-        self.assertEqual(sample1, sample2)
-        self.assertEqual(sample2, sample1)
+        model1 = self._create_model()
+        model2 = self._create_model()
+        self.assertEqual(model1, model2)
+        self.assertEqual(model2, model1)
 
     def test_equal_transitivity(self):
-        sample1 = self._create_model()
-        sample2 = self._create_model()
-        sample3 = self._create_model()
-        self.assertEqual(sample1, sample2)
-        self.assertEqual(sample2, sample3)
-        self.assertEqual(sample1, sample3)
+        model1 = self._create_model()
+        model2 = self._create_model()
+        model3 = self._create_model()
+        self.assertEqual(model1, model2)
+        self.assertEqual(model2, model3)
+        self.assertEqual(model1, model3)
+
+    def test_hash_equal_if_equal(self):
+        model1 = self._create_model()
+        model2 = self._create_model()
+        self.assertEquals(hash(model1), hash(model2))
+
+
+    def test_can_get_string_representation(self):
+        string_representation = str(self._create_model())
+        self.assertTrue(isinstance(string_representation, str))
 
     @abstractmethod
     def _create_model(self):
