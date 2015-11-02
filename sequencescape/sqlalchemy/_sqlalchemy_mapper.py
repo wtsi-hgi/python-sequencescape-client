@@ -1,14 +1,12 @@
 from typing import Union, List, Any, Tuple
 
-from sqlalchemy import Column
-
 from sequencescape.enums import Property
 from sequencescape.mapper import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
 from sequencescape.model import Model, Library, MultiplexedLibrary, Sample, Well, Study
-from sequencescape.sqlalchemy._sqlalchemy_model_converter import convert_to_sqlalchemy_model, convert_to_popo_model, \
-    convert_to_popo_models, get_equivalent_sqlalchemy_model_type
+from sequencescape.sqlalchemy._sqlalchemy_model_converter import convert_to_sqlalchemy_model, convert_to_popo_models,\
+    get_equivalent_sqlalchemy_model_type
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrent
+from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrentModel
 
 
 class SQLAlchemyMapper(Mapper):
@@ -70,14 +68,8 @@ class SQLAlchemyMapper(Mapper):
         return results
 
     def _get_by_property(self, property: Property, required_property_values: List[Any]) -> List[Model]:
-        """
-        Gets many that have a property, defined by a given property selector, that matches a given value.
-        :param property: TODO
-        :param required_property_values: the property must match this value to be selected
-        :return: models of the rows that are matched
-        """
-        # FIXME: Should this always limit `is_current` to 1?
-        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrent):
+        # FIXME: Should this always limit `is_current` to 1 - model might not even have this property!
+        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrentModel):
             raise ValueError(
                 "Not possible to get instances of type %s by name as the query required `is_current` property"
                     % self._get_model_type())
@@ -121,24 +113,6 @@ class SQLAlchemyMapper(Mapper):
         return self._model_type
 
 
-class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
-    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
-        """
-        Default constructor.
-        :param database_connector: the database connector
-        """
-        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
-
-
-class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMapper):
-    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
-        """
-        Default constructor.
-        :param database_connector: the database connector
-        """
-        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)
-
-
 class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
@@ -146,15 +120,6 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         :param database_connector: the database connector
         """
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
-
-
-class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
-    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
-        """
-        Default constructor.
-        :param database_connector: the database connector
-        """
-        super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
 
 
 class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
@@ -177,3 +142,30 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
 
         study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
         return self.get_by_id(study_ids)
+
+
+class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        Default constructor.
+        :param database_connector: the database connector
+        """
+        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
+
+
+class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        Default constructor.
+        :param database_connector: the database connector
+        """
+        super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
+
+
+class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        Default constructor.
+        :param database_connector: the database connector
+        """
+        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)

@@ -1,14 +1,15 @@
 import unittest
 
-from sequencescape.model import Sample, Study, Library, Well, MultiplexedLibrary, StudySamplesLink
+from sequencescape.model import Sample, Study, Library, Well, MultiplexedLibrary
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import get_equivalent_popo_model_type, \
-    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model
+    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
+    convert_to_sqlalchemy_models, convert_to_popo_models
 from sequencescape.tests.mocks import create_mock_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
     TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_mock_study, \
     STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_mock_library, LIBRARY_TYPE, \
-    create_mock_well, create_mock_multiplexed_library, create_mock_study_samples_link
+    create_mock_well, create_mock_multiplexed_library
 
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):
@@ -36,9 +37,6 @@ class TestGetEquivalentPopoModelType(unittest.TestCase):
     def test_correct_with_multiplexed_library(self):
         self.assertEqual(get_equivalent_popo_model_type(SQLAlchemyMultiplexedLibrary), MultiplexedLibrary)
 
-    def test_correct_with_study_samples_link(self):
-        self.assertEqual(get_equivalent_popo_model_type(SQLAlchemyStudySamplesLink), StudySamplesLink)
-
 
 class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
     """
@@ -65,14 +63,15 @@ class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
     def test_correct_with_multiplexed_library(self):
         self.assertEqual(get_equivalent_sqlalchemy_model_type(MultiplexedLibrary), SQLAlchemyMultiplexedLibrary)
 
-    def test_correct_with_study_samples_link(self):
-        self.assertEqual(get_equivalent_sqlalchemy_model_type(StudySamplesLink), SQLAlchemyStudySamplesLink)
-
 
 class TestConvertToSQLAlchemyModel(unittest.TestCase):
     """
     Unit testing for `convert_to_sqlalchemy_model`.
     """
+    def test_convert_none(self):
+        converted_model = convert_to_sqlalchemy_model(None)  # type: None
+        self.assertIsNone(converted_model)
+
     def test_convert_sample(self):
         model = create_mock_sample()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemySample
@@ -129,18 +128,57 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.name, NAME)
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
-    def test_convert_study_samples_link(self):
-        model = create_mock_study_samples_link()
-        converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemyStudySamplesLink
-        self.assertEqual(converted_model.__class__, SQLAlchemyStudySamplesLink)
-        self.assertEqual(converted_model.internal_id, INTERNAL_ID)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
+
+class TestConvertToSQLAlchemyModels(unittest.TestCase):
+    """
+    TODO
+    """
+    def test_convert_many_of_same_type(self):
+        names = ["name_1", "name_2"]
+        models = [Sample(name=names[0]), Sample(name=names[1])]
+        converted = convert_to_sqlalchemy_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+
+    def test_convert_many_of_different_type(self):
+        names = ["name_1", "name_2"]
+        models = [Sample(name=names[0]), Library(name=names[1])]
+        converted = convert_to_sqlalchemy_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+        self.assertIsInstance(converted[0], SQLAlchemySample)
+        self.assertIsInstance(converted[1], SQLAlchemyLibrary)
+
+
+class TestConvertToPOPOModels(unittest.TestCase):
+    """
+    TODO
+    """
+    def test_convert_many_of_same_type(self):
+        names = ["name_1", "name_2"]
+        models = [SQLAlchemySample(), SQLAlchemySample()]
+        models[0].name = names[0]
+        models[1].name = names[1]
+        converted = convert_to_popo_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+
+    def test_convert_many_of_different_type(self):
+        names = ["name_1", "name_2"]
+        models = [SQLAlchemySample(), SQLAlchemyLibrary()]
+        models[0].name = names[0]
+        models[1].name = names[1]
+        converted = convert_to_popo_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+        self.assertIsInstance(converted[0], Sample)
+        self.assertIsInstance(converted[1], Library)
 
 
 class TestConvertToPopoModel(unittest.TestCase):
     """
     Unit testing for `convert_to_popo_model`.
     """
+    def test_convert_none(self):
+        converted_model = convert_to_popo_model(None)  # type: None
+        self.assertIsNone(converted_model)
+
     def test_convert_sample(self):
         alchemy_model = convert_to_sqlalchemy_model(create_mock_sample())
         converted_model = convert_to_popo_model(alchemy_model)  # type: Sample
@@ -195,13 +233,6 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.__class__, MultiplexedLibrary)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
-
-    def test_convert_study_samples_link(self):
-        alchemy_model = convert_to_sqlalchemy_model(create_mock_study_samples_link())
-        converted_model = convert_to_popo_model(alchemy_model)  # type: StudySamplesLink
-        self.assertEqual(converted_model.__class__, StudySamplesLink)
-        self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
 
