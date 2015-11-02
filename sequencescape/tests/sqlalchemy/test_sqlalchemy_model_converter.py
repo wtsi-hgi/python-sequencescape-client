@@ -4,7 +4,8 @@ from sequencescape.model import Sample, Study, Library, Well, MultiplexedLibrary
 from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import get_equivalent_popo_model_type, \
-    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model
+    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
+    convert_to_sqlalchemy_models, convert_to_popo_models
 from sequencescape.tests.mocks import create_mock_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
     TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_mock_study, \
     STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_mock_library, LIBRARY_TYPE, \
@@ -126,16 +127,48 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
         self.assertEqual(converted_model.is_current, IS_CURRENT)
-#
-#
-# class TestConvertToSQLAlchemyModels(unittest.TestCase):
-#     """
-#     """
-#     def test_convert_many_of_same_type(self):
-#         named_models = []
-#         for i in range(0, 2):
-#             named_model = Sample()
-#             sample.name =
+
+
+class TestConvertToSQLAlchemyModels(unittest.TestCase):
+    """
+    TODO
+    """
+    def test_convert_many_of_same_type(self):
+        names = ["name_1", "name_2"]
+        models = [Sample(name=names[0]), Sample(name=names[1])]
+        converted = convert_to_sqlalchemy_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+
+    def test_convert_many_of_different_type(self):
+        names = ["name_1", "name_2"]
+        models = [Sample(name=names[0]), Library(name=names[1])]
+        converted = convert_to_sqlalchemy_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+        self.assertIsInstance(converted[0], SQLAlchemySample)
+        self.assertIsInstance(converted[1], SQLAlchemyLibrary)
+
+
+class TestConvertToPOPOModels(unittest.TestCase):
+    """
+    TODO
+    """
+    def test_convert_many_of_same_type(self):
+        names = ["name_1", "name_2"]
+        models = [SQLAlchemySample(), SQLAlchemySample()]
+        models[0].name = names[0]
+        models[1].name = names[1]
+        converted = convert_to_popo_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+
+    def test_convert_many_of_different_type(self):
+        names = ["name_1", "name_2"]
+        models = [SQLAlchemySample(), SQLAlchemyLibrary()]
+        models[0].name = names[0]
+        models[1].name = names[1]
+        converted = convert_to_popo_models(models)
+        self.assertEquals([x.name for x in converted], [x.name for x in models])
+        self.assertIsInstance(converted[0], Sample)
+        self.assertIsInstance(converted[1], Library)
 
 
 class TestConvertToPopoModel(unittest.TestCase):

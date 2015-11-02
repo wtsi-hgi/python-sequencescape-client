@@ -16,7 +16,7 @@ _SQLALCHEMY_TO_POPO_CONVERSIONS = {
 }
 
 
-def get_equivalent_popo_model_type(sqlalchemy_type: type) -> Union[type, None]:
+def get_equivalent_popo_model_type(sqlalchemy_type: Union[type, None]) -> Union[type, None]:
     """
     Gets the equivalent Plain Old Python Object (POPO) type for the given SQLAlchemy model type.
     :param sqlalchemy_type: the type of SQLAlchemy model to get equivalent POPO for
@@ -66,7 +66,6 @@ def convert_to_popo_model(sqlalchemy_model: SQLAlchemyModel) -> Union[Model, Non
     return converted
 
 
-# TODO: Write test
 def convert_to_popo_models(sqlalchemy_models: List[SQLAlchemyModel]) -> List[Union[Model, None]]:
     """
     Converts the given SQLAlchemy models into an equivalent POPO models thus removing the coupling to the underlying
