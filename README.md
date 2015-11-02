@@ -1,13 +1,16 @@
 # Sequencescape Python Client
 [![Build Status](https://travis-ci.org/wtsi-hgi/sequencescape-python-client.svg)](https://travis-ci.org/wtsi-hgi/sequencescape-python-client)
 
-## How To Include:
+## How to use in your project
+### Including the `sequencescape` library
 In ``/requirements.txt`` or in your ``/setup.py`` script:
 ```
-git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master
+git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master#egg=sequencescape
 ```
+*See more about using libraries for git repositories in the pip documentation:
+[pip documentation](https://pip.readthedocs.org/en/1.1/requirements.html#git)*
 
-## How To Use:
+## API
 ```python
 from sequencescape import connect_to_sequencescape
 
@@ -22,12 +25,12 @@ sequencescape.library.get_by_id([library_internal_id, other_library_internal_id]
 sequencescape.study.get_by_accession_number(study_accession_number)
 sequencescape.study.get_by_accession_number([study_accession_number, other_study_accession_number])
 
-sequencescape.sample.get_by_value(property, value)
-sequencescape.sample.get_by_value([(property, value), (other_property, value)])
-sequencescape.sample.get_by_value(property, [value, other_value])
+sequencescape.sample.get_by_property_value(property, value)
+sequencescape.sample.get_by_property_value([(property, value), (other_property, value)])
+sequencescape.sample.get_by_property_value(property, [value, other_value])
 ```
 
-## How To Develop:
+## How to develop
 ### Testing
 #### Locally
 To run the tests, use ``./scripts/run-tests.sh`` from the project's root directory. This script will use ``pip`` to 
