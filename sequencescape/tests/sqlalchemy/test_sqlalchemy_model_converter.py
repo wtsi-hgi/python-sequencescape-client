@@ -126,6 +126,16 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
         self.assertEqual(converted_model.is_current, IS_CURRENT)
+#
+#
+# class TestConvertToSQLAlchemyModels(unittest.TestCase):
+#     """
+#     """
+#     def test_convert_many_of_same_type(self):
+#         named_models = []
+#         for i in range(0, 2):
+#             named_model = Sample()
+#             sample.name =
 
 
 class TestConvertToPopoModel(unittest.TestCase):

@@ -4,7 +4,7 @@ from sequencescape.model import *
 INTERNAL_ID = 123
 NAME = "NAME123"
 ACCESSION_NUMBER = "ACCESSION_NUMBER123"
-IS_CURRENT = 1
+IS_CURRENT = True
 
 ORGANISM = "ORGANISM123"
 COMMON_NAME = "COMMON_NAME123"
@@ -22,6 +22,22 @@ STUDY_VISIBILITY = "STUDY_VISIBILITY123"
 FACULTY_SPONSOR = "FACULTY_SPONSOR123"
 
 LIBRARY_TYPE = "LIBRARY_TYPE123"
+
+
+def create_mock(model_type: type):
+    """
+    Creates a mock of an object of the given type
+    :param model_type: the type of model object to create a mock of
+    :return: the mock model object
+    """
+    mappings = {
+        Sample: create_mock_sample,
+        Study: create_mock_study,
+        Library: create_mock_library,
+        MultiplexedLibrary: create_mock_multiplexed_library,
+        Well: create_mock_well
+    }
+    return mappings[model_type]()
 
 
 def create_mock_sample() -> Sample:
@@ -64,6 +80,14 @@ def create_mock_library() -> Library:
     return library
 
 
+def create_mock_multiplexed_library() -> MultiplexedLibrary:
+    multiplexed_library = MultiplexedLibrary()
+    multiplexed_library.internal_id = INTERNAL_ID
+    multiplexed_library.name = NAME
+    multiplexed_library.is_current = IS_CURRENT
+    return multiplexed_library
+
+
 def create_mock_well() -> Well:
     well = Well()
     well.internal_id = INTERNAL_ID
@@ -71,10 +95,3 @@ def create_mock_well() -> Well:
     well.is_current = IS_CURRENT
     return well
 
-
-def create_mock_multiplexed_library() -> MultiplexedLibrary:
-    multiplexed_library = MultiplexedLibrary()
-    multiplexed_library.internal_id = INTERNAL_ID
-    multiplexed_library.name = NAME
-    multiplexed_library.is_current = IS_CURRENT
-    return multiplexed_library

@@ -53,14 +53,15 @@ class SQLAlchemyLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlch
     library_type = Column(String)
 
 
+class SQLAlchemyMultiplexedLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel,
+                                   SQLAlchemyIsCurrentModel):
+    __tablename__ = 'current_multiplexed_library_tubes'
+
+
 # TODO: doesn't look like this model name fits the domain very well (Wells?)
 class SQLAlchemyWell(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_wells'
 
-
-class SQLAlchemyMultiplexedLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel,
-                                   SQLAlchemyIsCurrentModel):
-    __tablename__ = 'current_multiplexed_library_tubes'
 
 
 # XXX: It is likely that this link can be put on the sample and/or study instead
