@@ -27,6 +27,7 @@ class Mapper(metaclass=ABCMeta):
         """
         pass
 
+    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_name(self, names: Union[str, List[str]]) -> List[Model]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
@@ -37,7 +38,7 @@ class Mapper(metaclass=ABCMeta):
         assert isinstance(results, list)
         return results
 
-    # TODO: This method needs to be tested separately
+    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
@@ -60,6 +61,7 @@ class Mapper(metaclass=ABCMeta):
         assert isinstance(results, list)
         return results
 
+    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[Model]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given accession
@@ -71,7 +73,7 @@ class Mapper(metaclass=ABCMeta):
         assert isinstance(results, list)
         return results
 
-    # TODO: This method needs to be tested separately
+    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_property_value(
             self,
             property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]],
@@ -104,7 +106,7 @@ class Mapper(metaclass=ABCMeta):
         values as the value of the given property.
         :param property: the property to match values to
         :param values: the values of the property to match
-        :return: models that...
+        :return: models that have at least one property value defined in the given list of acceptable values
         """
         pass
 
@@ -112,9 +114,10 @@ class Mapper(metaclass=ABCMeta):
     def _get_by_property_value_tuple(
             self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]) -> List[Model]:
         """
-        TODO
-        :param property_value_tuples:
-        :return:
+        Gets models (of the type this data mapper deals with) of data from the database that have have one of the
+        property values defined in a tuple from the given list.
+        :param property_value_tuples: the tuples declaring what property values to match
+        :return: models that have at least one property value defined in the given tuple list
         """
         pass
 
@@ -154,14 +157,8 @@ class StudyMapper(Mapper, metaclass=ABCMeta):
     @abstractmethod
     def get_associated_with_sample(self, sample_internal_ids: str) -> Study:
         """
-        This function fetches from seqeuencescape all the studies that the samples given as parameter belong to.
-        Parameters
-        ----------
-        sample_internal_ids : list
-            A list of sample internal_id values, for which you wish to find out the study/studies
-        Returns
-        -------
-        studies : list
-            A list of models.Study found for the samples given as parameter by sample_internal_ids
+        Gets all the studies that the given samples (identified by ID) belong to.
+        :param sample_internal_ids: the IDs of the samples that studies are to be got for
+        :return: studies related to one or more of the given samples
         """
         pass

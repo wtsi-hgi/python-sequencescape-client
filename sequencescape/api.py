@@ -30,9 +30,9 @@ class Connection():
 
 def connect_to_sequencescape(database_uri: str) -> Connection:
     """
-    TODO.
-    Only opens connections when used...
-    :param database_uri:
-    :return:
+    Creates an object that enables the transfer of data from a Sequencescape database to be made using data mappers.
+    Only opens connections when data mappers are used.
+    :param database_uri: location of the database as an IRI
+    :return: object through which connections can be made to the Sequencescape database
     """
     return Connection(database_uri)
