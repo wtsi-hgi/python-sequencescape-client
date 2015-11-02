@@ -1,13 +1,13 @@
 # Sequencescape Python Client
 [![Build Status](https://travis-ci.org/wtsi-hgi/sequencescape-python-client.svg)](https://travis-ci.org/wtsi-hgi/sequencescape-python-client)
 
-### How To Include:
+## How To Include:
 In ``/requirements.txt`` or in your ``/setup.py`` script:
 ```
 git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master
 ```
 
-### How To Use:
+## How To Use:
 ```python
 from sequencescape import connect_to_sequencescape
 
@@ -27,13 +27,13 @@ sequencescape.sample.get_by_value([(property, value), (other_property, value)])
 sequencescape.sample.get_by_value(property, [value, other_value])
 ```
 
-### How To Develop:
-## Testing
-# Locally
+## How To Develop:
+### Testing
+#### Locally
 To run the tests, use ``./scripts/run-tests.sh`` from the project's root directory. This script will use ``pip`` to 
 install all requirements for running the tests.
 
-# Using Docker
+#### Using Docker
 From the project's root directory:
 ```
 $ docker build -t hgi/sequencescape-python-client/test -f docker/tests/Dockerfile .
