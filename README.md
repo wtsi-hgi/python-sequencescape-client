@@ -1,13 +1,14 @@
 # Sequencescape Python Client
 [![Build Status](https://travis-ci.org/wtsi-hgi/sequencescape-python-client.svg)](https://travis-ci.org/wtsi-hgi/sequencescape-python-client)
 
-## How To Include:
+## How to use in your project
+### Including the `sequencescape` package
 In ``/requirements.txt`` or in your ``/setup.py`` script:
 ```
 git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master
 ```
 
-## How To Use:
+## API
 ```python
 from sequencescape import connect_to_sequencescape
 
@@ -27,7 +28,7 @@ sequencescape.sample.get_by_value([(property, value), (other_property, value)])
 sequencescape.sample.get_by_value(property, [value, other_value])
 ```
 
-## How To Develop:
+## How to develop
 ### Testing
 #### Locally
 To run the tests, use ``./scripts/run-tests.sh`` from the project's root directory. This script will use ``pip`` to 
