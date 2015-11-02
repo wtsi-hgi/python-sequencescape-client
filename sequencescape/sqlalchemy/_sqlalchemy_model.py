@@ -1,5 +1,3 @@
-from abc import ABCMeta
-
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
@@ -7,27 +5,27 @@ from sqlalchemy import Column, Integer, String
 SQLAlchemyModel = declarative_base()
 
 
-class SQLAlchemyNamedModel():
-    __metaclass__ = ABCMeta
+class SQLAlchemyNamedModel(SQLAlchemyModel):
+    __abstract__ = True
     name = Column(String)
 
 
-class SQLAlchemyInternalIdModel():
-    __metaclass__ = ABCMeta
+class SQLAlchemyInternalIdModel(SQLAlchemyModel):
+    __abstract__ = True
     internal_id = Column(Integer, primary_key=True)
 
 
-class SQLAlchemyAccessionNumberModel():
-    __metaclass__ = ABCMeta
+class SQLAlchemyAccessionNumberModel(SQLAlchemyModel):
+    __abstract__ = True
     accession_number = Column(String)
 
 
-class SQLAlchemyIsCurrentModel():
-    __metaclass__ = ABCMeta
+class SQLAlchemyIsCurrentModel(SQLAlchemyModel):
+    __abstract__ = True
     is_current = Column(Integer)
 
 
-class SQLAlchemySample(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
+class SQLAlchemySample(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
                        SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_samples'
     organism = Column(String)
@@ -40,7 +38,7 @@ class SQLAlchemySample(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternal
     geographical_region = Column(String)
 
 
-class SQLAlchemyStudy(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
+class SQLAlchemyStudy(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
                       SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_studies'
     study_type = Column(String)
@@ -50,22 +48,23 @@ class SQLAlchemyStudy(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalI
     faculty_sponsor = Column(String)
 
 
-class SQLAlchemyLibrary(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
+class SQLAlchemyLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_library_tubes'
     library_type = Column(String)
 
 
 # TODO: doesn't look like this model name fits the domain very well (Wells?)
-class SQLAlchemyWell(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
+class SQLAlchemyWell(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_wells'
 
 
-class SQLAlchemyMultiplexedLibrary(SQLAlchemyModel, SQLAlchemyNamedModel, SQLAlchemyInternalIdModel,
+class SQLAlchemyMultiplexedLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel,
                                    SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_multiplexed_library_tubes'
 
 
-class SQLAlchemyStudySamplesLink(SQLAlchemyModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
+# XXX: It is likely that this link can be put on the sample and/or study instead
+class SQLAlchemyStudySamplesLink(SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_study_samples'
     sample_internal_id = Column(Integer)
     study_internal_id = Column(Integer)
