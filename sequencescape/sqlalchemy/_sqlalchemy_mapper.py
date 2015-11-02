@@ -121,24 +121,6 @@ class SQLAlchemyMapper(Mapper):
         return self._model_type
 
 
-class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
-    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
-        """
-        Default constructor.
-        :param database_connector: the database connector
-        """
-        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
-
-
-class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMapper):
-    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
-        """
-        Default constructor.
-        :param database_connector: the database connector
-        """
-        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)
-
-
 class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
@@ -146,15 +128,6 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         :param database_connector: the database connector
         """
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
-
-
-class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
-    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
-        """
-        Default constructor.
-        :param database_connector: the database connector
-        """
-        super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
 
 
 class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
@@ -177,3 +150,30 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
 
         study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
         return self.get_by_id(study_ids)
+
+
+class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        Default constructor.
+        :param database_connector: the database connector
+        """
+        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
+
+
+class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        Default constructor.
+        :param database_connector: the database connector
+        """
+        super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
+
+
+class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
+        """
+        Default constructor.
+        :param database_connector: the database connector
+        """
+        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)

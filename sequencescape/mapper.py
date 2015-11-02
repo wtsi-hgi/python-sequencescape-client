@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Tuple, Union, Any, Optional
 
-from sequencescape.model import Model, Study
+from sequencescape.model import Model, Study, Named, InternalID, AccessionNumber
 from sequencescape.enums import Property
 
 
@@ -26,52 +26,6 @@ class Mapper(metaclass=ABCMeta):
         :return: a list of models representing each piece of data in the database of the type this data mapper deals with
         """
         pass
-
-    # TODO: This method needs to be tested independently of concrete subclass.
-    def get_by_name(self, names: Union[str, List[str]]) -> List[Model]:
-        """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
-        :param names: the name or list of names of the data to get models for
-        :return: list of models of data with the given name(s)
-        """
-        results = self.get_by_property_value(Property.NAME, names)
-        assert isinstance(results, list)
-        return results
-
-    # TODO: This method needs to be tested independently of concrete subclass.
-    def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[Model]]:
-        """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
-
-        The property values this method uses are unique to each entry. Therefore, invoking this method with a single ID
-        can return at most one model. For consistency, this return will be a list even if a single ID is used.
-        :param internal_ids: the ids or list of ids of the data to get models for
-        :return: list of models of data with the given id(s)
-        """
-        results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
-        too_many_results_error = "Retrieved multiple entries (%s) with the same internal ID; it has been defined that" \
-                                 "this property value should be unqiue. To bypass this check, use:" \
-                                 "`get_by_property_value(Property.INTERNAL_ID, internal_ids)`." % results
-        if not isinstance(internal_ids, list):
-            if len(results) > 1:
-                raise ValueError(too_many_results_error)
-        else:
-            if len(results) > len(internal_ids):
-                raise ValueError(too_many_results_error)
-        assert isinstance(results, list)
-        return results
-
-    # TODO: This method needs to be tested independently of concrete subclass.
-    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[Model]:
-        """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given accession
-        number(s).
-        :param accession_numbers: the accession number or list of accession numbers of the data to get models for
-        :return: list of models of data with the given accession number(s)
-        """
-        results = self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
-        assert isinstance(results, list)
-        return results
 
     # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_property_value(
@@ -122,35 +76,72 @@ class Mapper(metaclass=ABCMeta):
         pass
 
 
-class LibraryMapper(Mapper, metaclass=ABCMeta):
+class NamedMapper(Mapper, metaclass=ABCMeta):
     """
-    Mapper for `Library` models.
+    TODO
     """
-    pass
+    # TODO: This method needs to be tested independently of concrete subclass.
+    def get_by_name(self, names: Union[str, List[str]]) -> List[Named]:
+        """
+        Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
+        :param names: the name or list of names of the data to get models for
+        :return: list of models of data with the given name(s)
+        """
+        results = self.get_by_property_value(Property.NAME, names)
+        assert isinstance(results, list)
+        return results
 
 
-class MultiplexedLibraryMapper(Mapper, metaclass=ABCMeta):
+class InternalIDMapper(Mapper, metaclass=ABCMeta):
     """
-    Mapper for `MultiplexedLibrary` models.
+    TODO
     """
-    pass
+    # TODO: This method needs to be tested independently of concrete subclass.
+    def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalID]]:
+        """
+        Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
+
+        The property values this method uses are unique to each entry. Therefore, invoking this method with a single ID
+        can return at most one model. For consistency, this return will be a list even if a single ID is used.
+        :param internal_ids: the ids or list of ids of the data to get models for
+        :return: list of models of data with the given id(s)
+        """
+        results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
+        too_many_results_error = "Retrieved multiple entries (%s) with the same internal ID; it has been defined that" \
+                                 "this property value should be unqiue. To bypass this check, use:" \
+                                 "`get_by_property_value(Property.INTERNAL_ID, internal_ids)`." % results
+        if not isinstance(internal_ids, list):
+            if len(results) > 1:
+                raise ValueError(too_many_results_error)
+        else:
+            if len(results) > len(internal_ids):
+                raise ValueError(too_many_results_error)
+        assert isinstance(results, list)
+        return results
 
 
-class SampleMapper(Mapper, metaclass=ABCMeta):
+class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
+    # TODO: This method needs to be tested independently of concrete subclass.
+    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumber]:
+        """
+        Gets models (of the type this data mapper deals with) of data from the database that have the given accession
+        number(s).
+        :param accession_numbers: the accession number or list of accession numbers of the data to get models for
+        :return: list of models of data with the given accession number(s)
+        """
+        results = self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
+        assert isinstance(results, list)
+        return results
+
+
+class SampleMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metaclass=ABCMeta):
     """
     Mapper for `Sample` models.
     """
     pass
 
 
-class WellMapper(Mapper, metaclass=ABCMeta):
-    """
-    Mapper for `Well` models.
-    """
-    pass
-
-
-class StudyMapper(Mapper, metaclass=ABCMeta):
+class StudyMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metaclass=ABCMeta):
     """
     Mapper for `Study` models.
     """
@@ -162,3 +153,24 @@ class StudyMapper(Mapper, metaclass=ABCMeta):
         :return: studies related to one or more of the given samples
         """
         pass
+
+
+class LibraryMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+    """
+    Mapper for `Library` models.
+    """
+    pass
+
+
+class WellMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+    """
+    Mapper for `Well` models.
+    """
+    pass
+
+
+class MultiplexedLibraryMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+    """
+    Mapper for `MultiplexedLibrary` models.
+    """
+    pass

@@ -113,6 +113,7 @@ class MultiplexedLibrary(Named, InternalID, IsCurrent):
         super(MultiplexedLibrary, self).__init__()
 
 
+# FIXME: Required?
 class StudySamplesLink(InternalID, IsCurrent):
     """
     TODO

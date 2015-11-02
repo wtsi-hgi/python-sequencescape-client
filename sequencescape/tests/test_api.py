@@ -24,9 +24,9 @@ class TestConnection(unittest.TestCase):
         connection = Connection("dialect://host")
         self.assertIsInstance(connection.sample, Mapper)
         self.assertIsInstance(connection.study, Mapper)
-        self.assertIsInstance(connection.sample, Mapper)
-        self.assertIsInstance(connection.sample, Mapper)
-        self.assertIsInstance(connection.sample, Mapper)
+        self.assertIsInstance(connection.multiplexed_library, Mapper)
+        self.assertIsInstance(connection.library, Mapper)
+        self.assertIsInstance(connection.well, Mapper)
 
 
 class TestConnectToSequencescape(unittest.TestCase):
