@@ -26,3 +26,16 @@ sequencescape.sample.get_by_value(property, value)
 sequencescape.sample.get_by_value([(property, value), (other_property, value)])
 sequencescape.sample.get_by_value(property, [value, other_value])
 ```
+
+### How To Develop:
+## Testing
+# Locally
+To run the tests, use ``./scripts/run-tests.sh`` from the project's root directory. This script will use ``pip`` to 
+install all requirements for running the tests.
+
+# Using Docker
+From the project's root directory:
+```
+$ docker build -t hgi/sequencescape-python-client/test -f docker/tests/Dockerfile .
+$ docker run hgi/sequencescape-python-client/test
+```
