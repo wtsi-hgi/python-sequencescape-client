@@ -2,8 +2,8 @@ import unittest
 
 from sequencescape import connect_to_sequencescape
 from sequencescape.api import Connection
-from sequencescape.mapper import Mapper
-from sequencescape.tests.sqlalchemy.setup_database import create_database
+from sequencescape.mappers import Mapper
+from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
 
 class TestConnection(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestConnection(unittest.TestCase):
     Tests for `Connection` class.
     """
     def test_with_valid_database_url(self):
-        database_location, dialect = create_database()
+        database_location, dialect = create_stub_database()
         connect_to_sequencescape("%s:///%s" % (dialect, database_location))
 
     def test_with_no_database_url(self):

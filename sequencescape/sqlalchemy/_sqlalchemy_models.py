@@ -63,10 +63,8 @@ class SQLAlchemyWell(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemy
     __tablename__ = 'current_wells'
 
 
-
 # XXX: It is likely that this link can be put on the sample and/or study instead
 class SQLAlchemyStudySamplesLink(SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
     __tablename__ = 'current_study_samples'
     sample_internal_id = Column(Integer)
     study_internal_id = Column(Integer)
-

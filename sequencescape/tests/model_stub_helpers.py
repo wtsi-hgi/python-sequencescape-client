@@ -1,6 +1,6 @@
 from typing import List
 
-from sequencescape.model import *
+from sequencescape.models import *
 
 
 INTERNAL_ID = 123
@@ -108,4 +108,3 @@ def create_stub_well() -> Well:
     well.name = NAME
     well.is_current = IS_CURRENT
     return well
-

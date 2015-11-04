@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Tuple, Union, Any, Optional
 
-from sequencescape.model import Model, Study, NamedModel, InternalIdModel, AccessionNumberModel
+from sequencescape.models import Model, Study, NamedModel, InternalIdModel, AccessionNumberModel, Sample
 from sequencescape.enums import Property
 
 
@@ -88,7 +88,6 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
     """
     TODO
     """
-    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_name(self, names: Union[str, List[str]]) -> List[NamedModel]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
@@ -100,11 +99,10 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
         return results
 
 
-class InternalIDMapper(Mapper, metaclass=ABCMeta):
+class InternalIdMapper(Mapper, metaclass=ABCMeta):
     """
     TODO
     """
-    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalIdModel]]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
@@ -115,21 +113,11 @@ class InternalIDMapper(Mapper, metaclass=ABCMeta):
         :return: list of models of data with the given id(s)
         """
         results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
-        too_many_results_error = "Retrieved multiple entries (%s) with the same internal ID; it has been defined that" \
-                                 "this property value should be unqiue. To bypass this check, use:" \
-                                 "`get_by_property_value(Property.INTERNAL_ID, internal_ids)`." % results
-        if not isinstance(internal_ids, list):
-            if len(results) > 1:
-                raise ValueError(too_many_results_error)
-        else:
-            if len(results) > len(internal_ids):
-                raise ValueError(too_many_results_error)
         assert isinstance(results, list)
         return results
 
 
 class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
-    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumberModel]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given accession
@@ -142,43 +130,50 @@ class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
         return results
 
 
-class SampleMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metaclass=ABCMeta):
+class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclass=ABCMeta):
     """
     Mapper for `Sample` models.
     """
-    pass
+    @abstractmethod
+    def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
+        """
+        Gets all the samples that are associated to the given study or studies.
+        :param study_ids: the studies to find associated samples for
+        :return: samples that belong to one or more of the given studies
+        """
+        pass
 
 
-class StudyMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metaclass=ABCMeta):
+class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclass=ABCMeta):
     """
     Mapper for `Study` models.
     """
     @abstractmethod
-    def get_associated_with_sample(self, sample_internal_ids: str) -> Study:
+    def get_associated_with_sample(self, sample_ids: Union[Sample, List[Sample]]) -> List[Study]:
         """
         Gets all the studies that the given samples (identified by ID) belong to.
-        :param sample_internal_ids: the IDs of the samples that studies are to be got for
+        :param sample_ids: the IDs of the samples that studies are to be got for
         :return: studies related to one or more of the given samples
         """
         pass
 
 
-class LibraryMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+class LibraryMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
     Mapper for `Library` models.
     """
     pass
 
 
-class WellMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+class MultiplexedLibraryMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
-    Mapper for `Well` models.
+    Mapper for `MultiplexedLibrary` models.
     """
     pass
 
 
-class MultiplexedLibraryMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+class WellMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
-    Mapper for `MultiplexedLibrary` models.
+    Mapper for `Well` models.
     """
     pass
