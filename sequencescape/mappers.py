@@ -113,15 +113,6 @@ class InternalIdMapper(Mapper, metaclass=ABCMeta):
         :return: list of models of data with the given id(s)
         """
         results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
-        too_many_results_error = "Retrieved multiple entries (%s) with the same internal ID; it has been defined that" \
-                                 "this property value should be unqiue. To bypass this check, use:" \
-                                 "`get_by_property_value(Property.INTERNAL_ID, internal_ids)`." % results
-        if not isinstance(internal_ids, list):
-            if len(results) > 1:
-                raise ValueError(too_many_results_error)
-        else:
-            if len(results) > len(internal_ids):
-                raise ValueError(too_many_results_error)
         assert isinstance(results, list)
         return results
 
