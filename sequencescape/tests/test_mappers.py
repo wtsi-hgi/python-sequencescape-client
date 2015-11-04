@@ -3,8 +3,8 @@ from abc import ABCMeta
 from typing import List, Callable, Any, cast
 
 from sequencescape.enums import Property
-from sequencescape.mapper import Mapper
-from sequencescape.model import Model, InternalIdModel
+from sequencescape.mappers import Mapper
+from sequencescape.models import Model, InternalIdModel
 from sequencescape.tests.mock_mappers import MockMapper
 
 
@@ -59,12 +59,7 @@ class MapperTest(unittest.TestCase, metaclass=ABCMeta):
         """
         return MockMapper()
 
-
-class TestGetByPropertyValue(MapperTest):
-    """
-    Tests for `Mapper.get_by_property_value`.
-    """
-    def test_get_by_property_value_with_property_value(self):
+    def test_get_by_property_value_with_value(self):
         name = "test_name"
         mapper = self.create_mapper(Any)
         mapper.get_by_property_value(Property.NAME, name)
@@ -76,14 +71,13 @@ class TestGetByPropertyValue(MapperTest):
         mapper.get_by_property_value(Property.NAME, names)
         mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, names)
 
-    def test_get_by_property_value_with_property_tuple(self):
+    def test_get_by_property_value_with_tuple(self):
         property_value_tuple = (Property.NAME, "test_name")
         mapper = self.create_mapper(Any)
         mapper.get_by_property_value(property_value_tuple)
         mapper._get_by_property_value_tuple.assert_called_once_with(property_value_tuple)
 
-
-    def test_get_by_property_value_with_property_tuples_list(self):
+    def test_get_by_property_value_with_tuples_list(self):
         property_value_tuples = [(Property.NAME, "test_name1"), (Property.ACCESSION_NUMBER, "test_accession_number1")]
         mapper = self.create_mapper(Any)
         mapper.get_by_property_value(property_value_tuples)

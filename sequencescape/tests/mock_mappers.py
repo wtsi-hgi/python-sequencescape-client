@@ -2,8 +2,8 @@ from typing import Union, Any, List, Tuple
 from unittest.mock import MagicMock
 
 from sequencescape.enums import Property
-from sequencescape.mapper import Mapper
-from sequencescape.model import Model
+from sequencescape.mappers import Mapper
+from sequencescape.models import Model
 
 
 class MockMapper(Mapper):

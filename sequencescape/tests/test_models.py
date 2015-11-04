@@ -1,6 +1,6 @@
 import unittest
 
-from sequencescape.tests.model_stub_helper import *
+from sequencescape.tests.model_stub_helpers import *
 
 
 class _FakeModel(Model):

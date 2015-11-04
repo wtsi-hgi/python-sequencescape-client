@@ -3,12 +3,12 @@ from typing import Union, List, Any, Tuple
 from sqlalchemy import Column
 
 from sequencescape.enums import Property
-from sequencescape.mapper import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
-from sequencescape.model import Model, Library, MultiplexedLibrary, Sample, Well, Study
-from sequencescape.sqlalchemy._sqlalchemy_model_converter import convert_to_sqlalchemy_model, convert_to_popo_models,\
+from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
+from sequencescape.models import Model, Library, MultiplexedLibrary, Sample, Well, Study
+from sequencescape.sqlalchemy._sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
     get_equivalent_sqlalchemy_model_type
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrentModel
+from sequencescape.sqlalchemy._sqlalchemy_models import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrentModel
 
 
 class SQLAlchemyMapper(Mapper):

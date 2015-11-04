@@ -1,12 +1,12 @@
 import unittest
 
-from sequencescape.model import Sample, Study, Library, Well, MultiplexedLibrary
-from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
+from sequencescape.models import Sample, Study, Library, Well, MultiplexedLibrary
+from sequencescape.sqlalchemy._sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink
-from sequencescape.sqlalchemy._sqlalchemy_model_converter import get_equivalent_popo_model_type, \
+from sequencescape.sqlalchemy._sqlalchemy_model_converters import get_equivalent_popo_model_type, \
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_sqlalchemy_models, convert_to_popo_models
-from sequencescape.tests.model_stub_helper import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
+from sequencescape.tests.model_stub_helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
     TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_stub_study, \
     STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_stub_library, LIBRARY_TYPE, \
     create_stub_well, create_stub_multiplexed_library

@@ -2,13 +2,13 @@ import unittest
 from abc import ABCMeta
 from typing import List
 
-from sequencescape.mapper import Mapper
-from sequencescape.model import Sample, AccessionNumberModel, Model
+from sequencescape.mappers import Mapper
+from sequencescape.models import Sample, AccessionNumberModel, Model
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemyMapper, SQLAlchemySampleMapper
-from sequencescape.tests.model_stub_helper import create_stub_sample, assign_unique_ids
-from sequencescape.tests.sqlalchemy.setup_database import create_database
-from sequencescape.tests.test_mapper import MapperTest
+from sequencescape.sqlalchemy._sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper
+from sequencescape.tests.model_stub_helpers import create_stub_sample, assign_unique_ids
+from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
+from sequencescape.tests.test_mappers import MapperTest
 
 
 class _SQLAlchemyMapperTest(MapperTest, metaclass=ABCMeta):
@@ -35,7 +35,7 @@ class _SQLAlchemyMapperTest(MapperTest, metaclass=ABCMeta):
         Creates a connector to a test database.
         :return: connector to a test database
         """
-        database_file_path, dialect = create_database()
+        database_file_path, dialect = create_stub_database()
         connector = SQLAlchemyDatabaseConnector("%s:///%s" % (dialect, database_file_path))
         return connector, database_file_path
 

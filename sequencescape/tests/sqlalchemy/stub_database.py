@@ -2,12 +2,16 @@ import tempfile
 import sqlite3
 
 
-def create_database():
-    # Note: Not using an in-memory database because the ORM closes connections to it, hence destroying it, which is
-    #       not desired in this testing.
-    file_handle, database_file_path = tempfile.mkstemp()
+def create_stub_database():
+    """
+    Creates a stub database with a number of tables found in a Sequencescape database.
+
+    An in-memory database is not used because sqlite in-memory databases are destroyed upon close.
+    :return: stub database
+    """
+    file_handle, database_location = tempfile.mkstemp()
     dialect = "sqlite"
-    connection = sqlite3.connect(database_file_path)
+    connection = sqlite3.connect(database_location)
 
     cursor = connection.cursor()
     cursor.execute(
@@ -58,6 +62,5 @@ def create_database():
     connection.commit()
     connection.close()
 
-
-    return database_file_path, dialect
+    return database_location, dialect
 
