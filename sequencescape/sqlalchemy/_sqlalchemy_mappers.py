@@ -104,9 +104,19 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         """
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
-
     def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
-        raise NotImplemented()
+       # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
+        session = self._get_database_connector().create_session()
+
+        studies_samples = session.query(SQLAlchemyStudySamplesLink). \
+            filter(SQLAlchemyStudySamplesLink.study_ids.in_(study_ids)). \
+            filter(SQLAlchemyStudySamplesLink.is_current).all()
+
+        if not studies_samples:
+            return []
+
+        sample_ids = [study_sample.sample_internal_id for study_sample in studies_samples]
+        return self.get_by_id(sample_ids)
 
 
 class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
@@ -118,6 +128,7 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
         super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
     def get_associated_with_sample(self, sample_ids: Union[Sample, List[Sample]]) -> List[Study]:
+        # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
         session = self._get_database_connector().create_session()
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
