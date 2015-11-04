@@ -6,7 +6,7 @@ from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemySampleMapper, 
 from sequencescape.sqlalchemy._sqlalchemy_mapper import SQLAlchemyStudyMapper
 
 
-class Connection():
+class Connection:
     """
     Connection manager for queries to the Sequencescape database.
     """

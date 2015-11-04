@@ -6,10 +6,10 @@ from sequencescape.sqlalchemy._sqlalchemy_model import SQLAlchemySample, SQLAlch
 from sequencescape.sqlalchemy._sqlalchemy_model_converter import get_equivalent_popo_model_type, \
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_sqlalchemy_models, convert_to_popo_models
-from sequencescape.tests.mocks import create_mock_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
-    TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_mock_study, \
-    STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_mock_library, LIBRARY_TYPE, \
-    create_mock_well, create_mock_multiplexed_library
+from sequencescape.tests.model_stub_helper import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
+    TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_stub_study, \
+    STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_stub_library, LIBRARY_TYPE, \
+    create_stub_well, create_stub_multiplexed_library
 
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):
@@ -73,7 +73,7 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertIsNone(converted_model)
 
     def test_convert_sample(self):
-        model = create_mock_sample()
+        model = create_stub_sample()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemySample
         self.assertEqual(converted_model.__class__, SQLAlchemySample)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -90,7 +90,7 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_study(self):
-        model = create_mock_study()
+        model = create_stub_study()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemyStudy
         self.assertEqual(converted_model.__class__, SQLAlchemyStudy)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -104,7 +104,7 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_library(self):
-        model = create_mock_library()
+        model = create_stub_library()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemyLibrary
         self.assertEqual(converted_model.__class__, SQLAlchemyLibrary)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -113,7 +113,7 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_well(self):
-        model = create_mock_well()
+        model = create_stub_well()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemyWell
         self.assertEqual(converted_model.__class__, SQLAlchemyWell)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -121,7 +121,7 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_multiplexed_library(self):
-        model = create_mock_multiplexed_library()
+        model = create_stub_multiplexed_library()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemyMultiplexedLibrary
         self.assertEqual(converted_model.__class__, SQLAlchemyMultiplexedLibrary)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -180,7 +180,7 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertIsNone(converted_model)
 
     def test_convert_sample(self):
-        alchemy_model = convert_to_sqlalchemy_model(create_mock_sample())
+        alchemy_model = convert_to_sqlalchemy_model(create_stub_sample())
         converted_model = convert_to_popo_model(alchemy_model)  # type: Sample
         self.assertEqual(converted_model.__class__, Sample)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -197,7 +197,7 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_study(self):
-        alchemy_model = convert_to_sqlalchemy_model(create_mock_study())
+        alchemy_model = convert_to_sqlalchemy_model(create_stub_study())
         converted_model = convert_to_popo_model(alchemy_model)  # type: Study
         self.assertEqual(converted_model.__class__, Study)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -211,7 +211,7 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_library(self):
-        alchemy_model = convert_to_sqlalchemy_model(create_mock_library())
+        alchemy_model = convert_to_sqlalchemy_model(create_stub_library())
         converted_model = convert_to_popo_model(alchemy_model)  # type: Library
         self.assertEqual(converted_model.__class__, Library)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -220,7 +220,7 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_well(self):
-        alchemy_model = convert_to_sqlalchemy_model(create_mock_well())
+        alchemy_model = convert_to_sqlalchemy_model(create_stub_well())
         converted_model = convert_to_popo_model(alchemy_model)  # type: Well
         self.assertEqual(converted_model.__class__, Well)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
@@ -228,7 +228,7 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_multiplexed_library(self):
-        alchemy_model = convert_to_sqlalchemy_model(create_mock_multiplexed_library())
+        alchemy_model = convert_to_sqlalchemy_model(create_stub_multiplexed_library())
         converted_model = convert_to_popo_model(alchemy_model)  # type: MultiplexedLibrary
         self.assertEqual(converted_model.__class__, MultiplexedLibrary)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)

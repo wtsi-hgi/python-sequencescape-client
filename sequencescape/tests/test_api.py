@@ -1,8 +1,8 @@
 import unittest
 
+from sequencescape import connect_to_sequencescape
 from sequencescape.api import Connection
 from sequencescape.mapper import Mapper
-from sequencescape import connect_to_sequencescape
 from sequencescape.tests.sqlalchemy.setup_database import create_database
 
 

@@ -1,3 +1,5 @@
+from typing import List
+
 from sequencescape.model import *
 
 
@@ -22,6 +24,18 @@ STUDY_VISIBILITY = "STUDY_VISIBILITY123"
 FACULTY_SPONSOR = "FACULTY_SPONSOR123"
 
 LIBRARY_TYPE = "LIBRARY_TYPE123"
+
+
+def assign_unique_ids(models: List[InternalIdModel]) -> List[InternalIdModel]:
+    """
+    Gives each model in the list a unique ID. IDs are deterministic, based on each model's position in the list.
+    :param models: the models to give unique internal IDs to
+    :return: the models
+    """
+    for i in range(len(models)):
+        model = models[i]
+        model.internal_id = i
+    return models
 
 
 def create_stub(model_type: type):
