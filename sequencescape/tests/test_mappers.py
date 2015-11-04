@@ -34,7 +34,7 @@ class MapperTest(unittest.TestCase):
         self._mapper._get_by_property_value_tuple.assert_called_once_with(property_value_tuples)
 
 
-class NamedMapperTest(MapperTest):
+class NamedMapperTest(unittest.TestCase):
     """
     TODO
     """
@@ -52,7 +52,7 @@ class NamedMapperTest(MapperTest):
         self._mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, NamedMapperTest._NAMES)
 
 
-class InternalIdMapperTest(MapperTest):
+class InternalIdMapperTest(unittest.TestCase):
     """
     TODO
     """
@@ -72,7 +72,7 @@ class InternalIdMapperTest(MapperTest):
             Property.INTERNAL_ID, InternalIdMapperTest._INTERNAL_IDS)
 
 
-class AccessionNumberMapperTest(MapperTest):
+class AccessionNumberMapperTest(unittest.TestCase):
     """
     TODO
     """

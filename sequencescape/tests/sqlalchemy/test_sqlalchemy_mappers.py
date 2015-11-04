@@ -1,21 +1,34 @@
 import unittest
+from abc import ABCMeta
 from typing import List
 
 from sequencescape import Property
 from sequencescape.mappers import Mapper
 from sequencescape.models import InternalIdModel
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_mappers import SQLAlchemyMapper
+from sequencescape.sqlalchemy._sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper
 from sequencescape.tests.model_stub_helpers import create_stub_sample, assign_unique_ids
 from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
 
-class SQLAlchemyMapperTest(unittest.TestCase):
+class _SQLAlchemyTest(unittest.TestCase, metaclass=ABCMeta):
+    @staticmethod
+    def _create_connector() -> (SQLAlchemyDatabaseConnector, str):
+        """
+        Creates a connector to a test database.
+        :return: connector to a test database
+        """
+        database_file_path, dialect = create_stub_database()
+        connector = SQLAlchemyDatabaseConnector("%s:///%s" % (dialect, database_file_path))
+        return connector, database_file_path
+
+
+class SQLAlchemyMapperTest(_SQLAlchemyTest):
     """
     TODO
     """
     def setUp(self):
-        connector, database_location = SQLAlchemyMapperTest._create_connector()
+        connector, database_location = _SQLAlchemyTest._create_connector()
         self._mapper = SQLAlchemyMapper(connector, SQLAlchemyMapperTest._create_models(1)[0].__class__)
 
     def test_add_with_none(self):
@@ -110,15 +123,31 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         """
         return assign_unique_ids([create_stub_sample() for i in range(number_of_models)])
 
-    @staticmethod
-    def _create_connector() -> (SQLAlchemyDatabaseConnector, str):
-        """
-        Creates a connector to a test database.
-        :return: connector to a test database
-        """
-        database_file_path, dialect = create_stub_database()
-        connector = SQLAlchemyDatabaseConnector("%s:///%s" % (dialect, database_file_path))
-        return connector, database_file_path
+
+class SQLAlchemySampleMapperTest(_SQLAlchemyTest):
+    """
+    TODO
+    """
+    def setUp(self):
+        connector, database_location = _SQLAlchemyTest._create_connector()
+        self._mapper = SQLAlchemySampleMapper(connector)
+
+    def test_get_associated_with_study(self):
+        # TODO: Implement
+        pass
+
+
+class SQLAlchemyStudyMapperTest(unittest.TestCase):
+    """
+    TODO
+    """
+    def setUp(self):
+        connector, database_location = _SQLAlchemyTest._create_connector()
+        self._mapper = SQLAlchemySampleMapper(connector)
+
+    def test_get_associated_with_sample(self):
+        # TODO: Implement
+        pass
 
 
 if __name__ == '__main__':
