@@ -1,9 +1,6 @@
-from abc import ABCMeta
 import unittest
 
-from sequencescape.model import Model, NamedModel, IsCurrentModel, InternalIdModel, AccessionNumberModel, Sample, Study, \
-    Library, MultiplexedLibrary, Well
-from sequencescape.tests.mocks import *
+from sequencescape.tests.model_stub_helper import *
 
 
 class _FakeModel(Model):
@@ -61,7 +58,7 @@ class _TestModel(unittest.TestCase, metaclass=ABCMeta):
         Creates a mock of the model that this test deals with.
         :return: mock model
         """
-        return create_mock(self.model_type)
+        return create_stub(self.model_type)
 
 
 class _TestNamedModel(_TestModel, metaclass=ABCMeta):

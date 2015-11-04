@@ -57,7 +57,7 @@ class IsCurrentModel(Model, metaclass=ABCMeta):
     """
     Model that has an is_current property.
     """
-    def __init__(self, is_current: bool=None, **kwargs):
+    def __init__(self, is_current: bool=True, **kwargs):
         super(IsCurrentModel, self).__init__(**kwargs)
         self.is_current = is_current
 

@@ -1,3 +1,5 @@
+from typing import List
+
 from sequencescape.model import *
 
 
@@ -24,23 +26,35 @@ FACULTY_SPONSOR = "FACULTY_SPONSOR123"
 LIBRARY_TYPE = "LIBRARY_TYPE123"
 
 
-def create_mock(model_type: type):
+def assign_unique_ids(models: List[InternalIdModel]) -> List[InternalIdModel]:
+    """
+    Gives each model in the list a unique ID. IDs are deterministic, based on each model's position in the list.
+    :param models: the models to give unique internal IDs to
+    :return: the models
+    """
+    for i in range(len(models)):
+        model = models[i]
+        model.internal_id = i
+    return models
+
+
+def create_stub(model_type: type):
     """
     Creates a mock of an object of the given type
     :param model_type: the type of model object to create a mock of
     :return: the mock model object
     """
     mappings = {
-        Sample: create_mock_sample,
-        Study: create_mock_study,
-        Library: create_mock_library,
-        MultiplexedLibrary: create_mock_multiplexed_library,
-        Well: create_mock_well
+        Sample: create_stub_sample,
+        Study: create_stub_study,
+        Library: create_stub_library,
+        MultiplexedLibrary: create_stub_multiplexed_library,
+        Well: create_stub_well
     }
     return mappings[model_type]()
 
 
-def create_mock_sample() -> Sample:
+def create_stub_sample() -> Sample:
     sample = Sample()
     sample.internal_id = INTERNAL_ID
     sample.name = NAME
@@ -57,7 +71,7 @@ def create_mock_sample() -> Sample:
     return sample
 
 
-def create_mock_study() -> Study:
+def create_stub_study() -> Study:
     study = Study()
     study.internal_id = INTERNAL_ID
     study.name = NAME
@@ -71,7 +85,7 @@ def create_mock_study() -> Study:
     return study
 
 
-def create_mock_library() -> Library:
+def create_stub_library() -> Library:
     library = Library()
     library.internal_id = INTERNAL_ID
     library.name = NAME
@@ -80,7 +94,7 @@ def create_mock_library() -> Library:
     return library
 
 
-def create_mock_multiplexed_library() -> MultiplexedLibrary:
+def create_stub_multiplexed_library() -> MultiplexedLibrary:
     multiplexed_library = MultiplexedLibrary()
     multiplexed_library.internal_id = INTERNAL_ID
     multiplexed_library.name = NAME
@@ -88,7 +102,7 @@ def create_mock_multiplexed_library() -> MultiplexedLibrary:
     return multiplexed_library
 
 
-def create_mock_well() -> Well:
+def create_stub_well() -> Well:
     well = Well()
     well.internal_id = INTERNAL_ID
     well.name = NAME

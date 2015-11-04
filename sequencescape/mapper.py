@@ -20,6 +20,7 @@ class Mapper(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def get_all(self) -> List[Model]:
         """
         Gets all the data of the type this data mapper deals with in the Sequencescape database.
@@ -27,7 +28,17 @@ class Mapper(metaclass=ABCMeta):
         """
         pass
 
-    # TODO: This method needs to be tested independently of concrete subclass.
+    @abstractmethod
+    def _get_by_property_value_list(self, property: Property, values: List[Any]) -> List[Model]:
+        """
+        Gets models (of the type this data mapper deals with) of data from the database that have one of the given
+        values as the value of the given property.
+        :param property: the property to match values to
+        :param values: the values of the property to match
+        :return: list of models that have at least one property value defined in the given list of acceptable values
+        """
+        pass
+
     def get_by_property_value(
             self,
             property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]],
@@ -42,38 +53,35 @@ class Mapper(metaclass=ABCMeta):
         if isinstance(property, tuple) or isinstance(property, list):
             results = self._get_by_property_value_tuple(property)
         elif isinstance(property, str):
-            if isinstance(values, list):
-                results = self._get_by_property_value_list(property, values)
-            else:
-                # XXX: If limited to Property enums, would not allow custom properties. If not, why do they exist?
-                results = self._get_by_property_value_list(property, values)
+            # FIXME: If limited to Property enums, would not allow custom properties. If not, why do they exist?
+            if not isinstance(values, list):
+                values = [values]
+            results = self._get_by_property_value_list(property, values)
         else:
             raise ValueError("Invalid arguments")
-        assert isinstance(results, list)
         return results
 
-    @abstractmethod
-    def _get_by_property_value_list(
-            self, property: Property, values: Union[Any, List[Any]]) -> List[Model]:
-        """
-        Gets models (of the type this data mapper deals with) of data from the database that have one of the given
-        values as the value of the given property.
-        :param property: the property to match values to
-        :param values: the values of the property to match
-        :return: models that have at least one property value defined in the given list of acceptable values
-        """
-        pass
-
-    @abstractmethod
     def _get_by_property_value_tuple(
-            self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]) -> List[Model]:
+            self, property_value_tuples: Union[Tuple[Property, Any], List[Tuple[Property, Any]]]) -> List[Model]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have have one of the
         property values defined in a tuple from the given list.
         :param property_value_tuples: the tuples declaring what property values to match
         :return: models that have at least one property value defined in the given tuple list
         """
-        pass
+        # TODO: Be clever and group tuples quering on same property
+        if not isinstance(property_value_tuples, list):
+            property_value_tuples = [property_value_tuples]
+        results = []
+        for property, value in property_value_tuples:
+            try:
+                result = self.get_by_property_value(property, value)
+            except ValueError:
+                # FIXME: Handle this correctly (raise, log or ignore?)
+                print("Multiple entities with the same id found in the database")
+            else:
+                results += result
+        return results
 
 
 class NamedMapper(Mapper, metaclass=ABCMeta):

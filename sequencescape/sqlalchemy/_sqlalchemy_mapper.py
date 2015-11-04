@@ -1,5 +1,7 @@
 from typing import Union, List, Any, Tuple
 
+from sqlalchemy import Column
+
 from sequencescape.enums import Property
 from sequencescape.mapper import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
 from sequencescape.model import Model, Library, MultiplexedLibrary, Sample, Well, Study
@@ -27,6 +29,7 @@ class SQLAlchemyMapper(Mapper):
 
     def add(self, models: Union[Model, List[Model]]):
         if models is None:
+            # TODO: Generalise to anything that's not a subclass of model
             raise ValueError("Cannot add `None`")
         if not isinstance(models, list):
             models = [models]
@@ -36,38 +39,18 @@ class SQLAlchemyMapper(Mapper):
             sqlalchemy_model = convert_to_sqlalchemy_model(model)
             session.add(sqlalchemy_model)
         session.commit()
+        session.close()
 
     def get_all(self) -> List[Model]:
         query_model = self._get_sqlalchemy_model_type()
         session = self._get_database_connector().create_session()
         result = session.query(query_model). \
-            filter(query_model.is_current == 1).all()
+            filter(query_model.is_current).all()
         session.close()
         assert isinstance(result, list)
         return convert_to_popo_models(result)
 
-    def _get_by_property_value_list(
-            self, property: Property, values: Union[Any, List[Any]]) -> Union[Model, List[Model]]:
-        if not isinstance(values, list):
-            values = [values]
-        result = self._get_by_property(property, values)
-        return convert_to_popo_models(result)
-
-    def _get_by_property_value_tuple(
-            self, property_value_tuples: Union[Tuple, List[Tuple[Property, Any]]]) -> Union[Model, List[Model]]:
-        if not isinstance(property_value_tuples, list):
-            property_value_tuples = [property_value_tuples]
-        results = []
-        for property, value in property_value_tuples:
-            try:
-                result = self.get_by_property_value(property, value)
-            except ValueError:
-                print("Multiple entities with the same id found in the database")
-            else:
-                results += result
-        return results
-
-    def _get_by_property(self, property: Property, required_property_values: List[Any]) -> List[Model]:
+    def _get_by_property_value_list(self, property: Property, required_property_values: List[Any]) -> List[Model]:
         # FIXME: Should this always limit `is_current` to 1 - model might not even have this property!
         if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrentModel):
             raise ValueError(
@@ -81,10 +64,10 @@ class SQLAlchemyMapper(Mapper):
         query_column = query_model.__dict__[property]   # type: Column
         result = session.query(query_model). \
             filter(query_column.in_(required_property_values)). \
-            filter(query_model.is_current == 1).all()
+            filter(query_model.is_current).all()
         session.close()
         assert isinstance(result, list)
-        return result
+        return convert_to_popo_models(result)
 
     def _get_database_connector(self) -> SQLAlchemyDatabaseConnector:
         """
@@ -94,10 +77,10 @@ class SQLAlchemyMapper(Mapper):
         assert self._database_connector
         return self._database_connector
 
-    def _get_sqlalchemy_model_type(self) -> SQLAlchemyModel:
+    def _get_sqlalchemy_model_type(self) -> type:
         """
-        Gets the SQLAlchemy model for which this mapper uses to perform queries with.
-        :return: the SQLAlchemy model used by this mapper
+        Gets the type of SQLAlchemy model for which this mapper uses to perform queries with.
+        :return: the type of SQLAlchemy model used by this mapper
         """
         if not self._type_cache:
             self._type_cache = get_equivalent_sqlalchemy_model_type(self._get_model_type())
@@ -135,7 +118,7 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
             filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_internal_ids)). \
-            filter(SQLAlchemyStudySamplesLink.is_current == 1).all()
+            filter(SQLAlchemyStudySamplesLink.is_current).all()
 
         if not studies_samples:
             return []
