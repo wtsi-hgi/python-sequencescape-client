@@ -1,5 +1,5 @@
 import unittest
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import List, Callable, Any, cast
 
 from sequencescape.enums import Property
@@ -12,9 +12,19 @@ class MapperTest(unittest.TestCase, metaclass=ABCMeta):
     """
     Base class of all tests for methods in `Mapper`.
     """
-    def check_get(
-            self, mapper_type: type, models: List[Model], expected_models: List[Model],
-            mapper_get: Callable[[Mapper], List[Model]]):
+    @staticmethod
+    @abstractmethod
+    def create_mapper(mapper_type: type=None, model_type: type=None) -> Mapper:
+        """
+        Creates a mapper for a given type of model that is setup with a test data source
+        :param mapper_type: the type of the mapper to create
+        :param model_type: the type of model to be used with the mapper. Not required if mapper type dictates model
+        :return: the mapper for the given model
+        """
+        pass
+
+    def check_get(self, mapper_type: type, models: List[Model], expected_models: List[Model],
+                  mapper_get: Callable[[Mapper], List[Model]]):
         """
         Checks that when the given models are inserted into a database, the mapper gets the given expected models back
         when it uses the given mapper get function.
@@ -47,41 +57,37 @@ class MapperTest(unittest.TestCase, metaclass=ABCMeta):
         models_retrieved = mapper_get(mapper)
         self.assertCountEqual(models_retrieved, expected_models)
 
-    @staticmethod
-    # @abstractmethod
-    # XXX: Look at this interface
-    def create_mapper(mapper_type: type, model_type: type=None) -> Mapper:
-        """
-        Creates a mapper for a given type of model that is setup with a test data source
-        :param mapper_type: the type of the mapper to create
-        :param model_type: the type of model to be used with the mapper. Not required if mapper type dictates model
-        :return: the mapper for the given model
-        """
-        return MockMapper()
+
+class TestAbstractMapper(MapperTest):
+    """
+    Tests on the abstract `Mapper` class.
+    """
+    def setUp(self):
+        self._mapper = self.create_mapper()
 
     def test_get_by_property_value_with_value(self):
         name = "test_name"
-        mapper = self.create_mapper(Any)
-        mapper.get_by_property_value(Property.NAME, name)
-        mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, [name])
+        self._mapper.get_by_property_value(Property.NAME, name)
+        self._mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, [name])
 
     def test_get_by_property_value_with_list(self):
         names = ["test_name1", "test_name2", "test_name3"]
-        mapper = self.create_mapper(Any)
-        mapper.get_by_property_value(Property.NAME, names)
-        mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, names)
+        self._mapper.get_by_property_value(Property.NAME, names)
+        self._mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, names)
 
     def test_get_by_property_value_with_tuple(self):
         property_value_tuple = (Property.NAME, "test_name")
-        mapper = self.create_mapper(Any)
-        mapper.get_by_property_value(property_value_tuple)
-        mapper._get_by_property_value_tuple.assert_called_once_with(property_value_tuple)
+        self._mapper.get_by_property_value(property_value_tuple)
+        self._mapper._get_by_property_value_tuple.assert_called_once_with(property_value_tuple)
 
     def test_get_by_property_value_with_tuples_list(self):
         property_value_tuples = [(Property.NAME, "test_name1"), (Property.ACCESSION_NUMBER, "test_accession_number1")]
-        mapper = self.create_mapper(Any)
-        mapper.get_by_property_value(property_value_tuples)
-        mapper._get_by_property_value_tuple.assert_called_once_with(property_value_tuples)
+        self._mapper.get_by_property_value(property_value_tuples)
+        self._mapper._get_by_property_value_tuple.assert_called_once_with(property_value_tuples)
+
+    @staticmethod
+    def create_mapper(mapper_type: type=None, model_type: type=None):
+        return MockMapper()
 
 
 if __name__ == '__main__':

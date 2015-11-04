@@ -105,6 +105,10 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
 
+    def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
+        raise NotImplemented()
+
+
 class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
@@ -113,11 +117,11 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
         """
         super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
-    def get_associated_with_sample(self, sample_internal_ids: str) -> Study:
+    def get_associated_with_sample(self, sample_ids: Union[Sample, List[Sample]]) -> List[Study]:
         session = self._get_database_connector().create_session()
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
-            filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_internal_ids)). \
+            filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_ids)). \
             filter(SQLAlchemyStudySamplesLink.is_current).all()
 
         if not studies_samples:
