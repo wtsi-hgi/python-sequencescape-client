@@ -1,198 +1,114 @@
 import unittest
-from abc import ABCMeta
 from typing import List
 
+from sequencescape import Property
 from sequencescape.mappers import Mapper
-from sequencescape.models import Sample, AccessionNumberModel, Model
+from sequencescape.models import InternalIdModel
 from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper
+from sequencescape.sqlalchemy._sqlalchemy_mappers import SQLAlchemyMapper
 from sequencescape.tests.model_stub_helpers import create_stub_sample, assign_unique_ids
 from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
-from sequencescape.tests.test_mappers import MapperTest
 
 
-class SQLAlchemyMapperTest(MapperTest, metaclass=ABCMeta):
+class SQLAlchemyMapperTest(unittest.TestCase):
     """
-    Base class of all tests for methods in SQLAlchemyMapper.
+    TODO
     """
-    _ACCESSION_NUMBERS = ["test_accession_number1", "test_accession_number2", "test_accession_number3"]
-    _NAMES = ["test_name1", "test_name2", "test_name3"]
-
     def setUp(self):
-        self._accession_number_models = SQLAlchemyMapperTest._create_accession_number_models_with_accession_numbers(
-            SQLAlchemyMapperTest._ACCESSION_NUMBERS)
+        connector, database_location = SQLAlchemyMapperTest._create_connector()
+        self._mapper = SQLAlchemyMapper(connector, SQLAlchemyMapperTest._create_models(1)[0].__class__)
 
-    # Tests for `add` --------------------------------------------------
     def test_add_with_none(self):
-        mapper = SQLAlchemyMapperTest.create_mapper(SQLAlchemyMapper, Model)
-        self.assertRaises(ValueError, mapper.add, None)
+        self.assertRaises(ValueError, self._mapper.add, None)
 
     def test_add_with_non_model(self):
-        mapper = SQLAlchemyMapperTest.create_mapper(SQLAlchemyMapper, Model)
-        self.assertRaises(ValueError, mapper.add, Mapper)
+        self.assertRaises(ValueError, self._mapper.add, Mapper)
 
     def test_add_with_empty_list(self):
-        model = create_stub_sample()
+        self._mapper.add([])
 
-        mapper = SQLAlchemyMapperTest.create_mapper(SQLAlchemyMapper, model.__class__)
-        mapper.add([])
-
-        retrieved_models = mapper.get_all()
+        retrieved_models = self._mapper.get_all()
         self.assertEqual(len(retrieved_models), 0)
 
     def test_add_with_model(self):
-        model = create_stub_sample()
+        model = self._create_models(1)[0]
+        self._mapper.add(model)
 
-        mapper = SQLAlchemyMapperTest.create_mapper(SQLAlchemyMapper, model.__class__)
-        mapper.add(model)
-
-        retrieved_models = mapper.get_all()
+        retrieved_models = self._mapper.get_all()
         self.assertEqual(len(retrieved_models), 1)
         self.assertEqual(retrieved_models[0], model)
 
     def test_add_with_model_list(self):
-        models = assign_unique_ids([create_stub_sample(), create_stub_sample(), create_stub_sample()])
+        models = self._create_models(5)
+        self._mapper.add(models)
 
-        mapper = SQLAlchemyMapperTest.create_mapper(SQLAlchemyMapper, models[0].__class__)
-        mapper.add(models)
-
-        retrieved_models = mapper.get_all()
+        retrieved_models = self._mapper.get_all()
         self.assertCountEqual(retrieved_models, models)
 
-    # Tests for `get_by_name` --------------------------------------------------
-    def test_get_by_name_with_name_of_non_existent(self):
-        models = assign_unique_ids([create_stub_sample(), create_stub_sample()])
+    def test__get_by_property_value_list_with_empty_list(self):
+        models = self._create_models(5)
+        models_to_retrieve = []
+        self._mapper.add(models)
 
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [],
-            lambda mapper: mapper.get_by_name("invalid"))
+        retrieved_models = self._mapper._get_by_property_value_list(
+            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+        self.assertCountEqual(retrieved_models, models_to_retrieve)
 
-    def test_get_by_name_with_name(self):
-        named_model = create_stub_sample()
-        named_model.name = "expected_model"
-        models = assign_unique_ids([create_stub_sample(), named_model, create_stub_sample()])  # type: List[NamedModel]
+    def test__get_by_property_value_list_with_list_of_existing(self):
+        models = self._create_models(5)
+        models_to_retrieve = [models[0], models[2]]
+        self._mapper.add(models)
 
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [named_model],
-            lambda mapper: mapper.get_by_name(named_model.name))
+        retrieved_models = self._mapper._get_by_property_value_list(
+            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+        self.assertCountEqual(retrieved_models, models_to_retrieve)
 
-    def test_get_by_name_where_many_have_same_name(self):
-        same_name = "test_name"
-        names = [same_name, "test_other_name", same_name]
-        models = assign_unique_ids([create_stub_sample(), create_stub_sample(), create_stub_sample()])  # type: List[NamedModel]
-        for i in range(len(models)):
-            models[i].name = names[i]
+    def test__get_by_property_value_list_with_list_of_non_existing(self):
+        models = self._create_models(5)
+        models_to_retrieve = [models.pop(), models.pop()]
+        assert len(models) == 3
+        self._mapper.add(models)
 
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [models[0], models[2]],
-            lambda mapper: mapper.get_by_name(same_name)
-        )
+        retrieved_models = self._mapper._get_by_property_value_list(
+            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+        self.assertCountEqual(retrieved_models, [])
 
-    def test_get_by_name_with_name_list(self):
-        names = ["test_name1", "test_name2", "test_name3"]
-        models = assign_unique_ids([create_stub_sample(), create_stub_sample(), create_stub_sample()])  # type: List[NamedModel]
-        for i in range(len(models)):
-            models[i].name = names[i]
+    def test__get_by_property_value_list_with_list_of_both_existing_and_non_existing(self):
+        models = self._create_models(5)
+        models_to_retrieve = [models[0], models[2], models.pop()]
+        assert len(models) == 4
+        self._mapper.add(models)
 
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [models[0], models[2]],
-            lambda mapper: mapper.get_by_name([models[0].name, models[2].name])
-        )
+        retrieved_models = self._mapper._get_by_property_value_list(
+            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+        self.assertCountEqual(retrieved_models, models_to_retrieve[:2])
 
-    # Tests for `get_by_id` --------------------------------------------------
-    def test_get_by_id_with_id_of_non_existent(self):
-        models = assign_unique_ids([create_stub_sample(), create_stub_sample()])
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [],
-            lambda mapper: mapper.get_by_id("invalid"))
+    def test__get_by_property_value_list_returns_correct_type(self):
+        models = self._create_models(5)
+        self._mapper.add(models)
 
-    def test_get_by_id_with_id(self):
-        models = assign_unique_ids([create_stub_sample(), create_stub_sample(), create_stub_sample()])
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [models[1]],
-            lambda mapper: mapper.get_by_id(models[1].internal_id))
-
-    # TODO: Push this upwards to test Mapper superclass.
-    # def test_get_by_id_where_many_have_same_id(self):
-    #     same_id = 1
-    #     ids = [same_id, 2, same_id]
-    #     models = [create_mock_sample(), create_mock_sample(), create_mock_sample()]
-    #     for i in range(len(models)):
-    #         models[i].internal_id = ids[i]
-    #
-    #     mapper = self.create_mapper(Sample)
-    #     self.assertRaises(ValueError, mapper.get_by_id, models[0].internal_id)
-
-    def test_get_by_id_with_id_list(self):
-        models = assign_unique_ids([create_stub_sample(), create_stub_sample(), create_stub_sample()])
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [models[0], models[2]],
-            lambda mapper: mapper.get_by_id([models[0].internal_id, models[2].internal_id])
-        )
-
-    # Tests for `get_by_accession_number` method --------------------------------------------------
-    def test_get_by_accession_number_with_accession_number_of_non_existent(self):
-        self.check_get(
-            SQLAlchemySampleMapper,
-            self._accession_number_models,
-            [],
-            lambda mapper: mapper.get_by_accession_number("invalid"))
-
-    def test_get_by_accession_number_with_accession_number(self):
-        self.check_get(
-            SQLAlchemySampleMapper,
-            self._accession_number_models,
-            [self._accession_number_models[1]],
-            lambda mapper: mapper.get_by_accession_number(self._accession_number_models[1].accession_number))
-
-    def test_get_by_accession_number_with_accession_number_list(self):
-        self.check_get(
-            SQLAlchemySampleMapper,
-            self._accession_number_models,
-            [self._accession_number_models[0], self._accession_number_models[2]],
-            lambda mapper: mapper.get_by_accession_number([
-                self._accession_number_models[0].accession_number, self._accession_number_models[2].accession_number])
-        )
-
-    def test_get_by_accession_number_where_many_have_same_accession_number(self):
-        same_accession_number = SQLAlchemyMapperTest._ACCESSION_NUMBERS[0]
-        accession_numbers = [same_accession_number, SQLAlchemyMapperTest._ACCESSION_NUMBERS[1], same_accession_number]
-        models = SQLAlchemyMapperTest._create_accession_number_models_with_accession_numbers(accession_numbers)
-
-        self.check_get(
-            SQLAlchemySampleMapper,
-            models,
-            [models[0], models[2]],
-            lambda mapper: mapper.get_by_accession_number(same_accession_number)
-        )
+        retrieved_models = self._mapper._get_by_property_value_list(
+            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models))
+        self.assertCountEqual(retrieved_models, models)
+        self.assertIsInstance(retrieved_models[0], models[0].__class__)
 
     @staticmethod
-    def create_mapper(mapper_type: type, model_type: type=None) -> SQLAlchemyMapper:
+    def _get_internal_ids(models: List[InternalIdModel]) -> List[int]:
         """
-        Creates a mapper for a given type of model that is setup to connect with a test database.
-        :param mapper_type: the type of the mapper to create
-        :param model_type: the type of model to be used with the mapper. Not required if mapper type dictates model.
-        :return: the mapper for the given model, setup for use with a test database
+        Gets the ids of all of the given models
+        :param models: the models to get the ids of
+        :return: the ids of the given models
         """
-        connector, database_file_path = SQLAlchemyMapperTest._create_connector()
-        if mapper_type == SQLAlchemyMapper:
-            return mapper_type(connector, model_type)
-        else:
-            return mapper_type(connector)
+        return [model.internal_id for model in models]
+
+    @staticmethod
+    def _create_models(number_of_models: int) -> List[InternalIdModel]:
+        """
+        Creates a number of models to use in tests.
+        :param number_of_models: the number of models to create
+        :return: the models
+        """
+        return assign_unique_ids([create_stub_sample() for i in range(number_of_models)])
 
     @staticmethod
     def _create_connector() -> (SQLAlchemyDatabaseConnector, str):
@@ -203,17 +119,6 @@ class SQLAlchemyMapperTest(MapperTest, metaclass=ABCMeta):
         database_file_path, dialect = create_stub_database()
         connector = SQLAlchemyDatabaseConnector("%s:///%s" % (dialect, database_file_path))
         return connector, database_file_path
-
-    @staticmethod
-    def _create_accession_number_models_with_accession_numbers(accession_numbers: List[str]) -> List[AccessionNumberModel]:
-        """
-        TODO
-        :param accession_numbers:
-        :return:
-        """
-        models = [Sample(accession_number=accession_number) for accession_number in accession_numbers]
-        assign_unique_ids(models)
-        return models
 
 
 if __name__ == '__main__':

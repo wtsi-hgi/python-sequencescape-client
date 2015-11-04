@@ -88,7 +88,6 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
     """
     TODO
     """
-    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_name(self, names: Union[str, List[str]]) -> List[NamedModel]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
@@ -100,11 +99,10 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
         return results
 
 
-class InternalIDMapper(Mapper, metaclass=ABCMeta):
+class InternalIdMapper(Mapper, metaclass=ABCMeta):
     """
     TODO
     """
-    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalIdModel]]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
@@ -129,7 +127,6 @@ class InternalIDMapper(Mapper, metaclass=ABCMeta):
 
 
 class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
-    # TODO: This method needs to be tested independently of concrete subclass.
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumberModel]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given accession
@@ -142,7 +139,7 @@ class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
         return results
 
 
-class SampleMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metaclass=ABCMeta):
+class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclass=ABCMeta):
     """
     Mapper for `Sample` models.
     """
@@ -156,7 +153,7 @@ class SampleMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metacla
         pass
 
 
-class StudyMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metaclass=ABCMeta):
+class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclass=ABCMeta):
     """
     Mapper for `Study` models.
     """
@@ -170,22 +167,22 @@ class StudyMapper(NamedMapper, InternalIDMapper, AccessionNumberMapper, metaclas
         pass
 
 
-class LibraryMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+class LibraryMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
     Mapper for `Library` models.
     """
     pass
 
 
-class WellMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+class MultiplexedLibraryMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
-    Mapper for `Well` models.
+    Mapper for `MultiplexedLibrary` models.
     """
     pass
 
 
-class MultiplexedLibraryMapper(NamedMapper, InternalIDMapper, metaclass=ABCMeta):
+class WellMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
-    Mapper for `MultiplexedLibrary` models.
+    Mapper for `Well` models.
     """
     pass

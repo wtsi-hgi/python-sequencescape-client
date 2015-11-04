@@ -23,9 +23,12 @@ class SQLAlchemyMapper(Mapper):
         if not issubclass(model_type, Model):
             raise ValueError("Model type (%s) must be a subclass of `Model`" % model_type)
 
-        self._type_cache = None
-        self._model_type = model_type
         self._database_connector = database_connector
+        self._model_type = model_type
+        self._sqlalchemy_model_type = get_equivalent_sqlalchemy_model_type(self._model_type)
+
+        if self._sqlalchemy_model_type is None:
+            raise NotImplementedError("Not implemented for models of type: `%s`" % model_type)
 
     def add(self, models: Union[Model, List[Model]]):
         if models is None:
@@ -34,7 +37,7 @@ class SQLAlchemyMapper(Mapper):
         if not isinstance(models, list):
             models = [models]
 
-        session = self._get_database_connector().create_session()
+        session = self._database_connector.create_session()
         for model in models:
             sqlalchemy_model = convert_to_sqlalchemy_model(model)
             session.add(sqlalchemy_model)
@@ -42,8 +45,8 @@ class SQLAlchemyMapper(Mapper):
         session.close()
 
     def get_all(self) -> List[Model]:
-        query_model = self._get_sqlalchemy_model_type()
-        session = self._get_database_connector().create_session()
+        query_model = self._sqlalchemy_model_type
+        session = self._database_connector.create_session()
         result = session.query(query_model). \
             filter(query_model.is_current).all()
         session.close()
@@ -52,13 +55,13 @@ class SQLAlchemyMapper(Mapper):
 
     def _get_by_property_value_list(self, property: Property, required_property_values: List[Any]) -> List[Model]:
         # FIXME: Should this always limit `is_current` to 1 - model might not even have this property!
-        if not issubclass(self._get_sqlalchemy_model_type(), SQLAlchemyIsCurrentModel):
+        if not issubclass(self._sqlalchemy_model_type, SQLAlchemyIsCurrentModel):
             raise ValueError(
                 "Not possible to get instances of type %s by name as the query required `is_current` property"
-                    % self._get_model_type())
+                    % self._model_type)
 
-        query_model = self._get_sqlalchemy_model_type()
-        session = self._get_database_connector().create_session()
+        query_model = self._sqlalchemy_model_type
+        session = self._database_connector.create_session()
 
         # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel
         query_column = query_model.__dict__[property]   # type: Column
@@ -68,32 +71,6 @@ class SQLAlchemyMapper(Mapper):
         session.close()
         assert isinstance(result, list)
         return convert_to_popo_models(result)
-
-    def _get_database_connector(self) -> SQLAlchemyDatabaseConnector:
-        """
-        Gets the object through which database connections can be made.
-        :return: the database connector
-        """
-        assert self._database_connector
-        return self._database_connector
-
-    def _get_sqlalchemy_model_type(self) -> type:
-        """
-        Gets the type of SQLAlchemy model for which this mapper uses to perform queries with.
-        :return: the type of SQLAlchemy model used by this mapper
-        """
-        if not self._type_cache:
-            self._type_cache = get_equivalent_sqlalchemy_model_type(self._get_model_type())
-        assert issubclass(self._type_cache, SQLAlchemyModel)
-        return self._type_cache
-
-    def _get_model_type(self) -> type:
-        """
-        Gets the type of models that this mapper deals with
-        :return: the type of models that this mapper deals with
-        """
-        assert self._model_type
-        return self._model_type
 
 
 class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
@@ -106,7 +83,7 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
 
     def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
        # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
-        session = self._get_database_connector().create_session()
+        session = self._database_connector.create_session()
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
             filter(SQLAlchemyStudySamplesLink.study_ids.in_(study_ids)). \
@@ -129,7 +106,7 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
 
     def get_associated_with_sample(self, sample_ids: Union[Sample, List[Sample]]) -> List[Study]:
         # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
-        session = self._get_database_connector().create_session()
+        session = self._database_connector.create_session()
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
             filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_ids)). \
