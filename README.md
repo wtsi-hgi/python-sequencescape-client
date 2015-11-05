@@ -12,34 +12,38 @@ git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master#egg=seque
 
 ## API
 ```python
-from sequencescape import connect_to_sequencescape, Sample, Study, Library, MultiplexedLibrary, Well, Model
+from sequencescape import connect_to_sequencescape, Sample, Study, Library, \
+    MultiplexedLibrary, Well, Model
 
 # Classes of models of data in Sequencescape. Each have constructors with named parameters
 available_models = [Sample, Study, Library, MultiplexedLibrary, Well]   # type: List[Model]
 
-# Declares a connection to Sequencescape. (Actual network connections are only opened when required)
+# Declares a connection to Sequencescape. (Actual network connections are only opened when
+# required)
 sequencescape = connect_to_sequencescape("mysql://user:@host:3306/database")
 
-# Available on: study, sample, library, multiplexed_library, well
+# Available for: study, sample, library, multiplexed_library, well
 sequencescape.sample.get_by_name(sample_name)   # type: List[Sample]
 sequencescape.sample.get_by_name([sample_name, other_sample_name])   # type: List[Sample]
 
-# Available on: study, sample, library, multiplexed_library, well
-sequencescape.library.get_by_id(library_internal_id)   # type: List[Library]
-sequencescape.library.get_by_id([library_internal_id, other_library_internal_id])   # type: List[Library]
+# Available for: study, sample, library, multiplexed_library, well
+sequencescape.library.get_by_id(library_id)   # type: List[Library]
+sequencescape.library.get_by_id([library_id, other_library_id])   # type: List[Library]
 
-# Available on: study, sample
+# Available for: study, sample
 sequencescape.study.get_by_accession_number(study_accession_number)   # type: List[Study]
-sequencescape.study.get_by_accession_number([study_accession_number, other_study_accession_number])   # type: List[Study]
+sequencescape.study.get_by_accession_number(
+    [study_accession_number, other_study_accession_number])   # type: List[Study]
 
-# Available on: study
+# Available for: study
 sequencescape.study.get_associated_with_sample(sample)  # type: List[Study]
 sequencescape.study.get_associated_with_sample([sample_1, sample_2])  # type: List[Study]
 
-# Available on: sample
+# Available for: sample
 sequencescape.sample.get_associated_with_study(study)  # type: List[Sample]
 sequencescape.sample.get_associated_with_study([study_1, study_2])  # type: List[Sample]
 ```
+
 
 ## How to develop
 ### Testing
