@@ -5,8 +5,8 @@ from typing import List
 from sequencescape import Property
 from sequencescape.mappers import Mapper
 from sequencescape.models import InternalIdModel
-from sequencescape.sqlalchemy._sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape.sqlalchemy._sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper
+from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
+from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper
 from sequencescape.tests.model_stub_helpers import create_stub_sample, assign_unique_ids
 from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
