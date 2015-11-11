@@ -2,7 +2,7 @@ from typing import List, Union
 
 from sequencescape.models import Study, Sample, Well, MultiplexedLibrary, Model
 from sequencescape.models import Library
-from sequencescape.sqlalchemy._sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
+from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyModel
 
 

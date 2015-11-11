@@ -1,9 +1,9 @@
 import unittest
 
 from sequencescape.models import Sample, Study, Library, Well, MultiplexedLibrary
-from sequencescape.sqlalchemy._sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
+from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink
-from sequencescape.sqlalchemy._sqlalchemy_model_converters import get_equivalent_popo_model_type, \
+from sequencescape._sqlalchemy.sqlalchemy_model_converters import get_equivalent_popo_model_type, \
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_sqlalchemy_models, convert_to_popo_models
 from sequencescape.tests.model_stub_helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \

@@ -1,5 +1,5 @@
-FROM python:3.4-wheezy
-MAINTAINER hgi@sanger.ac.uk
+FROM python:3.4.3
+MAINTAINER "hgi@sanger.ac.uk"
 
 COPY . /sequencescape-python-client
 WORKDIR sequencescape-python-client
