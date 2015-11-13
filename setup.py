@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="sequencescape-python-client",
 
-    version="0.1.5",
+    version="0.1.6",
 
     author="Colin Nolan",
     author_email="hgi@sanger.ac.uk",

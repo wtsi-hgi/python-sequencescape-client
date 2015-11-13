@@ -1,6 +1,7 @@
 from abc import ABCMeta
 
 
+# TODO: Put in common library!
 class Model(metaclass=ABCMeta):
     """
     Superclass that all POPOs (Plain Old Python Objects) must implement.
@@ -21,6 +22,12 @@ class Model(metaclass=ABCMeta):
         for property, value in vars(self).items():
             string_builder.append("%s: %s" % (property, value))
         return "{ %s }" % ', '.join(string_builder)
+
+    def __repr__(self) -> str:
+        return "%s %s" % (self.__class__, str(self))
+
+    def __hash__(self):
+        return hash(str(self))
 
 
 class NamedModel(Model, metaclass=ABCMeta):
