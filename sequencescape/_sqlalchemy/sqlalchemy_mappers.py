@@ -82,7 +82,10 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
     def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
-       # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
+        if not isinstance(study_ids, list):
+            study_ids = [study_ids]
+
+        # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
         session = self._database_connector.create_session()
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
@@ -105,6 +108,9 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
         super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
     def get_associated_with_sample(self, sample_ids: Union[Sample, List[Sample]]) -> List[Study]:
+        if not isinstance(sample_ids, list):
+            sample_ids = [sample_ids]
+
         # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
         session = self._database_connector.create_session()
 
