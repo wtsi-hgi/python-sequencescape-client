@@ -89,7 +89,7 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         session = self._database_connector.create_session()
 
         studies_samples = session.query(SQLAlchemyStudySamplesLink). \
-            filter(SQLAlchemyStudySamplesLink.study_ids.in_(study_ids)). \
+            filter(SQLAlchemyStudySamplesLink.study_internal_id.in_(study_ids)). \
             filter(SQLAlchemyStudySamplesLink.is_current).all()
 
         if not studies_samples:
