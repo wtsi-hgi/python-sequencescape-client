@@ -3,7 +3,7 @@
 
 
 ## How to use in your project
-### Including the `sequencescape` library
+### Include the `sequencescape` library
 In ``/requirements.txt`` or in your ``/setup.py`` script:
 ```
 git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master#egg=sequencescape
@@ -11,8 +11,7 @@ git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master#egg=seque
 *See more about using libraries for git repositories in the 
 [pip documentation](https://pip.readthedocs.org/en/1.1/requirements.html#git).*
 
-
-## API
+### API
 ```python
 from sequencescape import connect_to_sequencescape, Sample, Study, Library, \
     MultiplexedLibrary, Well, Model
@@ -35,6 +34,11 @@ sequencescape.library.get_by_id([123, 456])   # type: List[Library]
 # Available for: study, sample
 sequencescape.study.get_by_accession_number("accession_number")   # type: List[Study]
 sequencescape.study.get_by_accession_number(["accession_number", "other_accession_number"])   # type: List[Study]
+
+# Available for: study, sample, library, multiplexed_library, well
+sequencescape.sample.get_by_property_value("property", "value")   # type: List[Sample]
+sequencescape.sample.get_by_property_value("property", ["value", "other_value"])   # type: List[Sample]
+sequencescape.sample.get_by_property_value([("property", "value"), ("other_property", "other_value")])   # type: List[Sample]
 
 # Available for: study
 sequencescape.study.get_associated_with_sample(sample)  # type: List[Study]

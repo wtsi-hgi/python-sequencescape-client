@@ -36,7 +36,7 @@ class MapperTest(unittest.TestCase):
 
 class NamedMapperTest(unittest.TestCase):
     """
-    TODO
+    Tests for `NamedMapper`.
     """
     _NAMES = ["test_name1", "test_name2", "test_name3"]
 
@@ -54,7 +54,7 @@ class NamedMapperTest(unittest.TestCase):
 
 class InternalIdMapperTest(unittest.TestCase):
     """
-    TODO
+    Tests for `InternalIdMapper`.
     """
     _INTERNAL_IDS = [123, 456, 789]
 
@@ -74,7 +74,7 @@ class InternalIdMapperTest(unittest.TestCase):
 
 class AccessionNumberMapperTest(unittest.TestCase):
     """
-    TODO
+    Tests for `AccessionNumberMapper`.
     """
     _ACCESSION_NUMBERS = ["test_accession_number1", "test_accession_number2", "test_accession_number3"]
 

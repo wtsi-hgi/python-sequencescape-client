@@ -1,8 +1,8 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Tuple, Union, Any, Optional
 
-from sequencescape.models import Model, Study, NamedModel, InternalIdModel, AccessionNumberModel, Sample
 from sequencescape.enums import Property
+from sequencescape.models import Model, Study, NamedModel, InternalIdModel, AccessionNumberModel, Sample
 
 
 # XXX: This interface should use generics (pep-0484). Unfortunately they are not good enough/the documentation is not
@@ -29,7 +29,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _get_by_property_value_list(self, property: Property, values: List[Any]) -> List[Model]:
+    def _get_by_property_value_list(self, property: str, values: List[Any]) -> List[Model]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have one of the given
         values as the value of the given property.
@@ -41,7 +41,7 @@ class Mapper(metaclass=ABCMeta):
 
     def get_by_property_value(
             self,
-            property: Union[Property, Union[Tuple[Property, Any]], List[Tuple[Property, Any]]],
+            property: Union[str, Union[Tuple[str, Any]], List[Tuple[str, Any]]],
             values: Optional[Union[Any, List[Any]]]=None) -> List[Model]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given property
@@ -53,7 +53,6 @@ class Mapper(metaclass=ABCMeta):
         if isinstance(property, tuple) or isinstance(property, list):
             results = self._get_by_property_value_tuple(property)
         elif isinstance(property, str):
-            # FIXME: If limited to Property enums, would not allow custom properties. If not, why do they exist?
             if not isinstance(values, list):
                 values = [values]
             results = self._get_by_property_value_list(property, values)
@@ -62,14 +61,14 @@ class Mapper(metaclass=ABCMeta):
         return results
 
     def _get_by_property_value_tuple(
-            self, property_value_tuples: Union[Tuple[Property, Any], List[Tuple[Property, Any]]]) -> List[Model]:
+            self, property_value_tuples: Union[Tuple[str, Any], List[Tuple[str, Any]]]) -> List[Model]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have have one of the
         property values defined in a tuple from the given list.
         :param property_value_tuples: the tuples declaring what property values to match
         :return: models that have at least one property value defined in the given tuple list
         """
-        # TODO: Be clever and group tuples quering on same property
+        # TODO: Be clever and group tuples querying same property
         if not isinstance(property_value_tuples, list):
             property_value_tuples = [property_value_tuples]
         results = []
