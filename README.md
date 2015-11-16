@@ -1,6 +1,6 @@
-# Sequencescape Python Client
 [![Build Status](https://travis-ci.org/wtsi-hgi/sequencescape-python-client.svg)](https://travis-ci.org/wtsi-hgi/sequencescape-python-client)
 
+# Sequencescape Python Client
 
 ## How to use in your project
 ### Include the `sequencescape` library
