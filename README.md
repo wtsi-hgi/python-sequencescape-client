@@ -17,36 +17,37 @@ from sequencescape import connect_to_sequencescape, Sample, Study, Library, \
     MultiplexedLibrary, Well, Model
 
 # Classes of models of data in Sequencescape. Each have constructors with named parameters
-available_models = [Sample, Study, Library, MultiplexedLibrary, Well]   # type: List[Model]
+available_models = [Sample, Study, Library, MultiplexedLibrary, Well]  # type: List[Model]
 
 # Declares a connection to Sequencescape. (Actual network connections are only opened when
 # required)
-sequencescape = connect_to_sequencescape("mysql://user:@host:3306/database")
+api = connect_to_sequencescape("mysql://user:@host:3306/database")
 
 # Available for: study, sample, library, multiplexed_library, well
-sequencescape.sample.get_by_name("sample_name")   # type: List[Sample]
-sequencescape.sample.get_by_name(["sample_name", "other_sample_name"])   # type: List[Sample]
+api.sample.get_by_name("sample_name")   # type: List[Sample]
+api.sample.get_by_name(["sample_name", "other_sample_name"])   # type: List[Sample]
 
 # Available for: study, sample, library, multiplexed_library, well
-sequencescape.library.get_by_id(123)   # type: List[Library]
-sequencescape.library.get_by_id([123, 456])   # type: List[Library]
+api.library.get_by_id(123)   # type: List[Library]
+api.library.get_by_id([123, 456])   # type: List[Library]
 
 # Available for: study, sample
-sequencescape.study.get_by_accession_number("accession_number")   # type: List[Study]
-sequencescape.study.get_by_accession_number(["accession_number", "other_accession_number"])   # type: List[Study]
+api.study.get_by_accession_number("accession_number")   # type: List[Study]
+api.study.get_by_accession_number(["accession_number", "other_accession_number"])   # type: List[Study]
 
 # Available for: study, sample, library, multiplexed_library, well
-sequencescape.sample.get_by_property_value("property", "value")   # type: List[Sample]
-sequencescape.sample.get_by_property_value("property", ["value", "other_value"])   # type: List[Sample]
-sequencescape.sample.get_by_property_value([("property", "value"), ("other_property", "other_value")])   # type: List[Sample]
+api.sample.get_by_property_value("property", "value")   # type: List[Sample]
+api.sample.get_by_property_value("property", ["value", "other_value"])   # type: List[Sample]
+api.sample.get_by_property_value([("property", "value"), ("other_property", "other_value")])   # type: List[Sample]
 
 # Available for: study
-sequencescape.study.get_associated_with_sample(sample)  # type: List[Study]
-sequencescape.study.get_associated_with_sample([sample_1, sample_2])  # type: List[Study]
+api.study.get_associated_with_sample(sample)  # type: List[Study]
+api.study.get_associated_with_sample([sample_1, sample_2])  # type: List[Study]
 
 # Available for: sample
-sequencescape.sample.get_associated_with_study(study)  # type: List[Sample]
-sequencescape.sample.get_associated_with_study([study_1, study_2])  # type: List[Sample]
+api.sample.get_associated_with_study(study)  # type: List[Sample]
+api.sample.get_associated_with_study([study_1, study_2])  # type: List[Sample]
+
 ```
 
 
