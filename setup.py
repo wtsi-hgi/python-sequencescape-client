@@ -8,7 +8,7 @@ setup(
     author="Colin Nolan",
     author_email="hgi@sanger.ac.uk",
 
-    packages=find_packages(exclude=["testing"]),
+    packages=find_packages(exclude=["tests"]),
 
     url="https://github.com/wtsi-hgi/sequencescape-python-client",
 
@@ -19,5 +19,5 @@ setup(
 
     install_requires=open("requirements.txt").read().splitlines(),
 
-    test_suite="sequencescape.testing"
+    test_suite="sequencescape.tests"
 )
