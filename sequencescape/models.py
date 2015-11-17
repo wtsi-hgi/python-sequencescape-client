@@ -12,8 +12,8 @@ class Model(metaclass=ABCMeta):
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
-        for property, value in vars(self).items():
-            if other.__dict__[property] != self.__dict__[property]:
+        for property_name, value in vars(self).items():
+            if other.__dict__[property_name] != self.__dict__[property_name]:
                 return False
         return True
 

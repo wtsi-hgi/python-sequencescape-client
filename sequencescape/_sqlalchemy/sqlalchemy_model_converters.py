@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from sequencescape.models import Study, Sample, Well, MultiplexedLibrary, Model
+from sequencescape.models import Study, Sample, Well, MultiplexedLibrary, Model, IsCurrentModel
 from sequencescape.models import Library
 from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyModel
@@ -63,6 +63,10 @@ def convert_to_popo_model(sqlalchemy_model: SQLAlchemyModel) -> Union[Model, Non
         if property_name in converted.__dict__:
             converted.__dict__[property_name] = value
 
+    # Type fix
+    if issubclass(convert_to_type, IsCurrentModel):
+        converted.is_current = bool(converted.is_current)
+
     return converted
 
 
@@ -82,6 +86,7 @@ def convert_to_sqlalchemy_model(model: Model) -> Union[SQLAlchemyModel, None]:
     :param model: the POPO model to convert
     :return: the equivalent SQLAlchemy model
     """
+    # FIXME: Drop support for this (and remove assocaited test)
     if model is None:
         return None
 

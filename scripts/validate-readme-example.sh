@@ -1,5 +1,5 @@
 #!/bin/bash
-tempFile=$(mktemp -t validate-readme)
+tempFile=$(mktemp /tmp/validate-readme-XXXXXXXXXX)
 sed -n '/^```python/,/^```/ p' < README.md | sed '/^```/ d' > $tempFile
 
 # Validate syntax by compilation

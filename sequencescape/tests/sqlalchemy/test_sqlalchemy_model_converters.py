@@ -1,8 +1,11 @@
 import unittest
 
+from typing import List
+
+from sequencescape import NamedModel
 from sequencescape.models import Sample, Study, Library, Well, MultiplexedLibrary
 from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
-    SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyStudySamplesLink
+    SQLAlchemyWell, SQLAlchemyMultiplexedLibrary
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import get_equivalent_popo_model_type, \
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_sqlalchemy_models, convert_to_popo_models
@@ -157,7 +160,7 @@ class TestConvertToPOPOModels(unittest.TestCase):
         models = [SQLAlchemySample(), SQLAlchemySample()]
         models[0].name = names[0]
         models[1].name = names[1]
-        converted = convert_to_popo_models(models)
+        converted = convert_to_popo_models(models)     # type: List[NamedModel]
         self.assertEquals([x.name for x in converted], [x.name for x in models])
 
     def test_convert_many_of_different_type(self):
@@ -165,7 +168,7 @@ class TestConvertToPOPOModels(unittest.TestCase):
         models = [SQLAlchemySample(), SQLAlchemyLibrary()]
         models[0].name = names[0]
         models[1].name = names[1]
-        converted = convert_to_popo_models(models)
+        converted = convert_to_popo_models(models)     # type: List[NamedModel]
         self.assertEquals([x.name for x in converted], [x.name for x in models])
         self.assertIsInstance(converted[0], Sample)
         self.assertIsInstance(converted[1], Library)

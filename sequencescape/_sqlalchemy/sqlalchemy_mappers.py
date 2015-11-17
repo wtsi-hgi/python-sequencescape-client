@@ -1,14 +1,12 @@
-from typing import Union, List, Any, Tuple
+from typing import Union, List, Any
 
-from sqlalchemy import Column
-
+from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
+from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
+    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_models
+from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemyIsCurrentModel, SQLAlchemySample, SQLAlchemyStudy
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
 from sequencescape.models import Model, Library, MultiplexedLibrary, Sample, Well, Study
-from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
-    get_equivalent_sqlalchemy_model_type
-from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemyModel, SQLAlchemyStudySamplesLink, SQLAlchemyIsCurrentModel
 
 
 class SQLAlchemyMapper(Mapper):
@@ -68,12 +66,12 @@ class SQLAlchemyMapper(Mapper):
 
         # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel
         query_column = query_model.__dict__[property]   # type: Column
-        result = session.query(query_model). \
+        results = session.query(query_model). \
             filter(query_column.in_(required_property_values)). \
             filter(query_model.is_current).all()
         session.close()
-        assert isinstance(result, list)
-        return convert_to_popo_models(result)
+        assert isinstance(results, list)
+        return convert_to_popo_models(results)
 
 
 class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
@@ -84,22 +82,53 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         """
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
-    def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
-        if not isinstance(study_ids, list):
-            study_ids = [study_ids]
+    def set_association_with_study(self, samples: Union[Sample, List[Sample]], study: Study):
+        if not isinstance(samples, list):
+            samples = [samples]
 
-        # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
         session = self._database_connector.create_session()
 
-        studies_samples = session.query(SQLAlchemyStudySamplesLink). \
-            filter(SQLAlchemyStudySamplesLink.study_internal_id.in_(study_ids)). \
-            filter(SQLAlchemyStudySamplesLink.is_current).all()
+        results = session.query(SQLAlchemySample). \
+            filter(SQLAlchemySample.internal_id.in_([sample.internal_id for sample in samples])). \
+            all()
 
-        if not studies_samples:
-            return []
+        if len(results) == 0:
+            raise ValueError("Sample does not exist or does not have an internal_id")
 
-        sample_ids = [study_sample.sample_internal_id for study_sample in studies_samples]
-        return self.get_by_id(sample_ids)
+        # FIXME: SQLAlchemy wants to insert the study again when associated to a sample. Could not find out how to stop
+        #        this so hacking by deleting from the database. May be a type problem
+        session.query(SQLAlchemyStudy).filter(SQLAlchemyStudy.internal_id == study.internal_id).delete()
+
+        sqlalchemy_study = convert_to_sqlalchemy_model(study)
+        for result in results:
+            result.studies.append(sqlalchemy_study)
+        session.commit()
+        session.close()
+
+    def get_associated_with_study(self, studies: Union[Study, List[Study]]) -> List[Sample]:
+        if not isinstance(studies, list):
+            studies = [studies]
+
+        study_internal_ids = [study.internal_id for study in studies]
+
+        session = self._database_connector.create_session()
+        results = session.query(SQLAlchemyStudy). \
+            filter(SQLAlchemyStudy.internal_id.in_(study_internal_ids)). \
+            filter(SQLAlchemyStudy.is_current).all()
+        assert isinstance(results, list)
+
+        if len(results) != len(studies):
+            raise ValueError("Not all given studies exist in the database.\nGiven: %s\nExisting: %s"
+                             % (studies, convert_to_popo_models(results)))
+
+        samples = []
+        for result in results:
+            for result_sample in result.samples:
+                if result_sample not in samples:
+                    samples.append(result_sample)
+        session.close()
+
+        return convert_to_popo_models(samples)
 
 
 class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
@@ -114,18 +143,20 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
         if not isinstance(sample_ids, list):
             sample_ids = [sample_ids]
 
-        # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
-        session = self._database_connector.create_session()
+        raise NotImplementedError()
 
-        studies_samples = session.query(SQLAlchemyStudySamplesLink). \
-            filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_ids)). \
-            filter(SQLAlchemyStudySamplesLink.is_current).all()
-
-        if not studies_samples:
-            return []
-
-        study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
-        return self.get_by_id(study_ids)
+        # # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
+        # session = self._database_connector.create_session()
+        # studies_samples = session.query(SQLAlchemyStudySamplesLink). \
+        #     filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_ids)). \
+        #     filter(SQLAlchemyStudySamplesLink.is_current).all()
+        # session.close()
+        #
+        # if not studies_samples:
+        #     return []
+        #
+        # study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
+        # return self.get_by_id(study_ids)
 
 
 class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):

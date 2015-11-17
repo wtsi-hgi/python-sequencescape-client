@@ -134,6 +134,16 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
     Mapper for `Sample` models.
     """
     @abstractmethod
+    def set_association_with_study(self, sample: Sample, study: Study):
+        """
+        TODO
+        :param study:
+        :param sample:
+        :return:
+        """
+        pass
+
+    @abstractmethod
     def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
         """
         Gets all the samples that are associated to the given study or studies.
