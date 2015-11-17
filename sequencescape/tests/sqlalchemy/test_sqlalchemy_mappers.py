@@ -129,7 +129,7 @@ class SQLAlchemySampleMapperTest(unittest.TestCase):
         connector, database_location = _create_connector()
         self._mapper = SQLAlchemySampleMapper(connector)
 
-    def test_get_associated_with_study(self):
+    def test_get_associated_with_study_with_value(self):
         # TODO: Implement
         pass
 

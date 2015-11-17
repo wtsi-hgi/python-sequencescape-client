@@ -60,6 +60,9 @@ class SQLAlchemyMapper(Mapper):
                 "Not possible to get instances of type %s by name as the query required `is_current` property"
                     % self._model_type)
 
+        if len(required_property_values) == 0:
+            return []
+
         query_model = self._sqlalchemy_model_type
         session = self._database_connector.create_session()
 
