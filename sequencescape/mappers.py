@@ -144,10 +144,10 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
         pass
 
     @abstractmethod
-    def get_associated_with_study(self, study_ids: Union[Study, List[Study]]) -> List[Sample]:
+    def get_associated_with_study(self, studies: Union[Study, List[Study]]) -> List[Sample]:
         """
         Gets all the samples that are associated to the given study or studies.
-        :param study_ids: the studies to find associated samples for
+        :param stides: the studies to find associated samples for
         :return: samples that belong to one or more of the given studies
         """
         pass
@@ -158,10 +158,10 @@ class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclas
     Mapper for `Study` models.
     """
     @abstractmethod
-    def get_associated_with_sample(self, sample_ids: Union[Sample, List[Sample]]) -> List[Study]:
+    def get_associated_with_sample(self, samples: Union[Sample, List[Sample]]) -> List[Study]:
         """
         Gets all the studies that the given samples (identified by ID) belong to.
-        :param sample_ids: the IDs of the samples that studies are to be got for
+        :param samples: the samples that studies are to be got for
         :return: studies related to one or more of the given samples
         """
         pass

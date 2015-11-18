@@ -40,7 +40,7 @@ class SQLAlchemySample(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlche
     cohort = Column(String)
     country_of_origin = Column(String)
     geographical_region = Column(String)
-    # studies = relationship("SQLAlchemyStudy", secondary=study_sample_join_table, backref="samples")
+    studies = relationship("SQLAlchemyStudy", secondary=study_sample_join_table)
 
 
 class SQLAlchemyStudy(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
@@ -51,7 +51,7 @@ class SQLAlchemyStudy(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchem
     study_title = Column(String)
     study_visibility = Column(String)
     faculty_sponsor = Column(String)
-    samples = relationship("SQLAlchemySample", secondary=study_sample_join_table, backref="studies", cascade_backrefs=False)
+    samples = relationship("SQLAlchemySample", secondary=study_sample_join_table)
 
 
 class SQLAlchemyLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):

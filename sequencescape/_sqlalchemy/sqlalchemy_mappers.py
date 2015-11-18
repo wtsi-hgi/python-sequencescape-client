@@ -1,12 +1,13 @@
-from typing import Union, List, Any
+from typing import Union, List, Any, Callable
 
 from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
-    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_models
-from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemyIsCurrentModel, SQLAlchemySample, SQLAlchemyStudy
+    get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_models, get_equivalent_popo_model_type
+from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemyIsCurrentModel, SQLAlchemySample, SQLAlchemyStudy, \
+    SQLAlchemyModel
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
-from sequencescape.models import Model, Library, MultiplexedLibrary, Sample, Well, Study
+from sequencescape.models import Model, Library, MultiplexedLibrary, Sample, Well, Study, InternalIdModel
 
 
 class SQLAlchemyMapper(Mapper):
@@ -74,7 +75,100 @@ class SQLAlchemyMapper(Mapper):
         return convert_to_popo_models(results)
 
 
-class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
+class SQLAssociationMapper(SQLAlchemyMapper):
+    def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
+        """
+        Default constructor.
+        :param database_connector: the object through which database connections can be made
+        :param model_type: the type of the model that the mapper is used for
+        """
+        super(SQLAssociationMapper, self).__init__(database_connector, model_type)
+
+    def _set_association(self, associate: Union[InternalIdModel, List[InternalIdModel]],
+                         associate_with: InternalIdModel, relationship_property_name: str):
+        """
+        TODO
+        :param associate:
+        :param associate_with:
+        :param relationship_property_name:
+        :return:
+        """
+        if associate_with.internal_id is None:
+            raise ValueError("Model to associate with must have an internal ID: %s" % associate_with)
+
+        if not isinstance(associate, list):
+            associate = [associate]
+
+        session = self._database_connector.create_session()
+        sqlalchemy_associated_with_type = get_equivalent_sqlalchemy_model_type(associate_with.__class__)
+        assert sqlalchemy_associated_with_type is not None
+
+        # sqlalchemy_associated_with_type = SQLAlchemyStudy
+        results = session.query(sqlalchemy_associated_with_type). \
+            filter(sqlalchemy_associated_with_type.internal_id == associate_with.internal_id).all()
+
+        if len(results) != 1:
+            raise ValueError("Model to associate with does not exist:\n%s" % associate_with)
+
+        # FIXME: SQLAlchemy wants to insert the `associate` records. Could not find out how to stop this so hacking by
+        #        deleting from the database. If the given model is not in sync with the  database this will lead to data
+        #        loss.
+        sqlalchemy_associate_type = get_equivalent_sqlalchemy_model_type(associate[0].__class__)
+        assert sqlalchemy_associate_type is not None
+        for associate_element in associate:
+            session.query(sqlalchemy_associate_type).\
+                filter(sqlalchemy_associate_type.internal_id == associate_element.internal_id).\
+                delete()
+
+        sqlalchemy_associate = convert_to_sqlalchemy_models(associate)
+        for result in results:
+            for sqlalchemy_associate_element in sqlalchemy_associate:
+                current_relationship = getattr(result, relationship_property_name)
+                if sqlalchemy_associate_element not in current_relationship:
+                    setattr(result, relationship_property_name, current_relationship + sqlalchemy_associate)
+
+        session.commit()
+        session.close()
+
+    def _get_association(self, associated_with: Union[InternalIdModel, List[InternalIdModel]],
+                         relationship_property_name: str) -> List[InternalIdModel]:
+        """
+        TODO
+        :param associated_with:
+        :param relationship_property_name:
+        :return:
+        """
+        if not isinstance(associated_with, list):
+            associated_with = [associated_with]
+
+        session = self._database_connector.create_session()
+        sqlalchemy_associated_with_type = get_equivalent_sqlalchemy_model_type(associated_with[0].__class__)
+        assert sqlalchemy_associated_with_type != None
+        results = session.query(sqlalchemy_associated_with_type). \
+            filter(sqlalchemy_associated_with_type.internal_id.in_([x.internal_id for x in associated_with])). \
+            filter(sqlalchemy_associated_with_type.is_current).all()
+        assert isinstance(results, list)
+
+        if len(results) != len(associated_with):
+            raise ValueError(
+                "Not all given models to find associations with exist in the database.\nGiven: %s\nExisting: %s"
+                % (associated_with, convert_to_popo_models(results)))
+
+        associated = []
+        for result in results:
+            relationships = getattr(result, relationship_property_name)
+            if not isinstance(relationships, list):
+                relationships = [relationships]
+            print(relationships)
+            for relationship in relationships:
+                if relationship not in associated:
+                    associated.append(relationship)
+        session.close()
+
+        return convert_to_popo_models(associated)
+
+
+class SQLAlchemySampleMapper(SQLAssociationMapper, SampleMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -83,55 +177,13 @@ class SQLAlchemySampleMapper(SQLAlchemyMapper, SampleMapper):
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
     def set_association_with_study(self, samples: Union[Sample, List[Sample]], study: Study):
-        if not isinstance(samples, list):
-            samples = [samples]
-
-        session = self._database_connector.create_session()
-
-        results = session.query(SQLAlchemySample). \
-            filter(SQLAlchemySample.internal_id.in_([sample.internal_id for sample in samples])). \
-            all()
-
-        if len(results) == 0:
-            raise ValueError("Sample does not exist or does not have an internal_id")
-
-        # FIXME: SQLAlchemy wants to insert the study again when associated to a sample. Could not find out how to stop
-        #        this so hacking by deleting from the database. May be a type problem
-        session.query(SQLAlchemyStudy).filter(SQLAlchemyStudy.internal_id == study.internal_id).delete()
-
-        sqlalchemy_study = convert_to_sqlalchemy_model(study)
-        for result in results:
-            result.studies.append(sqlalchemy_study)
-        session.commit()
-        session.close()
+        self._set_association(samples, study, "samples")
 
     def get_associated_with_study(self, studies: Union[Study, List[Study]]) -> List[Sample]:
-        if not isinstance(studies, list):
-            studies = [studies]
-
-        study_internal_ids = [study.internal_id for study in studies]
-
-        session = self._database_connector.create_session()
-        results = session.query(SQLAlchemyStudy). \
-            filter(SQLAlchemyStudy.internal_id.in_(study_internal_ids)). \
-            filter(SQLAlchemyStudy.is_current).all()
-        assert isinstance(results, list)
-
-        if len(results) != len(studies):
-            raise ValueError("Not all given studies exist in the database.\nGiven: %s\nExisting: %s"
-                             % (studies, convert_to_popo_models(results)))
-
-        samples = []
-        for result in results:
-            for result_sample in result.samples:
-                if result_sample not in samples:
-                    samples.append(result_sample)
-        session.close()
-
-        return convert_to_popo_models(samples)
+        return self._get_association(studies, "samples")
 
 
-class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
+class SQLAlchemyStudyMapper(SQLAssociationMapper, StudyMapper):
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
         Default constructor.
@@ -139,24 +191,11 @@ class SQLAlchemyStudyMapper(SQLAlchemyMapper, StudyMapper):
         """
         super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
-    def get_associated_with_sample(self, sample_ids: Union[Sample, List[Sample]]) -> List[Study]:
-        if not isinstance(sample_ids, list):
-            sample_ids = [sample_ids]
+    def set_association_with_sample(self, studies: Union[Study, List[Study]], sample: Sample):
+        self._set_association(studies, sample, "studies")
 
-        raise NotImplementedError()
-
-        # # FIXME: This implementation is bad - would be better to sort SQLAlchemy models to do the link correctly
-        # session = self._database_connector.create_session()
-        # studies_samples = session.query(SQLAlchemyStudySamplesLink). \
-        #     filter(SQLAlchemyStudySamplesLink.sample_internal_id.in_(sample_ids)). \
-        #     filter(SQLAlchemyStudySamplesLink.is_current).all()
-        # session.close()
-        #
-        # if not studies_samples:
-        #     return []
-        #
-        # study_ids = [study_sample.study_internal_id for study_sample in studies_samples]
-        # return self.get_by_id(study_ids)
+    def get_associated_with_sample(self, samples: Union[Sample, List[Sample]]) -> List[Study]:
+        return self._get_association(samples, "studies")
 
 
 class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
