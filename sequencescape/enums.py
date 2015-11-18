@@ -1,7 +1,6 @@
-# TODO: Are these required anymore?
-class Property():
+class Property:
     """
-    TODO
+    Property string values.
     """
     NAME = "name"
     ACCESSION_NUMBER = "accession_number"

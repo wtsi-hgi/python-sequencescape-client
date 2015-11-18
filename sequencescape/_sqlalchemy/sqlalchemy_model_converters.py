@@ -86,7 +86,7 @@ def convert_to_sqlalchemy_model(model: Model) -> Union[SQLAlchemyModel, None]:
     :param model: the POPO model to convert
     :return: the equivalent SQLAlchemy model
     """
-    # FIXME: Drop support for this (and remove assocaited test)
+    # FIXME: Drop support for this (and remove associated test)
     if model is None:
         return None
 

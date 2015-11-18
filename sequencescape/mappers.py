@@ -134,12 +134,11 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
     Mapper for `Sample` models.
     """
     @abstractmethod
-    def set_association_with_study(self, sample: Sample, study: Study):
+    def set_association_with_study(self, samples: Union[Sample, List[Sample]], study: Study):
         """
-        TODO
-        :param study:
-        :param sample:
-        :return:
+        Associates the given samples to the given study.
+        :param samples: the samples to associate to the study
+        :param study: the study to which the samples are associated
         """
         pass
 
@@ -157,6 +156,15 @@ class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclas
     """
     Mapper for `Study` models.
     """
+    @abstractmethod
+    def set_association_with_sample(self, studies: Union[Study, List[Study]], sample: Sample):
+        """
+        Associates the given studies to the given sample.
+        :param studies: the studies to associate to the sample
+        :param sample: the sample to which the studies are associated
+        """
+        pass
+
     @abstractmethod
     def get_associated_with_sample(self, samples: Union[Sample, List[Sample]]) -> List[Study]:
         """
