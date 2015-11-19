@@ -1,6 +1,7 @@
 import unittest
 from typing import List
 
+from sequencescape import connect_to_sequencescape
 from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper, SQLAlchemyStudyMapper
 from sequencescape.enums import Property
@@ -195,6 +196,11 @@ class SQLAssociationMapperTest(unittest.TestCase):
 
         associated_samples = self._sample_mapper.get_associated_with_study(studies)
         self.assertCountEqual(associated_samples, [sample])
+
+    def test_tmp(self):
+        connection = connect_to_sequencescape("mysql://warehouse_ro:@seqw-db.internal.sanger.ac.uk:3379/sequencescape_warehouse")
+        print(connection.sample.get_by_name("1866STDY5139782"))
+        self.assertFalse(True)
 
 
 if __name__ == '__main__':

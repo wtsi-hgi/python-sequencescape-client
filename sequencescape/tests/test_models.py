@@ -4,6 +4,9 @@ from sequencescape.tests.model_stub_helpers import *
 
 
 class _FakeModel(Model):
+    """
+    Fake model.
+    """
     pass
 
 

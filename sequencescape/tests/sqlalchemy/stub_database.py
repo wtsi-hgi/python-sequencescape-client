@@ -19,4 +19,3 @@ def create_stub_database():
     SQLAlchemyModel.metadata.create_all(bind=engine)
 
     return database_location, dialect
-

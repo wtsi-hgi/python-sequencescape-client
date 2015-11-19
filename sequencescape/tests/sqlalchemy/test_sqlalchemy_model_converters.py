@@ -9,10 +9,10 @@ from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlc
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import get_equivalent_popo_model_type, \
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_sqlalchemy_models, convert_to_popo_models
-from sequencescape.tests.model_stub_helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM, COMMON_NAME, \
-    TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT, create_stub_study, \
-    STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_stub_library, LIBRARY_TYPE, \
-    create_stub_well, create_stub_multiplexed_library
+from sequencescape.tests.model_stub_helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM,\
+    COMMON_NAME, TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT,\
+    create_stub_study, STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_stub_library,\
+    LIBRARY_TYPE, create_stub_well, create_stub_multiplexed_library
 
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):

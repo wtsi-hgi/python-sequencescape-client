@@ -55,6 +55,10 @@ def create_stub(model_type: type):
 
 
 def create_stub_sample() -> Sample:
+    """
+    Creates a `Sample` stub.
+    :return: stub a `Sample` model
+    """
     sample = Sample()
     sample.internal_id = INTERNAL_ID
     sample.name = NAME
@@ -72,6 +76,10 @@ def create_stub_sample() -> Sample:
 
 
 def create_stub_study() -> Study:
+    """
+    Creates a `Study` stub.
+    :return: stub a `Study` model
+    """
     study = Study()
     study.internal_id = INTERNAL_ID
     study.name = NAME
@@ -86,6 +94,10 @@ def create_stub_study() -> Study:
 
 
 def create_stub_library() -> Library:
+    """
+    Creates a `Library` stub.
+    :return: stub a `Library` model
+    """
     library = Library()
     library.internal_id = INTERNAL_ID
     library.name = NAME
@@ -95,6 +107,10 @@ def create_stub_library() -> Library:
 
 
 def create_stub_multiplexed_library() -> MultiplexedLibrary:
+    """
+    Creates a `MultiplexedLibrary` stub.
+    :return: stub a `MultiplexedLibrary` model
+    """
     multiplexed_library = MultiplexedLibrary()
     multiplexed_library.internal_id = INTERNAL_ID
     multiplexed_library.name = NAME
@@ -103,6 +119,10 @@ def create_stub_multiplexed_library() -> MultiplexedLibrary:
 
 
 def create_stub_well() -> Well:
+    """
+    Creates a `Well` stub.
+    :return: stub a `Well` model
+    """
     well = Well()
     well.internal_id = INTERNAL_ID
     well.name = NAME
