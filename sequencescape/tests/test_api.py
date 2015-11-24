@@ -18,10 +18,10 @@ class TestConnection(unittest.TestCase):
         self.assertRaises(ValueError, connect_to_sequencescape, "")
 
     def test_with_invalid_database_url(self):
-        self.assertRaises(ValueError, connect_to_sequencescape, "dialect://host:invalid")
+        self.assertRaises(ValueError, connect_to_sequencescape, "dialect://HOST:invalid")
 
     def test_correct_mapper_properties(self):
-        connection = Connection("dialect://host")
+        connection = Connection("dialect://HOST")
         self.assertIsInstance(connection.sample, Mapper)
         self.assertIsInstance(connection.study, Mapper)
         self.assertIsInstance(connection.multiplexed_library, Mapper)
@@ -34,7 +34,7 @@ class TestConnectToSequencescape(unittest.TestCase):
     Tests for `connect_to_sequencescape` method.
     """
     def test_returns_connection(self):
-        database_location = "dialect://host"
+        database_location = "dialect://HOST"
         connection = connect_to_sequencescape(database_location)
         self.assertIsInstance(connection, Connection)
         self.assertEquals(connection._database_location, database_location)

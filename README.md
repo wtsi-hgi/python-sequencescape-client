@@ -2,14 +2,16 @@
 
 # Sequencescape Python Client
 
+
 ## How to use in your project
 ### Include the `sequencescape` library
-In ``/requirements.txt`` or in your ``/setup.py`` script:
+Link to use in ``/requirements.txt`` or in your ``/setup.py`` script:
 ```
 git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master#egg=sequencescape
 ```
-*See more about using libraries for git repositories in the 
-[pip documentation](https://pip.readthedocs.org/en/1.1/requirements.html#git).*
+*See more information about how to use packages not on PyPI in [this documentation about specifying dependencies]
+(http://python-packaging.readthedocs.org/en/latest/dependencies.html#packages-not-on-pypi).*
+
 
 ### API
 ```python
@@ -47,7 +49,6 @@ api.study.get_associated_with_sample([sample_1, sample_2])  # type: List[Study]
 # Available for: sample
 api.sample.get_associated_with_study(study)  # type: List[Sample]
 api.sample.get_associated_with_study([study_1, study_2])  # type: List[Sample]
-
 ```
 
 

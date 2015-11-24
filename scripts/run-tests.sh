@@ -1,8 +1,5 @@
 #!/bin/bash
-# Run Python unit tests
-./scripts/pip-install-requirements.sh
-pip install -q nose
-nosetests -v
+pip install -q -r requirements.txt
+pip install -q -r test_requirements.txt
 
-# Validate example in README
-./scripts/validate-readme-example.sh
+nosetests -v
