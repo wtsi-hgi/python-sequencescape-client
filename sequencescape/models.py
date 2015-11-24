@@ -1,33 +1,6 @@
 from abc import ABCMeta
 
-
-# TODO: Put in common library!
-class Model(metaclass=ABCMeta):
-    """
-    Superclass that all POPOs (Plain Old Python Objects) must implement.
-    """
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        for property_name, value in vars(self).items():
-            if other.__dict__[property_name] != self.__dict__[property_name]:
-                return False
-        return True
-
-    def __str__(self) -> str:
-        string_builder = []
-        for property, value in vars(self).items():
-            string_builder.append("%s: %s" % (property, value))
-        return "{ %s }" % ', '.join(string_builder)
-
-    def __repr__(self) -> str:
-        return "%s %s" % (self.__class__, str(self))
-
-    def __hash__(self):
-        return hash(str(self))
+from hgicommon.models import Model
 
 
 class NamedModel(Model, metaclass=ABCMeta):

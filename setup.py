@@ -17,7 +17,8 @@ setup(
     description="Python client for interfacing with a Sequencescape database.",
     long_description=open("README.md").read(),
 
-    install_requires=open("requirements.txt").read().splitlines(),
+    install_requires=[x for x in open("requirements.txt").read().splitlines() if "://" not in x],
+    dependency_links=[x for x in open("requirements.txt").read().splitlines() if "://" in x],
 
     test_suite="sequencescape.tests"
 )

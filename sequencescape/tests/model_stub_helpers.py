@@ -1,7 +1,6 @@
 from typing import List
 
-from sequencescape.models import *
-
+from sequencescape import InternalIdModel, Study, Sample, Library, MultiplexedLibrary, Well
 
 INTERNAL_ID = 123
 NAME = "NAME123"

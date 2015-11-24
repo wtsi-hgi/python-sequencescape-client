@@ -1,9 +1,10 @@
 from typing import List, Union
 
-from sequencescape.models import Study, Sample, Well, MultiplexedLibrary, Model, IsCurrentModel
-from sequencescape.models import Library
+from hgicommon.models import Model
 from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyModel
+from sequencescape.models import Library
+from sequencescape.models import Study, Sample, Well, MultiplexedLibrary, IsCurrentModel
 
 
 # TODO: Move this to model module?

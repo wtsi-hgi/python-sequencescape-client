@@ -1,15 +1,14 @@
 from abc import ABCMeta
 from typing import Union, List, Any
 
-from sqlalchemy import Column
-
+from hgicommon.models import Model
 from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_models
 from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemyIsCurrentModel
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
-from sequencescape.models import Model, Library, MultiplexedLibrary, Sample, Well, Study, InternalIdModel
+from sequencescape.models import Library, MultiplexedLibrary, Sample, Well, Study, InternalIdModel
 
 
 class SQLAlchemyMapper(Mapper):

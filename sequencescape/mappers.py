@@ -1,8 +1,10 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Tuple, Union, Any, Optional
 
+from hgicommon.models import Model
+
 from sequencescape.enums import Property
-from sequencescape.models import Model, Study, NamedModel, InternalIdModel, AccessionNumberModel, Sample
+from sequencescape.models import Study, NamedModel, InternalIdModel, AccessionNumberModel, Sample
 
 
 # XXX: This interface should use generics (pep-0484). Unfortunately they are not good enough/the documentation is not
