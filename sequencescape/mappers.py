@@ -73,25 +73,22 @@ class Mapper(metaclass=ABCMeta):
         # TODO: Be clever and group tuples querying same property
         if not isinstance(property_value_tuples, list):
             property_value_tuples = [property_value_tuples]
+
         results = []
         for property, value in property_value_tuples:
-            try:
-                result = self.get_by_property_value(property, value)
-            except ValueError:
-                # FIXME: Handle this correctly (raise, log or ignore?)
-                print("Multiple entities with the same target found in the database")
-            else:
-                results += result
+            result = self.get_by_property_value(property, value)
+            results.extend(result)
         return results
 
 
 class NamedMapper(Mapper, metaclass=ABCMeta):
     """
-    TODO
+    Mapper for `Named` models.
     """
     def get_by_name(self, names: Union[str, List[str]]) -> List[NamedModel]:
         """
-        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given name(s).
+        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given
+        name(s).
         :param names: the name or list of names of the data to get_by_path models for
         :return: list of models of data with the given name(s)
         """
@@ -102,7 +99,7 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
 
 class InternalIdMapper(Mapper, metaclass=ABCMeta):
     """
-    TODO
+    Mapper for `InternalId` models.
     """
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalIdModel]]:
         """
@@ -119,6 +116,9 @@ class InternalIdMapper(Mapper, metaclass=ABCMeta):
 
 
 class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
+    """
+    Mapper for `AccessionNumber` models.
+    """
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumberModel]:
         """
         Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given accession

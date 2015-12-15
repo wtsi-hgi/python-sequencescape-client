@@ -1,6 +1,8 @@
 from abc import ABCMeta
 from typing import Union, List, Any
 
+from sqlalchemy import Column
+
 from hgicommon.models import Model
 from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
@@ -35,7 +37,6 @@ class SQLAlchemyMapper(Mapper):
 
     def add(self, models: Union[Model, List[Model]]):
         if models is None:
-            # TODO: Generalise to anything that's not a subclass of model
             raise ValueError("Cannot add `None`")
         if not isinstance(models, list):
             models = [models]
@@ -57,7 +58,7 @@ class SQLAlchemyMapper(Mapper):
         return convert_to_popo_models(result)
 
     def _get_by_property_value_list(self, property: Property, required_property_values: List[Any]) -> List[Model]:
-        # FIXME: Should this always limit `is_current` to 1 - model might not even have this property!
+        # FIXME: Should this always limit `is_current` to 1: the model might not even have this property!
         if not issubclass(self._sqlalchemy_model_type, SQLAlchemyIsCurrentModel):
             raise ValueError(
                 "Not possible to get_by_path instances of type %s by name as the query required `is_current` property"

@@ -7,7 +7,6 @@ from sequencescape.models import Library
 from sequencescape.models import Study, Sample, Well, MultiplexedLibrary, IsCurrentModel
 
 
-# TODO: Move this to model module?
 _SQLALCHEMY_TO_POPO_CONVERSIONS = {
     SQLAlchemySample: Sample,
     SQLAlchemyStudy: Study,
@@ -87,10 +86,6 @@ def convert_to_sqlalchemy_model(model: Model) -> Union[SQLAlchemyModel, None]:
     :param model: the POPO model to convert
     :return: the equivalent SQLAlchemy model
     """
-    # FIXME: Drop support for this (and remove associated test)
-    if model is None:
-        return None
-
     type = model.__class__
     convert_to_type = get_equivalent_sqlalchemy_model_type(type)    # type: type
 

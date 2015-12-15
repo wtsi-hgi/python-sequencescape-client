@@ -71,10 +71,6 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
     """
     Unit testing for `convert_to_sqlalchemy_model`.
     """
-    def test_convert_none(self):
-        converted_model = convert_to_sqlalchemy_model(None)  # type: None
-        self.assertIsNone(converted_model)
-
     def test_convert_sample(self):
         model = create_stub_sample()
         converted_model = convert_to_sqlalchemy_model(model)  # type: SQLAlchemySample
