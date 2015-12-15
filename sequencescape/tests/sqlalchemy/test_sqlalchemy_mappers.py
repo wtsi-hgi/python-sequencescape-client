@@ -107,7 +107,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
     def _get_internal_ids(models: List[InternalIdModel]) -> List[int]:
         """
         Gets the ids of all of the given models.
-        :param models: the models to get the ids of
+        :param models: the models to get_by_path the ids of
         :return: the ids of the given models
         """
         return [model.internal_id for model in models]

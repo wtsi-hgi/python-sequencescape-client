@@ -19,7 +19,7 @@ class SQLAlchemyMapper(Mapper):
         """
         Default constructor.
         :param database_connector: the object through which database connections can be made
-        :param model_type: the type of the model that the mapper is used for
+        :param model_type: the type of the model that the metadata_mapper is used for
         """
         if not model_type:
             raise ValueError("Model type must be specified through `model_type` parameter")
@@ -60,7 +60,7 @@ class SQLAlchemyMapper(Mapper):
         # FIXME: Should this always limit `is_current` to 1 - model might not even have this property!
         if not issubclass(self._sqlalchemy_model_type, SQLAlchemyIsCurrentModel):
             raise ValueError(
-                "Not possible to get instances of type %s by name as the query required `is_current` property"
+                "Not possible to get_by_path instances of type %s by name as the query required `is_current` property"
                     % self._model_type)
 
         if len(required_property_values) == 0:
@@ -81,13 +81,13 @@ class SQLAlchemyMapper(Mapper):
 
 class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
     """
-    SQLAlchemy mapper that deals with models that can be associated with other models via a join table.
+    SQLAlchemy metadata_mapper that deals with models that can be associated with other models via a join table.
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
         """
         Default constructor.
         :param database_connector: the object through which database connections can be made
-        :param model_type: the type of the model that the mapper is used for
+        :param model_type: the type of the model that the metadata_mapper is used for
         """
         super(SQLAssociationMapper, self).__init__(database_connector, model_type)
 

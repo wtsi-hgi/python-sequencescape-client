@@ -11,13 +11,13 @@ from sequencescape.models import Study, NamedModel, InternalIdModel, AccessionNu
 #      good enough to use them yet.
 class Mapper(metaclass=ABCMeta):
     """
-    A data mapper as defined by Martin Fowler (see: http://martinfowler.com/eaaCatalog/dataMapper.html) that moves data
-    between objects and a Sequencescape database, while keeping them independent of each other and the mapper itself.
+    A data metadata_mapper as defined by Martin Fowler (see: http://martinfowler.com/eaaCatalog/dataMapper.html) that moves data
+    between objects and a Sequencescape database, while keeping them independent of each other and the metadata_mapper itself.
     """
     @abstractmethod
     def add(self, model: Union[Model, List[Model]]):
         """
-        Adds data in the given model (of the type this data mapper deals with) to the database.
+        Adds data in the given model (of the type this data metadata_mapper deals with) to the database.
         :param model: the model containing that data to be transferred
         """
         pass
@@ -25,15 +25,15 @@ class Mapper(metaclass=ABCMeta):
     @abstractmethod
     def get_all(self) -> List[Model]:
         """
-        Gets all the data of the type this data mapper deals with in the Sequencescape database.
-        :return: a list of models representing each piece of data in the database of the type this data mapper deals with
+        Gets all the data of the type this data metadata_mapper deals with in the Sequencescape database.
+        :return: a list of models representing each piece of data in the database of the type this data metadata_mapper deals with
         """
         pass
 
     @abstractmethod
     def _get_by_property_value_list(self, property: str, values: List[Any]) -> List[Model]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have one of the given
+        Gets models (of the type this data metadata_mapper deals with) of data from the database that have one of the given
         values as the value of the given property.
         :param property: the property to match values to
         :param values: the values of the property to match
@@ -46,7 +46,7 @@ class Mapper(metaclass=ABCMeta):
             property: Union[str, Union[Tuple[str, Any]], List[Tuple[str, Any]]],
             values: Optional[Union[Any, List[Any]]]=None) -> List[Model]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given property
+        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given property
         values.
         :param property: TODO
         :param values: TODO
@@ -65,7 +65,7 @@ class Mapper(metaclass=ABCMeta):
     def _get_by_property_value_tuple(
             self, property_value_tuples: Union[Tuple[str, Any], List[Tuple[str, Any]]]) -> List[Model]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have have one of the
+        Gets models (of the type this data metadata_mapper deals with) of data from the database that have have one of the
         property values defined in a tuple from the given list.
         :param property_value_tuples: the tuples declaring what property values to match
         :return: models that have at least one property value defined in the given tuple list
@@ -79,7 +79,7 @@ class Mapper(metaclass=ABCMeta):
                 result = self.get_by_property_value(property, value)
             except ValueError:
                 # FIXME: Handle this correctly (raise, log or ignore?)
-                print("Multiple entities with the same id found in the database")
+                print("Multiple entities with the same target found in the database")
             else:
                 results += result
         return results
@@ -91,8 +91,8 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
     """
     def get_by_name(self, names: Union[str, List[str]]) -> List[NamedModel]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
-        :param names: the name or list of names of the data to get models for
+        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given name(s).
+        :param names: the name or list of names of the data to get_by_path models for
         :return: list of models of data with the given name(s)
         """
         results = self.get_by_property_value(Property.NAME, names)
@@ -106,12 +106,12 @@ class InternalIdMapper(Mapper, metaclass=ABCMeta):
     """
     def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalIdModel]]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given id(s).
+        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given target(s).
 
         The property values this method uses are unique to each entry. Therefore, invoking this method with a single ID
         can return at most one model. For consistency, this return will be a list even if a single ID is used.
-        :param internal_ids: the ids or list of ids of the data to get models for
-        :return: list of models of data with the given id(s)
+        :param internal_ids: the ids or list of ids of the data to get_by_path models for
+        :return: list of models of data with the given target(s)
         """
         results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
         assert isinstance(results, list)
@@ -121,9 +121,9 @@ class InternalIdMapper(Mapper, metaclass=ABCMeta):
 class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
     def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumberModel]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given accession
+        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given accession
         number(s).
-        :param accession_numbers: the accession number or list of accession numbers of the data to get models for
+        :param accession_numbers: the accession number or list of accession numbers of the data to get_by_path models for
         :return: list of models of data with the given accession number(s)
         """
         results = self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)

@@ -20,7 +20,7 @@ _SQLALCHEMY_TO_POPO_CONVERSIONS = {
 def get_equivalent_popo_model_type(sqlalchemy_type: Union[type, None]) -> Union[type, None]:
     """
     Gets the equivalent Plain Old Python Object (POPO) type for the given SQLAlchemy model type.
-    :param sqlalchemy_type: the type of SQLAlchemy model to get equivalent POPO for
+    :param sqlalchemy_type: the type of SQLAlchemy model to get_by_path equivalent POPO for
     :return: the equivalent type of POPO for the given SQLAlchemy model type. `None` if no equivalent model is known
     """
     if sqlalchemy_type not in _SQLALCHEMY_TO_POPO_CONVERSIONS:
@@ -32,7 +32,7 @@ def get_equivalent_popo_model_type(sqlalchemy_type: Union[type, None]) -> Union[
 def get_equivalent_sqlalchemy_model_type(popo_type: Union[type, None]) -> Union[type, None]:
     """
     Gets the equivalent SQLAlchemy model type for the given Plain Old Python Object (POPO).
-    :param popo_type: the type of POPO model to get equivalent SQLAlchemy model for
+    :param popo_type: the type of POPO model to get_by_path equivalent SQLAlchemy model for
     :return: the equivalent type of SQLAlchemy model to the given POPO. `None` if no equivalent model is known
     """
     for key, value in _SQLALCHEMY_TO_POPO_CONVERSIONS.items():
@@ -64,7 +64,7 @@ def convert_to_popo_model(sqlalchemy_model: SQLAlchemyModel) -> Union[Model, Non
         if property_name in converted.__dict__:
             converted.__dict__[property_name] = value
 
-    # Type fix
+    # RegistrationEventType fix
     if issubclass(convert_to_type, IsCurrentModel):
         converted.is_current = bool(converted.is_current)
 

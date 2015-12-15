@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 
 SQLAlchemyModel = declarative_base()
 
-study_sample_join_table = Table("study_sample_join_table", SQLAlchemyModel.metadata,
+study_sample_join_table = Table("current_study_sample", SQLAlchemyModel.metadata,
     Column("sample_internal_id", Integer, ForeignKey("current_samples.internal_id")),
     Column("study_internal_id", Integer, ForeignKey("current_studies.internal_id"))
 )
