@@ -1,5 +1,7 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Tuple, Union, Any, Optional
+from typing import Tuple, Union, Any, Optional, Iterable, Sequence
+
+import collections
 
 from hgicommon.models import Model
 
@@ -11,72 +13,71 @@ from sequencescape.models import Study, NamedModel, InternalIdModel, AccessionNu
 #      good enough to use them yet.
 class Mapper(metaclass=ABCMeta):
     """
-    A data metadata_mapper as defined by Martin Fowler (see: http://martinfowler.com/eaaCatalog/dataMapper.html) that moves data
-    between objects and a Sequencescape database, while keeping them independent of each other and the metadata_mapper itself.
+    A data mapper as defined by Martin Fowler (see: http://martinfowler.com/eaaCatalog/dataMapper.html) that moves data
+    between objects and a Sequencescape database, while keeping them independent of each other and the mapper itself.
     """
     @abstractmethod
-    def add(self, model: Union[Model, List[Model]]):
+    def add(self, model: Union[Model, Iterable[Model]]):
         """
-        Adds data in the given model (of the type this data metadata_mapper deals with) to the database.
+        Adds data in the given model (of the type this data mapper deals with) to the database.
         :param model: the model containing that data to be transferred
         """
         pass
 
     @abstractmethod
-    def get_all(self) -> List[Model]:
+    def get_all(self) -> Sequence[Model]:
         """
-        Gets all the data of the type this data metadata_mapper deals with in the Sequencescape database.
-        :return: a list of models representing each piece of data in the database of the type this data metadata_mapper deals with
+        Gets all the data of the type this data mapper deals with in the Sequencescape database.
+        :return: a sequence of models representing each piece of data in the database of the type this data mapper
+        deals with
         """
         pass
 
     @abstractmethod
-    def _get_by_property_value_list(self, property: str, values: List[Any]) -> List[Model]:
+    # TODO: No longer a list...
+    def _get_by_property_value_list(self, property: str, values: Iterable[Any]) -> Sequence[Model]:
         """
-        Gets models (of the type this data metadata_mapper deals with) of data from the database that have one of the given
+        Gets models (of the type this data mapper deals with) of data from the database that have one of the given
         values as the value of the given property.
         :param property: the property to match values to
         :param values: the values of the property to match
-        :return: list of models that have at least one property value defined in the given list of acceptable values
+        :return: sequence of models that have at least one property value defined in the given acceptable values
         """
         pass
 
-    def get_by_property_value(
-            self,
-            property: Union[str, Union[Tuple[str, Any]], List[Tuple[str, Any]]],
-            values: Optional[Union[Any, List[Any]]]=None) -> List[Model]:
+    def get_by_property_value(self, property: Union[str, Union[Tuple[str, Any]], Iterable[Tuple[str, Any]]],
+                              values: Optional[Union[Any, Iterable[Any]]]=None) -> Sequence[Model]:
         """
-        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given property
+        Gets models (of the type this data mapper deals with) of data from the database that have the given property
         values.
         :param property: TODO
         :param values: TODO
         :return: TODO
         """
-        if isinstance(property, tuple) or isinstance(property, list):
-            results = self._get_by_property_value_tuple(property)
-        elif isinstance(property, str):
-            if not isinstance(values, list):
+        if isinstance(property, str):
+            if isinstance(values, str) or isinstance(values, int):
                 values = [values]
-            results = self._get_by_property_value_list(property, values)
+            return self._get_by_property_value_list(property, values)
         else:
-            raise ValueError("Invalid arguments")
-        return results
+            return self._get_by_property_value_tuple(property)
 
     def _get_by_property_value_tuple(
-            self, property_value_tuples: Union[Tuple[str, Any], List[Tuple[str, Any]]]) -> List[Model]:
+            self, property_value_tuples: Union[Tuple[str, Any], Iterable[Tuple[str, Any]]]) -> Sequence[Model]:
         """
-        Gets models (of the type this data metadata_mapper deals with) of data from the database that have have one of the
-        property values defined in a tuple from the given list.
+        Gets models (of the type this data mapper deals with) of data from the database that have have one of the
+        property values defined in a tuple from the given iterable.
         :param property_value_tuples: the tuples declaring what property values to match
-        :return: models that have at least one property value defined in the given tuple list
+        :return: sequence of models that have at least one property value defined in the given tuple iterable
         """
-        # TODO: Be clever and group tuples querying same property
-        if not isinstance(property_value_tuples, list):
+        if isinstance(property_value_tuples, tuple):
             property_value_tuples = [property_value_tuples]
+
+        # TODO: Be clever and group tuples querying same property
 
         results = []
         for property, value in property_value_tuples:
             result = self.get_by_property_value(property, value)
+            assert isinstance(result, collections.Sequence)
             results.extend(result)
         return results
 
@@ -85,15 +86,14 @@ class NamedMapper(Mapper, metaclass=ABCMeta):
     """
     Mapper for `Named` models.
     """
-    def get_by_name(self, names: Union[str, List[str]]) -> List[NamedModel]:
+    def get_by_name(self, names: Union[str, Iterable[str]]) -> Sequence[NamedModel]:
         """
-        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given
-        name(s).
-        :param names: the name or list of names of the data to get_by_path models for
-        :return: list of models of data with the given name(s)
+        Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
+        :param names: the name or iterable of names of the data to get models for
+        :return: sequence of models of data with the given name(s)
         """
         results = self.get_by_property_value(Property.NAME, names)
-        assert isinstance(results, list)
+        assert isinstance(results, collections.Sequence)
         return results
 
 
@@ -101,17 +101,17 @@ class InternalIdMapper(Mapper, metaclass=ABCMeta):
     """
     Mapper for `InternalId` models.
     """
-    def get_by_id(self, internal_ids: Union[int, List[int]]) -> Union[Model, List[InternalIdModel]]:
+    def get_by_id(self, internal_ids: Union[int, Iterable[int]]) -> Union[Model, Sequence[InternalIdModel]]:
         """
-        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given target(s).
+        Gets models (of the type this data mapper deals with) of data from the database that have the given target(s).
 
         The property values this method uses are unique to each entry. Therefore, invoking this method with a single ID
-        can return at most one model. For consistency, this return will be a list even if a single ID is used.
-        :param internal_ids: the ids or list of ids of the data to get_by_path models for
-        :return: list of models of data with the given target(s)
+        can return at most one model. For consistency, this return will be a sequence even if a single ID is used.
+        :param internal_ids: the ids or iterable of ids of the data to get models for
+        :return: sequence of models of data with the given target(s)
         """
         results = self.get_by_property_value(Property.INTERNAL_ID, internal_ids)
-        assert isinstance(results, list)
+        assert isinstance(results, collections.Sequence)
         return results
 
 
@@ -119,15 +119,14 @@ class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
     """
     Mapper for `AccessionNumber` models.
     """
-    def get_by_accession_number(self, accession_numbers: Union[str, List[str]]) -> List[AccessionNumberModel]:
+    def get_by_accession_number(self, accession_numbers: Union[str, Iterable[str]]) -> Sequence[AccessionNumberModel]:
         """
-        Gets models (of the type this data metadata_mapper deals with) of data from the database that have the given accession
-        number(s).
-        :param accession_numbers: the accession number or list of accession numbers of the data to get_by_path models for
-        :return: list of models of data with the given accession number(s)
+        Gets models (of the type this data mapper deals with) of data from the database that have the given accession number(s).
+        :param accession_numbers: the accession number or iterable of accession numbers of the data to get models for
+        :return: sequence of models of data with the given accession number(s)
         """
         results = self.get_by_property_value(Property.ACCESSION_NUMBER, accession_numbers)
-        assert isinstance(results, list)
+        assert isinstance(results, collections.Sequence)
         return results
 
 
@@ -136,7 +135,7 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
     Mapper for `Sample` models.
     """
     @abstractmethod
-    def set_association_with_study(self, samples: Union[Sample, List[Sample]], study: Study):
+    def set_association_with_study(self, samples: Union[Sample, Iterable[Sample]], study: Study):
         """
         Associates the given samples to the given study.
         :param samples: the samples to associate to the study
@@ -145,7 +144,7 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
         pass
 
     @abstractmethod
-    def get_associated_with_study(self, studies: Union[Study, List[Study]]) -> List[Sample]:
+    def get_associated_with_study(self, studies: Union[Study, Iterable[Study]]) -> Sequence[Sample]:
         """
         Gets all the samples that are associated to the given study or studies.
         :param stides: the studies to find associated samples for
@@ -159,7 +158,7 @@ class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclas
     Mapper for `Study` models.
     """
     @abstractmethod
-    def set_association_with_sample(self, studies: Union[Study, List[Study]], sample: Sample):
+    def set_association_with_sample(self, studies: Union[Study, Iterable[Study]], sample: Sample):
         """
         Associates the given studies to the given sample.
         :param studies: the studies to associate to the sample
@@ -168,7 +167,7 @@ class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclas
         pass
 
     @abstractmethod
-    def get_associated_with_sample(self, samples: Union[Sample, List[Sample]]) -> List[Study]:
+    def get_associated_with_sample(self, samples: Union[Sample, Iterable[Sample]]) -> Sequence[Study]:
         """
         Gets all the studies that the given samples (identified by ID) belong to.
         :param samples: the samples that studies are to be got for

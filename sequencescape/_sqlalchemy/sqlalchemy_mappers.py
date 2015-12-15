@@ -1,6 +1,7 @@
 from abc import ABCMeta
-from typing import Union, List, Any
+from typing import Union, Any, Iterable, Sequence
 
+import collections
 from sqlalchemy import Column
 
 from hgicommon.models import Model
@@ -35,7 +36,7 @@ class SQLAlchemyMapper(Mapper):
         if self._sqlalchemy_model_type is None:
             raise NotImplementedError("Not implemented for models of type: `%s`" % model_type)
 
-    def add(self, models: Union[Model, List[Model]]):
+    def add(self, models: Union[Model, Iterable[Model]]):
         if models is None:
             raise ValueError("Cannot add `None`")
         if not isinstance(models, list):
@@ -48,16 +49,17 @@ class SQLAlchemyMapper(Mapper):
         session.commit()
         session.close()
 
-    def get_all(self) -> List[Model]:
+    def get_all(self) -> Sequence[Model]:
         query_model = self._sqlalchemy_model_type
         session = self._database_connector.create_session()
         result = session.query(query_model). \
             filter(query_model.is_current).all()
         session.close()
-        assert isinstance(result, list)
+        assert isinstance(result, collections.Sequence)
         return convert_to_popo_models(result)
 
-    def _get_by_property_value_list(self, property: Property, required_property_values: List[Any]) -> List[Model]:
+    def _get_by_property_value_list(self, property: Property, required_property_values: Iterable[Any]) \
+            -> Sequence[Model]:
         # FIXME: Should this always limit `is_current` to 1: the model might not even have this property!
         if not issubclass(self._sqlalchemy_model_type, SQLAlchemyIsCurrentModel):
             raise ValueError(
@@ -76,7 +78,7 @@ class SQLAlchemyMapper(Mapper):
             filter(query_column.in_(required_property_values)). \
             filter(query_model.is_current).all()
         session.close()
-        assert isinstance(results, list)
+        assert isinstance(results, collections.Sequence)
         return convert_to_popo_models(results)
 
 
@@ -86,13 +88,13 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
         """
-        Default constructor.
+        Constructor.
         :param database_connector: the object through which database connections can be made
         :param model_type: the type of the model that the metadata_mapper is used for
         """
         super(SQLAssociationMapper, self).__init__(database_connector, model_type)
 
-    def _set_association(self, associate: Union[InternalIdModel, List[InternalIdModel]],
+    def _set_association(self, associate: Union[InternalIdModel, Iterable[InternalIdModel]],
                          associate_with: InternalIdModel, relationship_property_name: str):
         """
         Associates the given models to another model, linked to via the specified relationship property.
@@ -103,7 +105,7 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
         if associate_with.internal_id is None:
             raise ValueError("Model to associate with must have an internal ID: %s" % associate_with)
 
-        if not isinstance(associate, list):
+        if isinstance(associate, InternalIdModel):
             associate = [associate]
 
         session = self._database_connector.create_session()
@@ -137,15 +139,15 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
         session.commit()
         session.close()
 
-    def _get_association(self, associated_with: Union[InternalIdModel, List[InternalIdModel]],
-                         relationship_property_name: str) -> List[InternalIdModel]:
+    def _get_association(self, associated_with: Union[InternalIdModel, Iterable[InternalIdModel]],
+                         relationship_property_name: str) -> Sequence[InternalIdModel]:
         """
         Gets the models that are associated to another model, linked to via the specified relationship property.
         :param associated_with: the model to find other models that are associated with it
         :param relationship_property_name: the property on `associated_with` in which the relationship is expressed
         :return: all models associated with the given `associated_with` model
         """
-        if not isinstance(associated_with, list):
+        if isinstance(associated_with, InternalIdModel):
             associated_with = [associated_with]
 
         session = self._database_connector.create_session()
@@ -155,7 +157,7 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
         results = session.query(sqlalchemy_associated_with_type). \
             filter(sqlalchemy_associated_with_type.internal_id.in_([x.internal_id for x in associated_with])). \
             filter(sqlalchemy_associated_with_type.is_current).all()
-        assert isinstance(results, list)
+        assert isinstance(results, collections.Sequence)
 
         if len(results) != len(associated_with):
             raise ValueError(
@@ -188,10 +190,10 @@ class SQLAlchemySampleMapper(SQLAssociationMapper, SampleMapper):
         """
         super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
 
-    def set_association_with_study(self, samples: Union[Sample, List[Sample]], study: Study):
+    def set_association_with_study(self, samples: Union[Sample, Iterable[Sample]], study: Study):
         self._set_association(samples, study, "samples")
 
-    def get_associated_with_study(self, studies: Union[Study, List[Study]]) -> List[Sample]:
+    def get_associated_with_study(self, studies: Union[Study, Iterable[Study]]) -> Sequence[Sample]:
         return self._get_association(studies, "samples")
 
 
@@ -206,10 +208,10 @@ class SQLAlchemyStudyMapper(SQLAssociationMapper, StudyMapper):
         """
         super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
 
-    def set_association_with_sample(self, studies: Union[Study, List[Study]], sample: Sample):
+    def set_association_with_sample(self, studies: Union[Study, Iterable[Study]], sample: Sample):
         self._set_association(studies, sample, "studies")
 
-    def get_associated_with_sample(self, samples: Union[Sample, List[Sample]]) -> List[Study]:
+    def get_associated_with_sample(self, samples: Union[Sample, Iterable[Sample]]) -> Sequence[Study]:
         return self._get_association(samples, "studies")
 
 

@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union, Sequence, Iterable
 
 from hgicommon.models import Model
 from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
@@ -16,7 +16,7 @@ _SQLALCHEMY_TO_POPO_CONVERSIONS = {
 }
 
 
-def get_equivalent_popo_model_type(sqlalchemy_type: Union[type, None]) -> Union[type, None]:
+def get_equivalent_popo_model_type(sqlalchemy_type: type) -> Union[type, None]:
     """
     Gets the equivalent Plain Old Python Object (POPO) type for the given SQLAlchemy model type.
     :param sqlalchemy_type: the type of SQLAlchemy model to get_by_path equivalent POPO for
@@ -28,7 +28,7 @@ def get_equivalent_popo_model_type(sqlalchemy_type: Union[type, None]) -> Union[
     return _SQLALCHEMY_TO_POPO_CONVERSIONS[sqlalchemy_type]
 
 
-def get_equivalent_sqlalchemy_model_type(popo_type: Union[type, None]) -> Union[type, None]:
+def get_equivalent_sqlalchemy_model_type(popo_type: type) -> Union[type, None]:
     """
     Gets the equivalent SQLAlchemy model type for the given Plain Old Python Object (POPO).
     :param popo_type: the type of POPO model to get_by_path equivalent SQLAlchemy model for
@@ -70,7 +70,7 @@ def convert_to_popo_model(sqlalchemy_model: SQLAlchemyModel) -> Union[Model, Non
     return converted
 
 
-def convert_to_popo_models(sqlalchemy_models: List[SQLAlchemyModel]) -> List[Union[Model, None]]:
+def convert_to_popo_models(sqlalchemy_models: Iterable[SQLAlchemyModel]) -> Sequence[Union[Model, None]]:
     """
     Converts the given SQLAlchemy models into an equivalent POPO models thus removing the coupling to the underlying
     ORM.
@@ -101,7 +101,7 @@ def convert_to_sqlalchemy_model(model: Model) -> Union[SQLAlchemyModel, None]:
     return converted
 
 
-def convert_to_sqlalchemy_models(models: List[Model]) -> List[Union[SQLAlchemyModel, None]]:
+def convert_to_sqlalchemy_models(models: Iterable[Model]) -> Sequence[Union[SQLAlchemyModel, None]]:
     """
     Converts the given POPO models into equivalent SQLAlchemy models.
     :param models: the POPO models to convert
