@@ -11,7 +11,7 @@ class MockMapper(Mapper):
     def __init__(self):
         self.add = MagicMock()
         self.get_all = MagicMock(return_value=[])
-        self._get_by_property_value_list = MagicMock(return_value=[])
+        self._get_by_property_value_sequence = MagicMock(return_value=[])
         self._get_by_property_value_tuple = MagicMock(return_value=[])
 
     def get_all(self) -> List[Model]:
@@ -20,7 +20,7 @@ class MockMapper(Mapper):
     def add(self, model: Union[Model, List[Model]]):
         pass
 
-    def _get_by_property_value_list(self, property: Property, values: Union[Any, List[Any]]) -> List[Model]:
+    def _get_by_property_value_sequence(self, property: Property, values: Union[Any, List[Any]]) -> List[Model]:
         pass
 
     def _get_by_property_value_tuple(

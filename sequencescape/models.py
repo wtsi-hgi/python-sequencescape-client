@@ -33,16 +33,7 @@ class AccessionNumberModel(Model, metaclass=ABCMeta):
         self.accession_number = accession_number
 
 
-class IsCurrentModel(Model, metaclass=ABCMeta):
-    """
-    Model that has an is_current property.
-    """
-    def __init__(self, is_current: bool=True, **kwargs):
-        super(IsCurrentModel, self).__init__(**kwargs)
-        self.is_current = is_current
-
-
-class Sample(NamedModel, InternalIdModel, AccessionNumberModel, IsCurrentModel):
+class Sample(NamedModel, InternalIdModel, AccessionNumberModel):
     """
     Model of a sample.
     """
@@ -60,7 +51,7 @@ class Sample(NamedModel, InternalIdModel, AccessionNumberModel, IsCurrentModel):
         self.geographical_region = geographical_region
 
 
-class Study(NamedModel, InternalIdModel, AccessionNumberModel, IsCurrentModel):
+class Study(NamedModel, InternalIdModel, AccessionNumberModel):
     """
     Model of a study.
     """
@@ -74,7 +65,7 @@ class Study(NamedModel, InternalIdModel, AccessionNumberModel, IsCurrentModel):
         self.faculty_sponsor = faculty_sponsor
 
 
-class Library(NamedModel, InternalIdModel, IsCurrentModel):
+class Library(NamedModel, InternalIdModel):
     """
     Model of a library.
     """
@@ -83,7 +74,7 @@ class Library(NamedModel, InternalIdModel, IsCurrentModel):
         self.library_type = library_type
 
 
-class MultiplexedLibrary(NamedModel, InternalIdModel, IsCurrentModel):
+class MultiplexedLibrary(NamedModel, InternalIdModel):
     """
     Model of a multiplexed library.
     """
@@ -91,7 +82,7 @@ class MultiplexedLibrary(NamedModel, InternalIdModel, IsCurrentModel):
         super(MultiplexedLibrary, self).__init__(**kwargs)
 
 
-class Well(NamedModel, InternalIdModel, IsCurrentModel):
+class Well(NamedModel, InternalIdModel):
     """
     Model of a well.
     """

@@ -1,10 +1,10 @@
 import unittest
 
-from sequencescape import InternalIdModel, AccessionNumberModel, IsCurrentModel, Sample, Study, Library
+from sequencescape import InternalIdModel, AccessionNumberModel, Sample, Study, Library
 from sequencescape import NamedModel
-from sequencescape.tests.model_stub_helpers import COMMON_NAME, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, \
+from sequencescape.tests._stub_helpers import COMMON_NAME, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, \
     GEOGRAPHICAL_REGION, STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, LIBRARY_TYPE
-from sequencescape.tests.model_stub_helpers import ORGANISM, TAXON_ID
+from sequencescape.tests._stub_helpers import ORGANISM, TAXON_ID
 
 
 class _TestNamedModel(unittest.TestCase):
@@ -65,26 +65,6 @@ class _TestAccessionNumberModel(unittest.TestCase):
         accession_number = "test_123"
         model = _TestAccessionNumberModel._MockAccessionNumberModel(accession_number=accession_number)
         self.assertEquals(model.accession_number, accession_number)
-
-
-class _TestIsCurrentModel(unittest.TestCase):
-    """
-    Tests for `IsCurrentModel`.
-    """
-    class _MockIsCurrentModel(IsCurrentModel):
-        pass
-
-    def test_not_equal_if_different_is_current(self):
-        model1 = _TestIsCurrentModel._MockIsCurrentModel()
-        model1.is_current = False
-        model2 = _TestIsCurrentModel._MockIsCurrentModel()
-        model2.is_current = True
-        self.assertNotEqual(model1, model2)
-
-    def test_can_set_is_current_with_named_parameter(self):
-        is_current = False
-        model = _TestIsCurrentModel._MockIsCurrentModel(is_current=is_current)
-        self.assertEquals(model.is_current, is_current)
 
 
 class TestSample(unittest.TestCase):

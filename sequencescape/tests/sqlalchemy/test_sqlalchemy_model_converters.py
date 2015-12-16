@@ -9,21 +9,18 @@ from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlc
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import get_equivalent_popo_model_type, \
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_sqlalchemy_models, convert_to_popo_models
-from sequencescape.tests.model_stub_helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM,\
-    COMMON_NAME, TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, IS_CURRENT,\
-    create_stub_study, STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_stub_library,\
-    LIBRARY_TYPE, create_stub_well, create_stub_multiplexed_library
+from sequencescape.tests._stub_helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM,\
+    COMMON_NAME, TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, create_stub_study, \
+    STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_stub_library, LIBRARY_TYPE, \
+    create_stub_well, create_stub_multiplexed_library
 
 
 class TestGetEquivalentPopoModelType(unittest.TestCase):
     """
     Unit testing for `get_equivalent_popo_model_type`.
     """
-    def test_none_with_unsupported_type(self):
-        self.assertIsNone(get_equivalent_popo_model_type(str))
-
-    def test_correct_with_none(self):
-        self.assertEqual(get_equivalent_popo_model_type(None), None)
+    def test_raises_with_unsupported_type(self):
+        self.assertRaises(ValueError, get_equivalent_popo_model_type, str)
 
     def test_correct_with_sample(self):
         self.assertEqual(get_equivalent_popo_model_type(SQLAlchemySample), Sample)
@@ -45,11 +42,8 @@ class TestGetEquivalentSqlalchemyModelType(unittest.TestCase):
     """
     Unit testing for `get_equivalent_sqlalchemy_model_type`.
     """
-    def test_none_with_unsupported_type(self):
-        self.assertIsNone(get_equivalent_sqlalchemy_model_type(str))
-
-    def test_correct_with_none(self):
-        self.assertEqual(get_equivalent_sqlalchemy_model_type(None), None)
+    def test_raises_with_unsupported_type(self):
+        self.assertRaises(ValueError, get_equivalent_sqlalchemy_model_type, str)
 
     def test_correct_with_sample(self):
         self.assertEqual(get_equivalent_sqlalchemy_model_type(Sample), SQLAlchemySample)
@@ -86,7 +80,6 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.cohort, COHORT)
         self.assertEqual(converted_model.country_of_origin, COUNTRY_OF_ORIGIN)
         self.assertEqual(converted_model.geographical_region, GEOGRAPHICAL_REGION)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_study(self):
         model = create_stub_study()
@@ -100,7 +93,6 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.study_title, STUDY_TITLE)
         self.assertEqual(converted_model.study_visibility, STUDY_VISIBILITY)
         self.assertEqual(converted_model.faculty_sponsor, FACULTY_SPONSOR)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_library(self):
         model = create_stub_library()
@@ -109,7 +101,6 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
         self.assertEqual(converted_model.library_type, LIBRARY_TYPE)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_well(self):
         model = create_stub_well()
@@ -117,7 +108,6 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.__class__, SQLAlchemyWell)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_multiplexed_library(self):
         model = create_stub_multiplexed_library()
@@ -125,7 +115,6 @@ class TestConvertToSQLAlchemyModel(unittest.TestCase):
         self.assertEqual(converted_model.__class__, SQLAlchemyMultiplexedLibrary)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
 
 class TestConvertToSQLAlchemyModels(unittest.TestCase):
@@ -174,10 +163,6 @@ class TestConvertToPopoModel(unittest.TestCase):
     """
     Unit testing for `convert_to_popo_model`.
     """
-    def test_convert_none(self):
-        converted_model = convert_to_popo_model(None)  # type: None
-        self.assertIsNone(converted_model)
-
     def test_convert_sample(self):
         alchemy_model = convert_to_sqlalchemy_model(create_stub_sample())
         converted_model = convert_to_popo_model(alchemy_model)  # type: Sample
@@ -193,7 +178,6 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.cohort, COHORT)
         self.assertEqual(converted_model.country_of_origin, COUNTRY_OF_ORIGIN)
         self.assertEqual(converted_model.geographical_region, GEOGRAPHICAL_REGION)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_study(self):
         alchemy_model = convert_to_sqlalchemy_model(create_stub_study())
@@ -207,7 +191,6 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.study_title, STUDY_TITLE)
         self.assertEqual(converted_model.study_visibility, STUDY_VISIBILITY)
         self.assertEqual(converted_model.faculty_sponsor, FACULTY_SPONSOR)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_library(self):
         alchemy_model = convert_to_sqlalchemy_model(create_stub_library())
@@ -216,7 +199,6 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
         self.assertEqual(converted_model.library_type, LIBRARY_TYPE)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_well(self):
         alchemy_model = convert_to_sqlalchemy_model(create_stub_well())
@@ -224,7 +206,6 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.__class__, Well)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
     def test_convert_multiplexed_library(self):
         alchemy_model = convert_to_sqlalchemy_model(create_stub_multiplexed_library())
@@ -232,8 +213,7 @@ class TestConvertToPopoModel(unittest.TestCase):
         self.assertEqual(converted_model.__class__, MultiplexedLibrary)
         self.assertEqual(converted_model.internal_id, INTERNAL_ID)
         self.assertEqual(converted_model.name, NAME)
-        self.assertEqual(converted_model.is_current, IS_CURRENT)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

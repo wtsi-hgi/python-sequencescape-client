@@ -1,13 +1,12 @@
 import unittest
 from typing import List
 
-from sequencescape import connect_to_sequencescape
 from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper, SQLAlchemyStudyMapper
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper
 from sequencescape.models import InternalIdModel, Sample, Study
-from sequencescape.tests.model_stub_helpers import create_stub_sample, assign_unique_ids
+from sequencescape.tests._stub_helpers import create_stub_sample, assign_unique_ids
 from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
 
@@ -61,7 +60,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         models_to_retrieve = []
         self._mapper.add(models)
 
-        retrieved_models = self._mapper._get_by_property_value_list(
+        retrieved_models = self._mapper._get_by_property_value_sequence(
             Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, models_to_retrieve)
 
@@ -70,7 +69,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         models_to_retrieve = [models[0], models[2]]
         self._mapper.add(models)
 
-        retrieved_models = self._mapper._get_by_property_value_list(
+        retrieved_models = self._mapper._get_by_property_value_sequence(
             Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, models_to_retrieve)
 
@@ -80,7 +79,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         assert len(models) == 3
         self._mapper.add(models)
 
-        retrieved_models = self._mapper._get_by_property_value_list(
+        retrieved_models = self._mapper._get_by_property_value_sequence(
             Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, [])
 
@@ -90,7 +89,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         assert len(models) == 4
         self._mapper.add(models)
 
-        retrieved_models = self._mapper._get_by_property_value_list(
+        retrieved_models = self._mapper._get_by_property_value_sequence(
             Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, models_to_retrieve[:2])
 
@@ -98,7 +97,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         models = self._create_models(5)
         self._mapper.add(models)
 
-        retrieved_models = self._mapper._get_by_property_value_list(
+        retrieved_models = self._mapper._get_by_property_value_sequence(
             Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models))
         self.assertCountEqual(retrieved_models, models)
         self.assertIsInstance(retrieved_models[0], models[0].__class__)

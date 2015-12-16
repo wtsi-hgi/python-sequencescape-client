@@ -1,7 +1,6 @@
 import unittest
 
-from sequencescape import connect_to_sequencescape
-from sequencescape.api import Connection
+from sequencescape.api import Connection, connect_to_sequencescape
 from sequencescape.mappers import Mapper
 from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 

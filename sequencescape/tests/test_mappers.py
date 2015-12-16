@@ -1,7 +1,7 @@
 import unittest
 
 from sequencescape.enums import Property
-from sequencescape.tests.mock_mappers import MockMapper, MockNamedMapper, MockInternalIdMapper, \
+from sequencescape.tests._mock_mappers import MockMapper, MockNamedMapper, MockInternalIdMapper, \
     MockAccessionNumberMapper
 
 
@@ -16,11 +16,11 @@ class MapperTest(unittest.TestCase):
 
     def test_get_by_property_value_with_value(self):
         self._mapper.get_by_property_value(Property.NAME, MapperTest._VALUES[0])
-        self._mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, [MapperTest._VALUES[0]])
+        self._mapper._get_by_property_value_sequence.assert_called_once_with(Property.NAME, [MapperTest._VALUES[0]])
 
     def test_get_by_property_value_with_list(self):
         self._mapper.get_by_property_value(Property.NAME, MapperTest._VALUES)
-        self._mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, MapperTest._VALUES)
+        self._mapper._get_by_property_value_sequence.assert_called_once_with(Property.NAME, MapperTest._VALUES)
 
     def test_get_by_property_value_with_tuple(self):
         property_value_tuple = (Property.NAME, MapperTest._VALUES[0])
@@ -45,11 +45,11 @@ class NamedMapperTest(unittest.TestCase):
 
     def test_get_by_name_with_value(self):
         self._mapper.get_by_name(NamedMapperTest._NAMES[0])
-        self._mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, [NamedMapperTest._NAMES[0]])
+        self._mapper._get_by_property_value_sequence.assert_called_once_with(Property.NAME, [NamedMapperTest._NAMES[0]])
 
     def test_get_by_name_with_list(self):
         self._mapper.get_by_name(NamedMapperTest._NAMES)
-        self._mapper._get_by_property_value_list.assert_called_once_with(Property.NAME, NamedMapperTest._NAMES)
+        self._mapper._get_by_property_value_sequence.assert_called_once_with(Property.NAME, NamedMapperTest._NAMES)
 
 
 class InternalIdMapperTest(unittest.TestCase):
@@ -63,12 +63,12 @@ class InternalIdMapperTest(unittest.TestCase):
 
     def test_get_by_id_with_value(self):
         self._mapper.get_by_id(InternalIdMapperTest._INTERNAL_IDS[0])
-        self._mapper._get_by_property_value_list.assert_called_once_with(
+        self._mapper._get_by_property_value_sequence.assert_called_once_with(
             Property.INTERNAL_ID, [InternalIdMapperTest._INTERNAL_IDS[0]])
 
     def test_get_by_id_with_list(self):
         self._mapper.get_by_id(InternalIdMapperTest._INTERNAL_IDS)
-        self._mapper._get_by_property_value_list.assert_called_once_with(
+        self._mapper._get_by_property_value_sequence.assert_called_once_with(
             Property.INTERNAL_ID, InternalIdMapperTest._INTERNAL_IDS)
 
 
@@ -87,7 +87,7 @@ class AccessionNumberMapperTest(unittest.TestCase):
 
     def test_get_by_accession_number_with_list(self):
         self._mapper.get_by_accession_number(AccessionNumberMapperTest._ACCESSION_NUMBERS)
-        self._mapper._get_by_property_value_list(
+        self._mapper._get_by_property_value_sequence(
             Property.ACCESSION_NUMBER, AccessionNumberMapperTest._ACCESSION_NUMBERS)
 
 

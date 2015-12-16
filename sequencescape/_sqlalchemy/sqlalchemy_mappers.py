@@ -8,7 +8,6 @@ from hgicommon.models import Model
 from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_models
-from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemyIsCurrentModel
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
 from sequencescape.models import Library, MultiplexedLibrary, Sample, Well, Study, InternalIdModel
@@ -20,7 +19,7 @@ class SQLAlchemyMapper(Mapper):
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
         """
-        Default constructor.
+        Constructor.
         :param database_connector: the object through which database connections can be made
         :param model_type: the type of the model that the metadata_mapper is used for
         """
@@ -52,31 +51,21 @@ class SQLAlchemyMapper(Mapper):
     def get_all(self) -> Sequence[Model]:
         query_model = self._sqlalchemy_model_type
         session = self._database_connector.create_session()
-        result = session.query(query_model). \
-            filter(query_model.is_current).all()
+        result = session.query(query_model).all()
         session.close()
         assert isinstance(result, collections.Sequence)
         return convert_to_popo_models(result)
 
-    def _get_by_property_value_list(self, property: Property, required_property_values: Iterable[Any]) \
+    def _get_by_property_value_sequence(self, property: Property, required_property_values: Iterable[Any]) \
             -> Sequence[Model]:
-        # FIXME: Should this always limit `is_current` to 1: the model might not even have this property!
-        if not issubclass(self._sqlalchemy_model_type, SQLAlchemyIsCurrentModel):
-            raise ValueError(
-                "Not possible to get_by_path instances of type %s by name as the query required `is_current` property"
-                    % self._model_type)
-
-        if len(required_property_values) == 0:
-            return []
-
         query_model = self._sqlalchemy_model_type
         session = self._database_connector.create_session()
 
         # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel property
         query_column = query_model.__dict__[property]   # type: Column
         results = session.query(query_model). \
-            filter(query_column.in_(required_property_values)). \
-            filter(query_model.is_current).all()
+            filter(query_column.in_(required_property_values)).\
+            all()
         session.close()
         assert isinstance(results, collections.Sequence)
         return convert_to_popo_models(results)
@@ -153,10 +142,10 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
         session = self._database_connector.create_session()
         sqlalchemy_associated_with_type = get_equivalent_sqlalchemy_model_type(associated_with[0].__class__)
         assert sqlalchemy_associated_with_type != None
-        # FIXME: `is_current` assumption again
         results = session.query(sqlalchemy_associated_with_type). \
-            filter(sqlalchemy_associated_with_type.internal_id.in_([x.internal_id for x in associated_with])). \
-            filter(sqlalchemy_associated_with_type.is_current).all()
+            filter(sqlalchemy_associated_with_type.internal_id. \
+            in_([x.internal_id for x in associated_with])).\
+            all()
         assert isinstance(results, collections.Sequence)
 
         if len(results) != len(associated_with):

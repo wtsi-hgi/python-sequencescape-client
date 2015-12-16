@@ -24,13 +24,7 @@ class SQLAlchemyAccessionNumberModel(SQLAlchemyModel):
     accession_number = Column(String)
 
 
-class SQLAlchemyIsCurrentModel(SQLAlchemyModel):
-    __abstract__ = True
-    is_current = Column(Integer)
-
-
-class SQLAlchemySample(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
-                       SQLAlchemyIsCurrentModel):
+class SQLAlchemySample(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel):
     __tablename__ = "current_samples"
     organism = Column(String)
     common_name = Column(String)
@@ -43,8 +37,7 @@ class SQLAlchemySample(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlche
     studies = relationship("SQLAlchemyStudy", secondary=study_sample_join_table)
 
 
-class SQLAlchemyStudy(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel,
-                      SQLAlchemyIsCurrentModel):
+class SQLAlchemyStudy(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyAccessionNumberModel):
     __tablename__ = "current_studies"
     study_type = Column(String)
     description = Column(String)
@@ -54,15 +47,14 @@ class SQLAlchemyStudy(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchem
     samples = relationship("SQLAlchemySample", secondary=study_sample_join_table)
 
 
-class SQLAlchemyLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
+class SQLAlchemyLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel):
     __tablename__ = "current_library_tubes"
     library_type = Column(String)
 
 
-class SQLAlchemyMultiplexedLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel,
-                                   SQLAlchemyIsCurrentModel):
+class SQLAlchemyMultiplexedLibrary(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel):
     __tablename__ = "current_multiplexed_library_tubes"
 
 
-class SQLAlchemyWell(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel, SQLAlchemyIsCurrentModel):
+class SQLAlchemyWell(SQLAlchemyNamedModel, SQLAlchemyInternalIdModel):
     __tablename__ = "current_wells"

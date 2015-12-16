@@ -5,7 +5,6 @@ from sequencescape import InternalIdModel, Study, Sample, Library, MultiplexedLi
 INTERNAL_ID = 123
 NAME = "NAME123"
 ACCESSION_NUMBER = "ACCESSION_NUMBER123"
-IS_CURRENT = True
 
 ORGANISM = "ORGANISM123"
 COMMON_NAME = "COMMON_NAME123"
@@ -70,7 +69,6 @@ def create_stub_sample() -> Sample:
     sample.cohort = COHORT
     sample.country_of_origin = COUNTRY_OF_ORIGIN
     sample.geographical_region = GEOGRAPHICAL_REGION
-    sample.is_current = IS_CURRENT
     return sample
 
 
@@ -88,7 +86,6 @@ def create_stub_study() -> Study:
     study.study_title = STUDY_TITLE
     study.study_visibility = STUDY_VISIBILITY
     study.faculty_sponsor = FACULTY_SPONSOR
-    study.is_current = IS_CURRENT
     return study
 
 
@@ -101,7 +98,6 @@ def create_stub_library() -> Library:
     library.internal_id = INTERNAL_ID
     library.name = NAME
     library.library_type = LIBRARY_TYPE
-    library.is_current = IS_CURRENT
     return library
 
 
@@ -113,7 +109,6 @@ def create_stub_multiplexed_library() -> MultiplexedLibrary:
     multiplexed_library = MultiplexedLibrary()
     multiplexed_library.internal_id = INTERNAL_ID
     multiplexed_library.name = NAME
-    multiplexed_library.is_current = IS_CURRENT
     return multiplexed_library
 
 
@@ -125,5 +120,4 @@ def create_stub_well() -> Well:
     well = Well()
     well.internal_id = INTERNAL_ID
     well.name = NAME
-    well.is_current = IS_CURRENT
     return well

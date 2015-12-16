@@ -34,8 +34,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    # TODO: No longer a list...
-    def _get_by_property_value_list(self, property: str, values: Iterable[Any]) -> Sequence[Model]:
+    def _get_by_property_value_sequence(self, property: str, values: Iterable[Any]) -> Sequence[Model]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have one of the given
         values as the value of the given property.
@@ -57,7 +56,7 @@ class Mapper(metaclass=ABCMeta):
         if isinstance(property, str):
             if isinstance(values, str) or isinstance(values, int):
                 values = [values]
-            return self._get_by_property_value_list(property, values)
+            return self._get_by_property_value_sequence(property, values)
         else:
             return self._get_by_property_value_tuple(property)
 
