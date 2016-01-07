@@ -2,9 +2,9 @@ from typing import Union, Any, List, Tuple
 from unittest.mock import MagicMock
 
 from sequencescape.enums import Property
-from sequencescape.mappers import Mapper, NamedMapper, InternalIdMapper, AccessionNumberMapper, SampleMapper, WellMapper, \
-    MultiplexedLibraryMapper, LibraryMapper, StudyMapper
-from sequencescape.models import Model
+from sequencescape.mappers import Mapper, NamedMapper, InternalIdMapper, AccessionNumberMapper, SampleMapper,\
+    WellMapper, MultiplexedLibraryMapper, LibraryMapper, StudyMapper
+from sequencescape.models import Model, NamedModel, InternalIdModel, AccessionNumberModel
 
 
 class MockMapper(Mapper):
@@ -29,40 +29,44 @@ class MockMapper(Mapper):
 
 
 class MockNamedMapper(MockMapper, NamedMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
 
 
 class MockInternalIdMapper(MockMapper, InternalIdMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
 
 
 class MockAccessionNumberMapper(MockMapper, AccessionNumberMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
 
 
 class MockSampleMapper(MockMapper, SampleMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
 
 
 class MockStudyMapper(MockMapper, StudyMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
 
 
 class MockLibraryMapper(MockMapper, LibraryMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
 
 
 class MockMultiplexedLibraryMapper(MockMapper, MultiplexedLibraryMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
 
 
 class MockWellMapper(MockMapper, WellMapper):
-    def __init__(self):
-        super(self.__class__, self).__init__()
+    pass
+
+
+class MockNamedModel(NamedModel):
+    pass
+
+
+class MockAccessionNumberModel(AccessionNumberModel):
+    pass
+
+
+class MockInternalIdModel(InternalIdModel):
+    pass

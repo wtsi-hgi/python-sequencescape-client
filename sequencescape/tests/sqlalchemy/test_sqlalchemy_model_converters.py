@@ -9,7 +9,7 @@ from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlc
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import get_equivalent_popo_model_type, \
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_model, convert_to_popo_model, \
     convert_to_sqlalchemy_models, convert_to_popo_models
-from sequencescape.tests._stub_helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM,\
+from sequencescape.tests._helpers import create_stub_sample, INTERNAL_ID, NAME, ACCESSION_NUMBER, ORGANISM,\
     COMMON_NAME, TAXON_ID, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, GEOGRAPHICAL_REGION, create_stub_study, \
     STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, create_stub_library, LIBRARY_TYPE, \
     create_stub_well, create_stub_multiplexed_library
@@ -138,7 +138,7 @@ class TestConvertToSQLAlchemyModels(unittest.TestCase):
 
 class TestConvertToPOPOModels(unittest.TestCase):
     """
-    TODO
+    Using testing for `convert_to_popo_models`.
     """
     def test_convert_many_of_same_type(self):
         names = ["name_1", "name_2"]

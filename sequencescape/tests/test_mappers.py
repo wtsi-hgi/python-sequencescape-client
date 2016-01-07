@@ -1,7 +1,7 @@
 import unittest
 
 from sequencescape.enums import Property
-from sequencescape.tests._mock_mappers import MockMapper, MockNamedMapper, MockInternalIdMapper, \
+from sequencescape.tests._mocks import MockMapper, MockNamedMapper, MockInternalIdMapper, \
     MockAccessionNumberMapper
 
 
@@ -91,5 +91,5 @@ class AccessionNumberMapperTest(unittest.TestCase):
             Property.ACCESSION_NUMBER, AccessionNumberMapperTest._ACCESSION_NUMBERS)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

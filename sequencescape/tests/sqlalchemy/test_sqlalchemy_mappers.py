@@ -6,7 +6,7 @@ from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyMapper, SQLAl
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper
 from sequencescape.models import InternalIdModel, Sample, Study
-from sequencescape.tests._stub_helpers import create_stub_sample, assign_unique_ids
+from sequencescape.tests._helpers import create_stub_sample, assign_unique_ids
 from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
 
@@ -197,5 +197,5 @@ class SQLAssociationMapperTest(unittest.TestCase):
         self.assertCountEqual(associated_samples, [sample])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

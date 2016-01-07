@@ -39,5 +39,5 @@ class TestConnectToSequencescape(unittest.TestCase):
         self.assertEquals(connection._database_location, database_location)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
