@@ -5,10 +5,10 @@ from hgicommon.models import Model
 
 class NamedModel(Model, metaclass=ABCMeta):
     """
-    Model that has a name.
+    Model that has a build_name.
     """
     def __init__(self, name: str=None, **kwargs):
-        super(NamedModel, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.name = name
 
 
@@ -17,7 +17,7 @@ class InternalIdModel(Model, metaclass=ABCMeta):
     Model that has an internal ID.
     """
     def __init__(self, internal_id: int=None, **kwargs):
-        super(InternalIdModel, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.internal_id = internal_id
 
     def __hash__(self) -> hash:
@@ -29,7 +29,7 @@ class AccessionNumberModel(Model, metaclass=ABCMeta):
     Model that has an accession number.
     """
     def __init__(self, accession_number: str=None, **kwargs):
-        super(AccessionNumberModel, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.accession_number = accession_number
 
 
@@ -40,7 +40,7 @@ class Sample(NamedModel, InternalIdModel, AccessionNumberModel):
     def __init__(self, organism: str=None, common_name: str=None, taxon_id: str=None, gender: str=None,
                  ethnicity: str=None, cohort: str=None, country_of_origin: str=None, geographical_region: str=None,
                  **kwargs):
-        super(Sample, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.organism = organism
         self.common_name = common_name
         self.taxon_id = taxon_id
@@ -57,7 +57,7 @@ class Study(NamedModel, InternalIdModel, AccessionNumberModel):
     """
     def __init__(self, study_type: str=None, description: str=None, study_title: str=None, study_visibility: str=None,
                  faculty_sponsor: str=None, **kwargs):
-        super(Study, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.study_type = study_type
         self.description = description
         self.study_title = study_title
@@ -70,7 +70,7 @@ class Library(NamedModel, InternalIdModel):
     Model of a library.
     """
     def __init__(self, library_type: str=None, **kwargs):
-        super(Library, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.library_type = library_type
 
 
@@ -78,13 +78,11 @@ class MultiplexedLibrary(NamedModel, InternalIdModel):
     """
     Model of a multiplexed library.
     """
-    def __init__(self, **kwargs):
-        super(MultiplexedLibrary, self).__init__(**kwargs)
+    pass
 
 
 class Well(NamedModel, InternalIdModel):
     """
     Model of a well.
     """
-    def __init__(self, **kwargs):
-        super(Well, self).__init__(**kwargs)
+    pass

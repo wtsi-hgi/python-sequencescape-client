@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from typing import Union, Any, Iterable, Sequence
+from typing import Union, Any, Iterable, Sequence, Generic, TypeVar
 
 import collections
 from sqlalchemy import Column
@@ -9,11 +9,15 @@ from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDa
 from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_models
 from sequencescape.enums import Property
-from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
+from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper, \
+    MappedType
 from sequencescape.models import Library, MultiplexedLibrary, Sample, Well, Study, InternalIdModel
 
 
-class SQLAlchemyMapper(Mapper):
+_InternalIdMappedType = TypeVar("S", bound=InternalIdModel)
+
+
+class SQLAlchemyMapper(Mapper[MappedType], metaclass=ABCMeta):
     """
     Implementation of `Mapper` using SQLAlchemy.
     """
@@ -21,7 +25,8 @@ class SQLAlchemyMapper(Mapper):
         """
         Constructor.
         :param database_connector: the object through which database connections can be made
-        :param model_type: the type of the model that the metadata_mapper is used for
+        :param model_type: the type of the model that the metadata_mapper is used for. Note that it is not (currently)
+        possible in Python to get this type from the generic used
         """
         if not model_type:
             raise ValueError("Model type must be specified through `model_type` parameter")
@@ -35,7 +40,7 @@ class SQLAlchemyMapper(Mapper):
         if self._sqlalchemy_model_type is None:
             raise NotImplementedError("Not implemented for models of type: `%s`" % model_type)
 
-    def add(self, models: Union[Model, Iterable[Model]]):
+    def add(self, models: Union[Model, Iterable[MappedType]]):
         if models is None:
             raise ValueError("Cannot add `None`")
         if not isinstance(models, list):
@@ -48,7 +53,7 @@ class SQLAlchemyMapper(Mapper):
         session.commit()
         session.close()
 
-    def get_all(self) -> Sequence[Model]:
+    def get_all(self) -> Sequence[MappedType]:
         query_model = self._sqlalchemy_model_type
         session = self._database_connector.create_session()
         result = session.query(query_model).all()
@@ -57,11 +62,11 @@ class SQLAlchemyMapper(Mapper):
         return convert_to_popo_models(result)
 
     def _get_by_property_value_sequence(self, property: Property, required_property_values: Iterable[Any]) \
-            -> Sequence[Model]:
+            -> Sequence[MappedType]:
         query_model = self._sqlalchemy_model_type
         session = self._database_connector.create_session()
 
-        # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel property
+        # FIXME: It is an assumption that the Model property has the same build_name as SQLAlchemyModel property
         query_column = query_model.__dict__[property]   # type: Column
         results = session.query(query_model). \
             filter(query_column.in_(required_property_values)).\
@@ -71,18 +76,10 @@ class SQLAlchemyMapper(Mapper):
         return convert_to_popo_models(results)
 
 
-class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
+class SQLAssociationMapper(SQLAlchemyMapper[_InternalIdMappedType], metaclass=ABCMeta):
     """
     SQLAlchemy metadata_mapper that deals with models that can be associated with other models via a join table.
     """
-    def __init__(self, database_connector: SQLAlchemyDatabaseConnector, model_type: type):
-        """
-        Constructor.
-        :param database_connector: the object through which database connections can be made
-        :param model_type: the type of the model that the metadata_mapper is used for
-        """
-        super(SQLAssociationMapper, self).__init__(database_connector, model_type)
-
     def _set_association(self, associate: Union[InternalIdModel, Iterable[InternalIdModel]],
                          associate_with: InternalIdModel, relationship_property_name: str):
         """
@@ -129,7 +126,7 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
         session.close()
 
     def _get_association(self, associated_with: Union[InternalIdModel, Iterable[InternalIdModel]],
-                         relationship_property_name: str) -> Sequence[InternalIdModel]:
+                         relationship_property_name: str) -> Sequence[_InternalIdMappedType]:
         """
         Gets the models that are associated to another model, linked to via the specified relationship property.
         :param associated_with: the model to find other models that are associated with it
@@ -143,8 +140,8 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
         sqlalchemy_associated_with_type = get_equivalent_sqlalchemy_model_type(associated_with[0].__class__)
         assert sqlalchemy_associated_with_type != None
         results = session.query(sqlalchemy_associated_with_type). \
-            filter(sqlalchemy_associated_with_type.internal_id. \
-            in_([x.internal_id for x in associated_with])).\
+            filter(sqlalchemy_associated_with_type.internal_id.
+            in_([x.internal_id for x in associated_with])). \
             all()
         assert isinstance(results, collections.Sequence)
 
@@ -168,7 +165,7 @@ class SQLAssociationMapper(SQLAlchemyMapper, metaclass=ABCMeta):
         return convert_to_popo_models(associated)
 
 
-class SQLAlchemySampleMapper(SQLAssociationMapper, SampleMapper):
+class SQLAlchemySampleMapper(SQLAssociationMapper[MappedType], SampleMapper):
     """
     Implementation of `SampleMapper` using SQLAlchemy.
     """
@@ -177,7 +174,7 @@ class SQLAlchemySampleMapper(SQLAssociationMapper, SampleMapper):
         Default constructor.
         :param database_connector: the database connector
         """
-        super(SQLAlchemySampleMapper, self).__init__(database_connector, Sample)
+        super().__init__(database_connector, Sample)
 
     def set_association_with_study(self, samples: Union[Sample, Iterable[Sample]], study: Study):
         self._set_association(samples, study, "samples")
@@ -186,7 +183,7 @@ class SQLAlchemySampleMapper(SQLAssociationMapper, SampleMapper):
         return self._get_association(studies, "samples")
 
 
-class SQLAlchemyStudyMapper(SQLAssociationMapper, StudyMapper):
+class SQLAlchemyStudyMapper(SQLAssociationMapper[Study], StudyMapper):
     """
     Implementation of `StudyMapper` using SQLAlchemy.
     """
@@ -195,7 +192,7 @@ class SQLAlchemyStudyMapper(SQLAssociationMapper, StudyMapper):
         Default constructor.
         :param database_connector: the database connector
         """
-        super(SQLAlchemyStudyMapper, self).__init__(database_connector, Study)
+        super().__init__(database_connector, Study)
 
     def set_association_with_sample(self, studies: Union[Study, Iterable[Study]], sample: Sample):
         self._set_association(studies, sample, "studies")
@@ -204,7 +201,7 @@ class SQLAlchemyStudyMapper(SQLAssociationMapper, StudyMapper):
         return self._get_association(samples, "studies")
 
 
-class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
+class SQLAlchemyLibraryMapper(SQLAlchemyMapper[Library], LibraryMapper):
     """
     Implementation of `LibraryMapper` using SQLAlchemy.
     """
@@ -213,10 +210,10 @@ class SQLAlchemyLibraryMapper(SQLAlchemyMapper, LibraryMapper):
         Default constructor.
         :param database_connector: the database connector
         """
-        super(SQLAlchemyLibraryMapper, self).__init__(database_connector, Library)
+        super().__init__(database_connector, Library)
 
 
-class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
+class SQLAlchemyWellMapper(SQLAlchemyMapper[Well], WellMapper):
     """
     Implementation of `WellMapper` using SQLAlchemy.
     """
@@ -225,10 +222,10 @@ class SQLAlchemyWellMapper(SQLAlchemyMapper, WellMapper):
         Default constructor.
         :param database_connector: the database connector
         """
-        super(SQLAlchemyWellMapper, self).__init__(database_connector, Well)
+        super().__init__(database_connector, Well)
 
 
-class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMapper):
+class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper[MultiplexedLibrary], MultiplexedLibraryMapper):
     """
     Implementation of `MultiplexedLibraryMapper` using SQLAlchemy.
     """
@@ -237,4 +234,4 @@ class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper, MultiplexedLibraryMap
         Default constructor.
         :param database_connector: the database connector
         """
-        super(SQLAlchemyMultiplexedLibraryMapper, self).__init__(database_connector, MultiplexedLibrary)
+        super().__init__(database_connector, MultiplexedLibrary)

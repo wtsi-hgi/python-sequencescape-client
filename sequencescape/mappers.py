@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import Tuple, Union, Any, Optional, Iterable, Sequence
+from typing import Tuple, Union, Any, Optional, Iterable, Sequence, Generic, TypeVar
 
 import collections
 
@@ -8,16 +8,16 @@ from hgicommon.models import Model
 from sequencescape.enums import Property
 from sequencescape.models import Study, NamedModel, InternalIdModel, AccessionNumberModel, Sample
 
+MappedType = TypeVar("T", bound=Model)
 
-# XXX: This interface should use generics (pep-0484). Unfortunately they are not good enough/the documentation is not
-#      good enough to use them yet.
-class Mapper(metaclass=ABCMeta):
+
+class Mapper(Generic[MappedType], metaclass=ABCMeta):
     """
     A data mapper as defined by Martin Fowler (see: http://martinfowler.com/eaaCatalog/dataMapper.html) that moves data
     between objects and a Sequencescape database, while keeping them independent of each other and the mapper itself.
     """
     @abstractmethod
-    def add(self, model: Union[Model, Iterable[Model]]):
+    def add(self, model: Union[MappedType, Iterable[MappedType]]):
         """
         Adds data in the given model (of the type this data mapper deals with) to the database.
         :param model: the model containing that data to be transferred
@@ -25,7 +25,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_all(self) -> Sequence[Model]:
+    def get_all(self) -> Sequence[MappedType]:
         """
         Gets all the data of the type this data mapper deals with in the Sequencescape database.
         :return: a sequence of models representing each piece of data in the database of the type this data mapper
@@ -34,7 +34,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _get_by_property_value_sequence(self, property: str, values: Iterable[Any]) -> Sequence[Model]:
+    def _get_by_property_value_sequence(self, property: str, values: Iterable[Any]) -> Sequence[MappedType]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have one of the given
         values as the value of the given property.
@@ -45,7 +45,7 @@ class Mapper(metaclass=ABCMeta):
         pass
 
     def get_by_property_value(self, property: Union[str, Union[Tuple[str, Any]], Iterable[Tuple[str, Any]]],
-                              values: Optional[Union[Any, Iterable[Any]]]=None) -> Sequence[Model]:
+                              values: Optional[Union[Any, Iterable[Any]]]=None) -> Sequence[MappedType]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have the given property
         values.
@@ -61,7 +61,7 @@ class Mapper(metaclass=ABCMeta):
             return self._get_by_property_value_tuple(property)
 
     def _get_by_property_value_tuple(
-            self, property_value_tuples: Union[Tuple[str, Any], Iterable[Tuple[str, Any]]]) -> Sequence[Model]:
+            self, property_value_tuples: Union[Tuple[str, Any], Iterable[Tuple[str, Any]]]) -> Sequence[MappedType]:
         """
         Gets models (of the type this data mapper deals with) of data from the database that have have one of the
         property values defined in a tuple from the given iterable.
@@ -81,22 +81,22 @@ class Mapper(metaclass=ABCMeta):
         return results
 
 
-class NamedMapper(Mapper, metaclass=ABCMeta):
+class NamedMapper(Mapper[NamedModel], metaclass=ABCMeta):
     """
     Mapper for `Named` models.
     """
     def get_by_name(self, names: Union[str, Iterable[str]]) -> Sequence[NamedModel]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given name(s).
-        :param names: the name or iterable of names of the data to get models for
-        :return: sequence of models of data with the given name(s)
+        Gets models (of the type this data mapper deals with) of data from the database that have the given names(s).
+        :param names: the names or iterable of names of the data to get models for
+        :return: sequence of models of data with the given names(s)
         """
         results = self.get_by_property_value(Property.NAME, names)
         assert isinstance(results, collections.Sequence)
         return results
 
 
-class InternalIdMapper(Mapper, metaclass=ABCMeta):
+class InternalIdMapper(Mapper[InternalIdModel], metaclass=ABCMeta):
     """
     Mapper for `InternalId` models.
     """
@@ -114,13 +114,14 @@ class InternalIdMapper(Mapper, metaclass=ABCMeta):
         return results
 
 
-class AccessionNumberMapper(Mapper, metaclass=ABCMeta):
+class AccessionNumberMapper(Mapper[AccessionNumberModel], metaclass=ABCMeta):
     """
     Mapper for `AccessionNumber` models.
     """
     def get_by_accession_number(self, accession_numbers: Union[str, Iterable[str]]) -> Sequence[AccessionNumberModel]:
         """
-        Gets models (of the type this data mapper deals with) of data from the database that have the given accession number(s).
+        Gets models (of the type this data mapper deals with) of data from the database that have the given accession
+        number(s).
         :param accession_numbers: the accession number or iterable of accession numbers of the data to get models for
         :return: sequence of models of data with the given accession number(s)
         """
