@@ -12,8 +12,7 @@ class Connection:
     """
     def __init__(self, database_location: str):
         """
-        Default constructor.
-        (immutable once set)
+        Constructor.
         :param database_location: location of the database as an IRI
         """
         if not match(database_location, rule="IRI"):
