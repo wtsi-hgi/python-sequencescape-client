@@ -1,9 +1,10 @@
-[![Build Status](https://travis-ci.org/wtsi-hgi/sequencescape-python-client.svg)](https://travis-ci.org/wtsi-hgi/sequencescape-python-client)
+[![Build Status](https://travis-ci.org/wtsi-hgi/python-sequencescape-client.svg)](https://travis-ci.org/wtsi-hgi/python-sequencescape-client)
+[![codecov.io](https://codecov.io/github/wtsi-hgi/python-sequencescape-client/coverage.svg?branch=develop)](https://codecov.io/github/wtsi-hgi/python-sequencescape-client?branch=develop)
 
 # Sequencescape Python Client
 
-
 ## How to use in your project
+
 ### Include the `sequencescape` library
 Link to use in ``/requirements.txt`` or in your ``/setup.py`` script:
 ```
