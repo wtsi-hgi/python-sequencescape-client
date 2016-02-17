@@ -78,11 +78,9 @@ class MultiplexedLibrary(NamedModel, InternalIdModel):
     """
     Model of a multiplexed library.
     """
-    pass
 
 
 class Well(NamedModel, InternalIdModel):
     """
     Model of a well.
     """
-    pass

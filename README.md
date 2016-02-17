@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/wtsi-hgi/python-sequencescape-client.svg)](https://travis-ci.org/wtsi-hgi/python-sequencescape-client)
-[![codecov.io](https://codecov.io/github/wtsi-hgi/python-sequencescape-client/coverage.svg?branch=develop)](https://codecov.io/github/wtsi-hgi/python-sequencescape-client?branch=develop)
+[![codecov.io](https://codecov.io/github/wtsi-hgi/python-sequencescape-client/coverage.svg?branch=master)](https://codecov.io/github/wtsi-hgi/python-sequencescape-client?branch=master)
 
 # Sequencescape Python Client
 

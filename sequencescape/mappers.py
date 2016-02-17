@@ -22,7 +22,6 @@ class Mapper(Generic[MappedType], metaclass=ABCMeta):
         Adds data in the given model (of the type this data mapper deals with) to the database.
         :param model: the model containing that data to be transferred
         """
-        pass
 
     @abstractmethod
     def get_all(self) -> Sequence[MappedType]:
@@ -31,7 +30,6 @@ class Mapper(Generic[MappedType], metaclass=ABCMeta):
         :return: a sequence of models representing each piece of data in the database of the type this data mapper
         deals with
         """
-        pass
 
     @abstractmethod
     def _get_by_property_value_sequence(self, property: str, values: Iterable[Any]) -> Sequence[MappedType]:
@@ -42,7 +40,6 @@ class Mapper(Generic[MappedType], metaclass=ABCMeta):
         :param values: the values of the property to match
         :return: sequence of models that have at least one property value defined in the given acceptable values
         """
-        pass
 
     def get_by_property_value(self, property: Union[str, Union[Tuple[str, Any]], Iterable[Tuple[str, Any]]],
                               values: Optional[Union[Any, Iterable[Any]]]=None) -> Sequence[MappedType]:
@@ -141,7 +138,6 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
         :param samples: the samples to associate to the study
         :param study: the study to which the samples are associated
         """
-        pass
 
     @abstractmethod
     def get_associated_with_study(self, studies: Union[Study, Iterable[Study]]) -> Sequence[Sample]:
@@ -150,7 +146,6 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
         :param stides: the studies to find associated samples for
         :return: samples that belong to one or more of the given studies
         """
-        pass
 
 
 class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclass=ABCMeta):
@@ -164,7 +159,6 @@ class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclas
         :param studies: the studies to associate to the sample
         :param sample: the sample to which the studies are associated
         """
-        pass
 
     @abstractmethod
     def get_associated_with_sample(self, samples: Union[Sample, Iterable[Sample]]) -> Sequence[Study]:
@@ -173,25 +167,21 @@ class StudyMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metaclas
         :param samples: the samples that studies are to be got for
         :return: studies related to one or more of the given samples
         """
-        pass
 
 
 class LibraryMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
     Mapper for `Library` models.
     """
-    pass
 
 
 class MultiplexedLibraryMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
     Mapper for `MultiplexedLibrary` models.
     """
-    pass
 
 
 class WellMapper(NamedMapper, InternalIdMapper, metaclass=ABCMeta):
     """
     Mapper for `Well` models.
     """
-    pass
