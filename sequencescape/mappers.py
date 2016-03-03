@@ -8,7 +8,7 @@ from hgicommon.models import Model
 from sequencescape.enums import Property
 from sequencescape.models import Study, NamedModel, InternalIdModel, AccessionNumberModel, Sample
 
-MappedType = TypeVar("T", bound=Model)
+MappedType = TypeVar("MappedType", bound=Model)
 
 
 class Mapper(Generic[MappedType], metaclass=ABCMeta):

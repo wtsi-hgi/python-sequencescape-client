@@ -14,7 +14,7 @@ from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMappe
 from sequencescape.models import Library, MultiplexedLibrary, Sample, Well, Study, InternalIdModel
 
 
-_InternalIdMappedType = TypeVar("S", bound=InternalIdModel)
+_InternalIdMappedType = TypeVar("InternalIdMappedType", bound=InternalIdModel)
 
 
 class SQLAlchemyMapper(Mapper[MappedType], metaclass=ABCMeta):

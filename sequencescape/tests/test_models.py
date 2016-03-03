@@ -103,14 +103,12 @@ class TestMultiplexedLibrary(unittest.TestCase):
     """
     Tests for `MultiplexedLibrary`.
     """
-    pass
 
 
 class TestWell(unittest.TestCase):
     """
     Tests for `Well`.
     """
-    pass
 
 
 if __name__ == "__main__":

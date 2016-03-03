@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="sequencescape-python-client",
+    name="sequencescape",
 
     version="0.1.6",
 
@@ -10,9 +10,9 @@ setup(
 
     packages=find_packages(exclude=["tests"]),
 
-    url="https://github.com/wtsi-hgi/sequencescape-python-client",
+    url="https://github.com/wtsi-hgi/python-sequencescape-client",
 
-    license="LICENSE",
+    license="LICENSE.txt",
 
     description="Python client for interfacing with a Sequencescape database.",
     long_description=open("README.md").read(),
