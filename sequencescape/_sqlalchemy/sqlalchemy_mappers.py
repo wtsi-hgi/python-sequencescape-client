@@ -138,7 +138,7 @@ class SQLAssociationMapper(SQLAlchemyMapper[_InternalIdMappedType], metaclass=AB
 
         session = self._database_connector.create_session()
         sqlalchemy_associated_with_type = get_equivalent_sqlalchemy_model_type(associated_with[0].__class__)
-        assert sqlalchemy_associated_with_type != None
+        assert sqlalchemy_associated_with_type is not None
         results = session.query(sqlalchemy_associated_with_type). \
             filter(sqlalchemy_associated_with_type.internal_id.
             in_([x.internal_id for x in associated_with])). \
