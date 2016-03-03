@@ -135,6 +135,8 @@ class SQLAssociationMapper(SQLAlchemyMapper[_InternalIdMappedType], metaclass=AB
         """
         if isinstance(associated_with, InternalIdModel):
             associated_with = [associated_with]
+        if len(associated_with) == 0:
+            return []
 
         session = self._database_connector.create_session()
         sqlalchemy_associated_with_type = get_equivalent_sqlalchemy_model_type(associated_with[0].__class__)
