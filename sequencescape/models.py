@@ -5,7 +5,7 @@ from hgicommon.models import Model
 
 class NamedModel(Model, metaclass=ABCMeta):
     """
-    Model that has a build_name.
+    Model that has a name.
     """
     def __init__(self, name: str=None, **kwargs):
         super().__init__(**kwargs)

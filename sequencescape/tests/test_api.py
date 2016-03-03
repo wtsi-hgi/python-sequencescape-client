@@ -2,7 +2,7 @@ import unittest
 
 from sequencescape.api import Connection, connect_to_sequencescape
 from sequencescape.mappers import Mapper
-from sequencescape.tests._sqlalchemy.stub_database import create_stub_database
+from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
 
 class TestConnection(unittest.TestCase):

@@ -66,7 +66,7 @@ class SQLAlchemyMapper(Mapper[MappedType], metaclass=ABCMeta):
         query_model = self._sqlalchemy_model_type
         session = self._database_connector.create_session()
 
-        # FIXME: It is an assumption that the Model property has the same build_name as SQLAlchemyModel property
+        # FIXME: It is an assumption that the Model property has the same name as SQLAlchemyModel property
         query_column = query_model.__dict__[property]   # type: Column
         results = session.query(query_model). \
             filter(query_column.in_(required_property_values)).\

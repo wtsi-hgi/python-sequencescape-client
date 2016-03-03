@@ -7,7 +7,7 @@ from sequencescape.enums import Property
 from sequencescape.mappers import Mapper
 from sequencescape.models import InternalIdModel, Sample, Study
 from sequencescape.tests._helpers import create_stub_sample, assign_unique_ids
-from sequencescape.tests._sqlalchemy.stub_database import create_stub_database
+from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
 
 def _create_connector() -> (SQLAlchemyDatabaseConnector, str):
