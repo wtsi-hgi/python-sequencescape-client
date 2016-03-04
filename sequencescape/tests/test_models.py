@@ -1,7 +1,6 @@
 import unittest
 
-from sequencescape import InternalIdModel, AccessionNumberModel, Sample, Study, Library
-from sequencescape import NamedModel
+from sequencescape import Sample, Study, Library
 from sequencescape.tests._helpers import COMMON_NAME, GENDER, ETHNICITY, COHORT, COUNTRY_OF_ORIGIN, \
     GEOGRAPHICAL_REGION, STUDY_TYPE, DESCRIPTION, STUDY_TITLE, STUDY_VISIBILITY, FACULTY_SPONSOR, LIBRARY_TYPE
 from sequencescape.tests._helpers import ORGANISM, TAXON_ID

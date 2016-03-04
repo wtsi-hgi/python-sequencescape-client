@@ -28,8 +28,8 @@ class _SQLAlchemyMapperTest(unittest.TestCase, metaclass=ABCMeta):
     Tests for `SQLAlchemyMapper`.
     """
     def setUp(self):
-        connector = _create_connector()
-        self._mapper = self._create_mapper(connector)
+        self._connector = _create_connector()
+        self._mapper = self._create_mapper(self._connector)
 
     def test_add_with_none(self):
         self.assertRaises(ValueError, self._mapper.add, None)
@@ -116,15 +116,15 @@ class _SQLAlchemyMapperTest(unittest.TestCase, metaclass=ABCMeta):
     @abstractmethod
     def _create_model(self) -> InternalIdModel:
         """
-        TODO
-        :return:
+        Creates a model of the type the mapper being tested uses.
+        :return: model for use with SUT
         """
 
     @abstractmethod
     def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
         """
-        TODO
-        :return:
+        Creates the mapper that is to be tested.
+        :return: mapper to be tested
         """
 
     @staticmethod
@@ -137,86 +137,78 @@ class _SQLAlchemyMapperTest(unittest.TestCase, metaclass=ABCMeta):
         return [model.internal_id for model in models]
 
 
-class SQLAssociationMapperTest(unittest.TestCase):
+class _SQLAssociationMapperTest(_SQLAlchemyMapperTest):
     """
     Tests for `SQLAssociationMapper`.
-
-    Tested through `SQLAlchemySampleMapper`.
     """
-    _STUDY_INTERNAL_IDS = [123, 456]
-    _SAMPLE_INTERNAL_IDS = [789, 101112]
-
     def setUp(self):
-        connector = _create_connector()
-        self._sample_mapper = SQLAlchemySampleMapper(connector)
-        self._study_mapper = SQLAlchemyStudyMapper(connector)
+        super().setUp()
+        self._associated_with_type = self._get_associated_with_instance().__class__.__name__
+        self._associated_with_mapper = globals()["SQLAlchemy%sMapper" % self._associated_with_type](self._connector)
+        self._mapper_get_associated_with_x = getattr(
+            self._mapper, "get_associated_with_%s" % self._associated_with_type.lower())
+        self._mapper_set_association_with_x = getattr(
+            self._mapper, "set_association_with_%s" % self._associated_with_type.lower())
 
-    def test__get_associated_with_study_with_non_existent_study(self):
-        self.assertRaises(ValueError, self._sample_mapper.get_associated_with_study, Study())
+    def test__get_associated_with_x_with_non_existent_x(self):
+        self.assertRaises(ValueError, self._mapper_get_associated_with_x, self._get_associated_with_instance())
 
-    def test__get_associated_with_study_with_non_associated(self):
-        study = Study(internal_id=SQLAssociationMapperTest._STUDY_INTERNAL_IDS[0])
-        self._study_mapper.add(study)
+    def test__get_associated_with_x_with_non_associated(self):
+        x = self._get_associated_with_instance()
+        self._associated_with_mapper.add(x)
 
-        associated_samples = self._sample_mapper.get_associated_with_study(study)
-        self.assertEquals(len(associated_samples), 0)
+        associated = self._mapper_get_associated_with_x(x)
+        self.assertEquals(len(associated), 0)
 
-    def test__get_associated_with_study_with_value(self):
-        study = Study(internal_id=SQLAssociationMapperTest._STUDY_INTERNAL_IDS[0])
-        self._study_mapper.add(study)
+    def test__get_associated_with_x_with_value(self):
+        x = self._get_associated_with_instance()
+        self._associated_with_mapper.add(x)
 
-        samples = [
-            Sample(internal_id=SQLAssociationMapperTest._SAMPLE_INTERNAL_IDS[0]),
-            Sample(internal_id=SQLAssociationMapperTest._SAMPLE_INTERNAL_IDS[1])
-        ]
-        self._sample_mapper.add(samples)
+        models = self._create_models(2)
+        self._mapper.add(models)
+        self._mapper_set_association_with_x(models, x)
 
-        self._sample_mapper.set_association_with_study(samples, study)
-        self.assertEquals(self._study_mapper.get_by_id(study.internal_id)[0], study)
+        associated = self._mapper_get_associated_with_x(x)
+        self.assertCountEqual(associated, models)
 
-        associated_samples = self._sample_mapper.get_associated_with_study(study)
-        self.assertCountEqual(associated_samples, samples)
+    def test__get_associated_with_x_with_empty_list(self):
+        self._mapper_get_associated_with_x([])
 
-    def test__get_associated_with_study_with_empty_list(self):
-        self._sample_mapper.get_associated_with_study([])
+    def test__get_associated_with_x_with_list(self):
+        models = self._create_models(2)
+        self._mapper.add(models)
 
-    def test__get_associated_with_study_with_list(self):
-        studies = [
-            Study(internal_id=SQLAssociationMapperTest._STUDY_INTERNAL_IDS[0]),
-            Study(internal_id=SQLAssociationMapperTest._STUDY_INTERNAL_IDS[1])
-        ]
-        self._study_mapper.add(studies)
+        xs = [self._get_associated_with_instance(i) for i in range(2)]
+        self._associated_with_mapper.add(xs)
 
-        samples = [
-            Sample(internal_id=SQLAssociationMapperTest._SAMPLE_INTERNAL_IDS[0]),
-            Sample(internal_id=SQLAssociationMapperTest._SAMPLE_INTERNAL_IDS[1])
-        ]
-        self._sample_mapper.add(samples)
+        self._mapper_set_association_with_x(models[0], xs[0])
+        self._mapper_set_association_with_x(models[1], xs[1])
 
-        self._sample_mapper.set_association_with_study(samples[0], studies[0])
-        self._sample_mapper.set_association_with_study(samples[1], studies[1])
+        associated = self._mapper_get_associated_with_x(xs)
+        self.assertCountEqual(associated, models)
 
-        associated_samples = self._sample_mapper.get_associated_with_study(studies)
-        self.assertCountEqual(associated_samples, samples)
+    def test__get_associated_with_x_with_list_and_shared_association(self):
+        xs = [self._get_associated_with_instance(i) for i in range(2)]
+        self._associated_with_mapper.add(xs)
 
-    def test__get_associated_with_study_with_list_and_shared_association(self):
-        studies = [
-            Study(internal_id=SQLAssociationMapperTest._STUDY_INTERNAL_IDS[0]),
-            Study(internal_id=SQLAssociationMapperTest._STUDY_INTERNAL_IDS[1])
-        ]
-        self._study_mapper.add(studies)
+        model = self._create_model()
+        self._mapper.add(model)
 
-        sample = Sample(internal_id=SQLAssociationMapperTest._SAMPLE_INTERNAL_IDS[0])
-        self._sample_mapper.add(sample)
+        self._mapper_set_association_with_x(model, xs[0])
+        self._mapper_set_association_with_x(model, xs[1])
 
-        self._sample_mapper.set_association_with_study(sample, studies[0])
-        self._sample_mapper.set_association_with_study(sample, studies[1])
+        associated = self._mapper_get_associated_with_x(xs)
+        self.assertCountEqual(associated, [model])
 
-        associated_samples = self._sample_mapper.get_associated_with_study(studies)
-        self.assertCountEqual(associated_samples, [sample])
+    @abstractmethod
+    def _get_associated_with_instance(self, internal_id=None) -> InternalIdModel:
+        """
+        Gets an instance of the type which the objects the mapper deals with can be associated to.
+        :return: instance that the object that the mapper is for can be assocaited with
+        """
 
 
-class SQLAlchemySampleMapperTest(_SQLAlchemyMapperTest):
+class SQLAlchemySampleMapperTest(_SQLAssociationMapperTest):
     """
     Tests for `SQLAlchemySampleMapper`.
     """
@@ -226,8 +218,14 @@ class SQLAlchemySampleMapperTest(_SQLAlchemyMapperTest):
     def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
         return SQLAlchemySampleMapper(connector)
 
+    def _get_associated_with_instance(self, internal_id=None) -> InternalIdModel:
+        study = create_stub_study()
+        if internal_id is not None:
+            study.internal_id = internal_id
+        return study
 
-class SQLAlchemyStudyMapperTest(_SQLAlchemyMapperTest):
+
+class SQLAlchemyStudyMapperTest(_SQLAssociationMapperTest):
     """
     Tests for `SQLAlchemyStudyMapper`.
     """
@@ -236,6 +234,12 @@ class SQLAlchemyStudyMapperTest(_SQLAlchemyMapperTest):
 
     def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
         return SQLAlchemyStudyMapper(connector)
+
+    def _get_associated_with_instance(self, internal_id=None) -> InternalIdModel:
+        study = create_stub_sample()
+        if internal_id is not None:
+            study.internal_id = internal_id
+        return study
 
 
 class SQLAlchemyLibraryMapperTest(_SQLAlchemyMapperTest):
@@ -271,8 +275,9 @@ class SQLAlchemyMultiplexedLibraryMapperTest(_SQLAlchemyMapperTest):
         return SQLAlchemyMultiplexedLibraryMapper(connector)
 
 
-# Trick required to stop Python's unittest from running the abstract base class as a test
+# Trick required to stop Python's unittest from running the abstract base classes as tests
 del _SQLAlchemyMapperTest
+del _SQLAssociationMapperTest
 
 
 if __name__ == "__main__":
