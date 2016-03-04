@@ -7,7 +7,7 @@ from sequencescape.tests._helpers import ORGANISM, TAXON_ID
 from sequencescape.tests._mocks import MockNamedModel, MockInternalIdModel, MockAccessionNumberModel
 
 
-class _TestNamedModel(unittest.TestCase):
+class TestNamedModel(unittest.TestCase):
     """
     Tests for `NamedModel`.
     """
@@ -24,7 +24,7 @@ class _TestNamedModel(unittest.TestCase):
         self.assertEquals(model.name, name)
 
 
-class _TestInternalIdModel(unittest.TestCase):
+class TestInternalIdModel(unittest.TestCase):
     """
     Tests for `InternalIdModel`.
     """
@@ -41,7 +41,7 @@ class _TestInternalIdModel(unittest.TestCase):
         self.assertEquals(model.internal_id, internal_id)
 
 
-class _TestAccessionNumberModel(unittest.TestCase):
+class TestAccessionNumberModel(unittest.TestCase):
     """
     Tests for `AccessionNumberModel`.
     """
