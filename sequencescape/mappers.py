@@ -143,7 +143,7 @@ class SampleMapper(NamedMapper, InternalIdMapper, AccessionNumberMapper, metacla
     def get_associated_with_study(self, studies: Union[Study, Iterable[Study]]) -> Sequence[Sample]:
         """
         Gets all the samples that are associated to the given study or studies.
-        :param stides: the studies to find associated samples for
+        :param studies: the studies to find associated samples for
         :return: samples that belong to one or more of the given studies
         """
 

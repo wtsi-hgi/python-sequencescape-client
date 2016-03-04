@@ -1,32 +1,35 @@
 import unittest
+from abc import abstractmethod, ABCMeta
 from typing import List
 
 from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper, SQLAlchemyStudyMapper
+from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper, SQLAlchemyStudyMapper, \
+    SQLAlchemyLibraryMapper, SQLAlchemyWellMapper, SQLAlchemyMultiplexedLibraryMapper
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper
 from sequencescape.models import InternalIdModel, Sample, Study
-from sequencescape.tests._helpers import create_stub_sample, assign_unique_ids
+from sequencescape.tests._helpers import create_stub_sample, assign_unique_ids, create_stub_study, create_stub_library, \
+    create_stub_multiplexed_library, create_stub_well
 from sequencescape.tests.sqlalchemy.stub_database import create_stub_database
 
 
-def _create_connector() -> (SQLAlchemyDatabaseConnector, str):
+def _create_connector() -> SQLAlchemyDatabaseConnector:
     """
     Creates a connector to a test database.
     :return: connector to a test database
     """
-    database_file_path, dialect = create_stub_database()
-    connector = SQLAlchemyDatabaseConnector("%s:///%s" % (dialect, database_file_path))
-    return connector, database_file_path
+    database_location, dialect = create_stub_database()
+    connector = SQLAlchemyDatabaseConnector("%s:///%s" % (dialect, database_location))
+    return connector
 
 
-class SQLAlchemyMapperTest(unittest.TestCase):
+class _SQLAlchemyMapperTest(unittest.TestCase, metaclass=ABCMeta):
     """
     Tests for `SQLAlchemyMapper`.
     """
     def setUp(self):
-        connector, database_location = _create_connector()
-        self._mapper = SQLAlchemyMapper(connector, SQLAlchemyMapperTest._create_models(1)[0].__class__)
+        connector = _create_connector()
+        self._mapper = self._create_mapper(connector)
 
     def test_add_with_none(self):
         self.assertRaises(ValueError, self._mapper.add, None)
@@ -61,7 +64,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         self._mapper.add(models)
 
         retrieved_models = self._mapper._get_by_property_value_sequence(
-            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+            Property.INTERNAL_ID, self._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, models_to_retrieve)
 
     def test__get_by_property_value_sequence_with_list_of_existing(self):
@@ -70,7 +73,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         self._mapper.add(models)
 
         retrieved_models = self._mapper._get_by_property_value_sequence(
-            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+            Property.INTERNAL_ID, self._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, models_to_retrieve)
 
     def test__get_by_property_value_sequence_with_list_of_non_existing(self):
@@ -80,7 +83,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         self._mapper.add(models)
 
         retrieved_models = self._mapper._get_by_property_value_sequence(
-            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+            Property.INTERNAL_ID, self._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, [])
 
     def test__get_by_property_value_sequence_with_list_of_both_existing_and_non_existing(self):
@@ -90,7 +93,7 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         self._mapper.add(models)
 
         retrieved_models = self._mapper._get_by_property_value_sequence(
-            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models_to_retrieve))
+            Property.INTERNAL_ID, self._get_internal_ids(models_to_retrieve))
         self.assertCountEqual(retrieved_models, models_to_retrieve[:2])
 
     def test__get_by_property_value_sequence_returns_correct_type(self):
@@ -98,9 +101,31 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         self._mapper.add(models)
 
         retrieved_models = self._mapper._get_by_property_value_sequence(
-            Property.INTERNAL_ID, SQLAlchemyMapperTest._get_internal_ids(models))
+            Property.INTERNAL_ID, self._get_internal_ids(models))
         self.assertCountEqual(retrieved_models, models)
         self.assertIsInstance(retrieved_models[0], models[0].__class__)
+
+    def _create_models(self, number_of_models: int) -> List[InternalIdModel]:
+        """
+        Creates a number of models to use in tests.
+        :param number_of_models: the number of models to create
+        :return: the models
+        """
+        return assign_unique_ids([self._create_model() for _ in range(number_of_models)])
+
+    @abstractmethod
+    def _create_model(self) -> InternalIdModel:
+        """
+        TODO
+        :return:
+        """
+
+    @abstractmethod
+    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
+        """
+        TODO
+        :return:
+        """
 
     @staticmethod
     def _get_internal_ids(models: List[InternalIdModel]) -> List[int]:
@@ -110,15 +135,6 @@ class SQLAlchemyMapperTest(unittest.TestCase):
         :return: the ids of the given models
         """
         return [model.internal_id for model in models]
-
-    @staticmethod
-    def _create_models(number_of_models: int) -> List[InternalIdModel]:
-        """
-        Creates a number of models to use in tests.
-        :param number_of_models: the number of models to create
-        :return: the models
-        """
-        return assign_unique_ids([create_stub_sample() for _ in range(number_of_models)])
 
 
 class SQLAssociationMapperTest(unittest.TestCase):
@@ -131,7 +147,7 @@ class SQLAssociationMapperTest(unittest.TestCase):
     _SAMPLE_INTERNAL_IDS = [789, 101112]
 
     def setUp(self):
-        connector, database_location = _create_connector()
+        connector = _create_connector()
         self._sample_mapper = SQLAlchemySampleMapper(connector)
         self._study_mapper = SQLAlchemyStudyMapper(connector)
 
@@ -198,6 +214,65 @@ class SQLAssociationMapperTest(unittest.TestCase):
 
         associated_samples = self._sample_mapper.get_associated_with_study(studies)
         self.assertCountEqual(associated_samples, [sample])
+
+
+class SQLAlchemySampleMapperTest(_SQLAlchemyMapperTest):
+    """
+    Tests for `SQLAlchemySampleMapper`.
+    """
+    def _create_model(self) -> InternalIdModel:
+        return create_stub_sample()
+
+    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
+        return SQLAlchemySampleMapper(connector)
+
+
+class SQLAlchemyStudyMapperTest(_SQLAlchemyMapperTest):
+    """
+    Tests for `SQLAlchemyStudyMapper`.
+    """
+    def _create_model(self) -> InternalIdModel:
+        return create_stub_study()
+
+    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
+        return SQLAlchemyStudyMapper(connector)
+
+
+class SQLAlchemyLibraryMapperTest(_SQLAlchemyMapperTest):
+    """
+    Tests for `SQLAlchemyLibraryMapper`.
+    """
+    def _create_model(self) -> InternalIdModel:
+        return create_stub_library()
+
+    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
+        return SQLAlchemyLibraryMapper(connector)
+
+
+class SQLAlchemyWellMapperTest(_SQLAlchemyMapperTest):
+    """
+    Tests for `SQLAlchemyWellMapper`.
+    """
+    def _create_model(self) -> InternalIdModel:
+        return create_stub_well()
+
+    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
+        return SQLAlchemyWellMapper(connector)
+
+
+class SQLAlchemyMultiplexedLibraryMapperTest(_SQLAlchemyMapperTest):
+    """
+    Tests for `SQLAlchemyMultiplexedLibraryMapper`.
+    """
+    def _create_model(self) -> InternalIdModel:
+        return create_stub_multiplexed_library()
+
+    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
+        return SQLAlchemyMultiplexedLibraryMapper(connector)
+
+
+# Trick required to stop Python's unittest from running the abstract base class as a test
+del _SQLAlchemyMapperTest
 
 
 if __name__ == "__main__":
