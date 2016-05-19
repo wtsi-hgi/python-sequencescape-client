@@ -1,10 +1,9 @@
-from typing import Union, Sequence, Iterable
+from typing import Sequence, Iterable
 
 from hgicommon.models import Model
-from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
+from sequencescape._sqlalchemy._models import SQLAlchemySample, SQLAlchemyStudy, SQLAlchemyLibrary, \
     SQLAlchemyWell, SQLAlchemyMultiplexedLibrary, SQLAlchemyModel
-from sequencescape.models import Library
-from sequencescape.models import Study, Sample, Well, MultiplexedLibrary
+from sequencescape.models import Library, Study, Sample, Well, MultiplexedLibrary
 
 
 _SQLALCHEMY_TO_POPO_CONVERSIONS = {

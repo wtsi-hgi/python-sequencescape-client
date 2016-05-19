@@ -9,6 +9,7 @@ study_sample_join_table = Table("current_study_samples", SQLAlchemyModel.metadat
     Column("study_internal_id", Integer, ForeignKey("current_studies.internal_id"))
 )
 
+
 class SQLAlchemyNamedModel(SQLAlchemyModel):
     __abstract__ = True
     name = Column(String)

@@ -2,7 +2,7 @@ import tempfile
 
 from sqlalchemy import create_engine
 
-from sequencescape._sqlalchemy.sqlalchemy_models import SQLAlchemyModel
+from sequencescape._sqlalchemy._models import SQLAlchemyModel
 
 
 def create_stub_database():

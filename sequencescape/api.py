@@ -1,9 +1,9 @@
 from rfc3987 import match
 
-from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemySampleMapper, SQLAlchemyMultiplexedLibraryMapper, \
+from sequencescape._sqlalchemy.database_connector import SQLAlchemyDatabaseConnector
+from sequencescape._sqlalchemy.mappers import SQLAlchemySampleMapper, SQLAlchemyMultiplexedLibraryMapper, \
     SQLAlchemyLibraryMapper, SQLAlchemyWellMapper
-from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyStudyMapper
+from sequencescape._sqlalchemy.mappers import SQLAlchemyStudyMapper
 
 
 class Connection:

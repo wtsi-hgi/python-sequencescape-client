@@ -2,8 +2,8 @@ import unittest
 from abc import abstractmethod, ABCMeta
 from typing import List
 
-from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape._sqlalchemy.sqlalchemy_mappers import SQLAlchemyMapper, SQLAlchemySampleMapper, SQLAlchemyStudyMapper, \
+from sequencescape._sqlalchemy.database_connector import SQLAlchemyDatabaseConnector
+from sequencescape._sqlalchemy.mappers import SQLAlchemyMapper, SQLAlchemySampleMapper, SQLAlchemyStudyMapper, \
     SQLAlchemyLibraryMapper, SQLAlchemyWellMapper, SQLAlchemyMultiplexedLibraryMapper
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper
@@ -27,6 +27,29 @@ class _SQLAlchemyMapperTest(unittest.TestCase, metaclass=ABCMeta):
     """
     Tests for `SQLAlchemyMapper`.
     """
+    @staticmethod
+    def _get_internal_ids(models: List[InternalIdModel]) -> List[int]:
+        """
+        Gets the ids of all of the given models.
+        :param models: the models to get_by_path the ids of
+        :return: the ids of the given models
+        """
+        return [model.internal_id for model in models]
+
+    @abstractmethod
+    def _create_model(self) -> InternalIdModel:
+        """
+        Creates a model of the type the mapper being tested uses.
+        :return: model for use with SUT
+        """
+
+    @abstractmethod
+    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
+        """
+        Creates the mapper that is to be tested.
+        :return: mapper to be tested
+        """
+
     def setUp(self):
         self._connector = _create_connector()
         self._mapper = self._create_mapper(self._connector)
@@ -113,34 +136,18 @@ class _SQLAlchemyMapperTest(unittest.TestCase, metaclass=ABCMeta):
         """
         return assign_unique_ids([self._create_model() for _ in range(number_of_models)])
 
-    @abstractmethod
-    def _create_model(self) -> InternalIdModel:
-        """
-        Creates a model of the type the mapper being tested uses.
-        :return: model for use with SUT
-        """
-
-    @abstractmethod
-    def _create_mapper(self, connector: SQLAlchemyDatabaseConnector) -> SQLAlchemyMapper:
-        """
-        Creates the mapper that is to be tested.
-        :return: mapper to be tested
-        """
-
-    @staticmethod
-    def _get_internal_ids(models: List[InternalIdModel]) -> List[int]:
-        """
-        Gets the ids of all of the given models.
-        :param models: the models to get_by_path the ids of
-        :return: the ids of the given models
-        """
-        return [model.internal_id for model in models]
-
 
 class _SQLAssociationMapperTest(_SQLAlchemyMapperTest):
     """
     Tests for `SQLAssociationMapper`.
     """
+    @abstractmethod
+    def _get_associated_with_instance(self, internal_id=None) -> InternalIdModel:
+        """
+        Gets an instance of the type which the objects the mapper deals with can be associated to.
+        :return: instance that the object that the mapper is for can be assocaited with
+        """
+
     def setUp(self):
         super().setUp()
         self._associated_with_type = self._get_associated_with_instance().__class__.__name__
@@ -199,13 +206,6 @@ class _SQLAssociationMapperTest(_SQLAlchemyMapperTest):
 
         associated = self._mapper_get_associated_with_x(xs)
         self.assertCountEqual(associated, [model])
-
-    @abstractmethod
-    def _get_associated_with_instance(self, internal_id=None) -> InternalIdModel:
-        """
-        Gets an instance of the type which the objects the mapper deals with can be associated to.
-        :return: instance that the object that the mapper is for can be assocaited with
-        """
 
 
 class SQLAlchemySampleMapperTest(_SQLAssociationMapperTest):

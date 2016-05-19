@@ -1,18 +1,17 @@
-from abc import ABCMeta
-from typing import Union, Any, Iterable, Sequence, Generic, TypeVar
-
 import collections
+from abc import ABCMeta
+from typing import Union, Any, Iterable, Sequence, TypeVar
+
 from sqlalchemy import Column
 
 from hgicommon.models import Model
-from sequencescape._sqlalchemy.sqlalchemy_database_connector import SQLAlchemyDatabaseConnector
-from sequencescape._sqlalchemy.sqlalchemy_model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
+from sequencescape._sqlalchemy.database_connector import SQLAlchemyDatabaseConnector
+from sequencescape._sqlalchemy.model_converters import convert_to_sqlalchemy_model, convert_to_popo_models,\
     get_equivalent_sqlalchemy_model_type, convert_to_sqlalchemy_models
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper, \
     MappedType
 from sequencescape.models import Library, MultiplexedLibrary, Sample, Well, Study, InternalIdModel
-
 
 _InternalIdMappedType = TypeVar("InternalIdMappedType", bound=InternalIdModel)
 
@@ -173,7 +172,7 @@ class SQLAlchemySampleMapper(SQLAssociationMapper[MappedType], SampleMapper):
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        Default constructor.
+        Constructor.
         :param database_connector: the database connector
         """
         super().__init__(database_connector, Sample)
@@ -191,7 +190,7 @@ class SQLAlchemyStudyMapper(SQLAssociationMapper[Study], StudyMapper):
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        Default constructor.
+        Constructor.
         :param database_connector: the database connector
         """
         super().__init__(database_connector, Study)
@@ -209,7 +208,7 @@ class SQLAlchemyLibraryMapper(SQLAlchemyMapper[Library], LibraryMapper):
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        Default constructor.
+        Constructor.
         :param database_connector: the database connector
         """
         super().__init__(database_connector, Library)
@@ -221,7 +220,7 @@ class SQLAlchemyWellMapper(SQLAlchemyMapper[Well], WellMapper):
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        Default constructor.
+        Constructor.
         :param database_connector: the database connector
         """
         super().__init__(database_connector, Well)
@@ -233,7 +232,7 @@ class SQLAlchemyMultiplexedLibraryMapper(SQLAlchemyMapper[MultiplexedLibrary], M
     """
     def __init__(self, database_connector: SQLAlchemyDatabaseConnector):
         """
-        Default constructor.
+        Constructor.
         :param database_connector: the database connector
         """
         super().__init__(database_connector, MultiplexedLibrary)
