@@ -1,6 +1,7 @@
 from hgijson.json.builders import MappingJSONEncoderClassBuilder, MappingJSONDecoderClassBuilder
 from hgijson.json.models import JsonPropertyMapping
-from sequencescape.models import Sample, InternalIdModel, NamedModel
+from sequencescape.models import Sample, InternalIdModel, NamedModel, Study, AccessionNumberModel, Library, Well, \
+    MultiplexedLibrary
 
 JSON_NAME_PROPERTY = "name"
 
@@ -17,7 +18,16 @@ JSON_COHORT_PROPERTY = "cohort"
 JSON_COUNTRY_OF_ORIGIN_PROPERTY = "country_of_origin"
 JSON_GEOGRAPHICAL_REGION_PROPERTY = "geographical_region"
 
+JSON_STUDY_TYPE = "type"
+JSON_DESCRIPTION = "description"
+JSON_STUDY_TITLE = "title"
+JSON_STUDY_VISIBILITY = "visibility"
+JSON_FACULTY_SPONSER = "faculty_sponsor"
 
+JSON_LIBRARY_TYPE = "type"
+
+
+# JSON encoder/decoder for `NamedModel`
 _named_json_mapping = [
     JsonPropertyMapping(JSON_NAME_PROPERTY, "name")
 ]
@@ -25,6 +35,7 @@ _NamedModelJSONEncoder = MappingJSONEncoderClassBuilder(NamedModel, _named_json_
 _NamedModelJSONDecoder = MappingJSONDecoderClassBuilder(NamedModel, _named_json_mapping).build()
 
 
+# JSON encoder/decoder for `InternalIdModel`
 _internal_id_json_mapping = [
     JsonPropertyMapping(JSON_INTERNAL_ID_PROPERTY, "internal_id")
 ]
@@ -32,13 +43,15 @@ _InternalIdModelJSONEncoder = MappingJSONEncoderClassBuilder(InternalIdModel, _i
 _InternalIdModelJSONDecoder = MappingJSONDecoderClassBuilder(InternalIdModel, _internal_id_json_mapping).build()
 
 
+# JSON encoder/decoder for `AccessionNumberModel`
 _accession_number_json_mapping = [
     JsonPropertyMapping(JSON_ACCESSION_NUMBER_PROPERTY, "accession_number")
 ]
-_AccessionNumberModelJSONEncoder = MappingJSONEncoderClassBuilder(InternalIdModel, _accession_number_json_mapping).build()
-_AccessionNumberModelJSONDecoder = MappingJSONDecoderClassBuilder(InternalIdModel, _accession_number_json_mapping).build()
+_AccessionNumberModelJSONEncoder = MappingJSONEncoderClassBuilder(AccessionNumberModel, _accession_number_json_mapping).build()
+_AccessionNumberModelJSONDecoder = MappingJSONDecoderClassBuilder(AccessionNumberModel, _accession_number_json_mapping).build()
 
 
+# JSON encoder/decoder for `Sample`
 _sample_json_mapping = [
     JsonPropertyMapping(JSON_ORGANISM_PROPERTY, "organism"),
     JsonPropertyMapping(JSON_COMMON_NAME_PROPERTY, "common_name"),
@@ -50,12 +63,58 @@ _sample_json_mapping = [
     JsonPropertyMapping(JSON_GEOGRAPHICAL_REGION_PROPERTY, "geographical_region")
 ]
 SampleJSONEncoder = MappingJSONEncoderClassBuilder(
-    Sample,
-    _sample_json_mapping,
+    Sample, _sample_json_mapping,
     (_NamedModelJSONEncoder, _AccessionNumberModelJSONEncoder, _InternalIdModelJSONEncoder)
 ).build()
 SampleJSONDecoder = MappingJSONDecoderClassBuilder(
-    Sample,
-    _sample_json_mapping,
+    Sample, _sample_json_mapping,
     (_NamedModelJSONDecoder, _AccessionNumberModelJSONDecoder, _InternalIdModelJSONDecoder)
+).build()
+
+
+# JSON encoder/decoder for `Study`
+_study_json_mapping = [
+    JsonPropertyMapping(JSON_STUDY_TYPE, "study_type"),
+    JsonPropertyMapping(JSON_DESCRIPTION, "description"),
+    JsonPropertyMapping(JSON_STUDY_TITLE, "study_title"),
+    JsonPropertyMapping(JSON_STUDY_VISIBILITY, "study_visibility"),
+    JsonPropertyMapping(JSON_FACULTY_SPONSER, "faculty_sponsor")
+]
+StudyJSONEncoder = MappingJSONDecoderClassBuilder(
+    Study, _study_json_mapping, (_NamedModelJSONEncoder, _AccessionNumberModelJSONEncoder, _InternalIdModelJSONEncoder)
+).build()
+StudyJSONDecoder = MappingJSONDecoderClassBuilder(
+    Study, _study_json_mapping, (_NamedModelJSONDecoder, _AccessionNumberModelJSONDecoder, _InternalIdModelJSONDecoder)
+).build()
+
+
+# JSON encoder/decoder for `Library`
+_library_json_mapping = [
+    JsonPropertyMapping(JSON_LIBRARY_TYPE, "library_type")
+]
+LibraryJSONEncoder = MappingJSONDecoderClassBuilder(
+    Library, _library_json_mapping, (_NamedModelJSONEncoder, _InternalIdModelJSONEncoder)
+).build()
+LibraryJSONDecoder = MappingJSONDecoderClassBuilder(
+    Library, _library_json_mapping, (_NamedModelJSONDecoder, _InternalIdModelJSONDecoder)
+).build()
+
+
+# JSON encoder/decoder for `MultiplexedLibrary`
+_multiplexd_library_json_mapping = []
+MultiplexedLibraryJSONEncoder = MappingJSONDecoderClassBuilder(
+    MultiplexedLibrary, _multiplexd_library_json_mapping, (_NamedModelJSONEncoder, _InternalIdModelJSONEncoder)
+).build()
+MultiplexedLibraryJSONDecoder = MappingJSONDecoderClassBuilder(
+    MultiplexedLibrary, _multiplexd_library_json_mapping, (_NamedModelJSONDecoder, _InternalIdModelJSONDecoder)
+).build()
+
+
+# JSON encoder/decoder for `Well`
+_well_json_mapping = []
+WellJSONEncoder = MappingJSONDecoderClassBuilder(
+    Well, _well_json_mapping, (_NamedModelJSONEncoder, _InternalIdModelJSONEncoder)
+).build()
+WellJSONDecoder = MappingJSONDecoderClassBuilder(
+    Well, _well_json_mapping, (_NamedModelJSONDecoder, _InternalIdModelJSONDecoder)
 ).build()
