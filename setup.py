@@ -1,24 +1,24 @@
 from setuptools import setup, find_packages
 
+try:
+    from pypandoc import convert
+    def read_markdown(file: str) -> str:
+        return convert(file, "rst")
+except ImportError:
+    def read_markdown(file: str) -> str:
+        return open(file, "r").read()
+
 setup(
-    name="sequencescape",
-
+    name="sequencescape-db",
     version="0.2.0",
-
     author="Colin Nolan",
-    author_email="hgi@sanger.ac.uk",
-
+    author_email="colin.nolan@sanger.ac.uk",
     packages=find_packages(exclude=["tests"]),
-
-    url="https://github.com/wtsi-hgi/python-sequencescape-client",
-
-    license="LICENSE.txt",
-
-    description="Python client for interfacing with a Sequencescape database.",
-    long_description=open("README.md").read(),
-
     install_requires=[x for x in open("requirements.txt").read().splitlines() if "://" not in x],
     dependency_links=[x for x in open("requirements.txt").read().splitlines() if "://" in x],
-
-    test_suite="sequencescape.tests"
+    url="https://github.com/wtsi-hgi/python-sequencescape-client",
+    license="MIT",
+    description="Python client for using a Sequencescape database.",
+    long_description=read_markdown("README.md"),
+    test_suite="hgijson.tests"
 )

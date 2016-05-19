@@ -1,29 +1,27 @@
 [![Build Status](https://travis-ci.org/wtsi-hgi/python-sequencescape-client.svg)](https://travis-ci.org/wtsi-hgi/python-sequencescape-client)
-[![codecov.io](https://codecov.io/github/wtsi-hgi/python-sequencescape-client/coverage.svg?branch=master)](https://codecov.io/github/wtsi-hgi/python-sequencescape-client?branch=master)
+[![codecov.io](https://codecov.io/gh/wtsi-hgi/python-sequencescape-db/graph/badge.svg)](https://codecov.io/gh/wtsi-hgi/python-sequencescape-db/)
 
-# Sequencescape Python Client
+# Python 3 Sequencescape Database Client
 
-## How to use in your project
 
-### Include the `sequencescape` library
-Link to use in ``/requirements.txt`` or in your ``/setup.py`` script:
+## How to use
+### Installation
+The client can be installed directly from GitHub:
+```bash
+$ pip3 install git+https://github.com/wtsi-hgi/sequencescape-python-client.git@<commit_id_or_branch_or_tag>#egg=sequencescape
 ```
-git+https://github.com/wtsi-hgi/sequencescape-python-client.git@master#egg=sequencescape
-```
-*See more information about how to use packages not on PyPI in [this documentation about specifying dependencies]
-(http://python-packaging.readthedocs.org/en/latest/dependencies.html#packages-not-on-pypi).*
+
+To declare this library as a dependency of your project, add it to your `requirement.txt` file.
 
 
 ### API
 ```python
-from sequencescape import connect_to_sequencescape, Sample, Study, Library, \
-    MultiplexedLibrary, Well, Model
+from sequencescape import connect_to_sequencescape, Sample, Study, Library, MultiplexedLibrary, Well
 
 # Classes of models of data in Sequencescape. Each have constructors with named parameters
-available_models = [Sample, Study, Library, MultiplexedLibrary, Well]  # type: List[Model]
+available_models = [Sample, Study, Library, MultiplexedLibrary, Well]
 
-# Declares a connection to Sequencescape. (Actual network connections are only opened when
-# required)
+# Declares a connection to Sequencescape. (Actual network connections are only opened when required)
 api = connect_to_sequencescape("mysql://user:@host:3306/database")
 
 # Available for: study, sample, library, multiplexed_library, well
@@ -55,13 +53,18 @@ api.sample.get_associated_with_study([study_1, study_2])  # type: List[Sample]
 
 ## How to develop
 ### Testing
-#### Locally
-To run the tests, use ``./scripts/run-tests.sh`` from the project's root directory. This script will use ``pip`` to 
-install all requirements for running the tests (use `virtualenv` if necessary).
+Using nosetests, in the project directory, run:
+```bash
+$ nosetests -v
+```
 
-#### Using Docker
-From the project's root directory:
+To generate a test coverage report with nosetests:
+```bash
+$ nosetests -v --with-coverage --cover-package=sequencescape --cover-inclusive
 ```
-$ docker build -t wtsi-hgi/sequencescape-python-client/test -f docker/tests/Dockerfile .
-$ docker run wtsi-hgi/sequencescape-python-client/test
-```
+
+
+## License
+[MIT license](LICENSE.txt).
+
+Copyright (c) 2015, 2016 Genome Research Limited
