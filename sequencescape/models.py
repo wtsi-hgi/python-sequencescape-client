@@ -2,6 +2,7 @@ from abc import ABCMeta
 
 from hgicommon.models import Model
 
+Model = Model
 
 class NamedModel(Model, metaclass=ABCMeta):
     """

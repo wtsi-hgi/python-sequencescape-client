@@ -1,5 +1,4 @@
-from hgijson.json.builders import MappingJSONEncoderClassBuilder, MappingJSONDecoderClassBuilder
-from hgijson.json.models import JsonPropertyMapping
+from hgijson import JsonPropertyMapping, MappingJSONEncoderClassBuilder, MappingJSONDecoderClassBuilder
 from sequencescape.models import Sample, InternalIdModel, NamedModel, Study, AccessionNumberModel, Library, Well, \
     MultiplexedLibrary
 
@@ -80,7 +79,7 @@ _study_json_mapping = [
     JsonPropertyMapping(JSON_STUDY_VISIBILITY, "study_visibility"),
     JsonPropertyMapping(JSON_FACULTY_SPONSER, "faculty_sponsor")
 ]
-StudyJSONEncoder = MappingJSONDecoderClassBuilder(
+StudyJSONEncoder = MappingJSONEncoderClassBuilder(
     Study, _study_json_mapping, (_NamedModelJSONEncoder, _AccessionNumberModelJSONEncoder, _InternalIdModelJSONEncoder)
 ).build()
 StudyJSONDecoder = MappingJSONDecoderClassBuilder(
@@ -92,7 +91,7 @@ StudyJSONDecoder = MappingJSONDecoderClassBuilder(
 _library_json_mapping = [
     JsonPropertyMapping(JSON_LIBRARY_TYPE, "library_type")
 ]
-LibraryJSONEncoder = MappingJSONDecoderClassBuilder(
+LibraryJSONEncoder = MappingJSONEncoderClassBuilder(
     Library, _library_json_mapping, (_NamedModelJSONEncoder, _InternalIdModelJSONEncoder)
 ).build()
 LibraryJSONDecoder = MappingJSONDecoderClassBuilder(
@@ -102,7 +101,7 @@ LibraryJSONDecoder = MappingJSONDecoderClassBuilder(
 
 # JSON encoder/decoder for `MultiplexedLibrary`
 _multiplexd_library_json_mapping = []
-MultiplexedLibraryJSONEncoder = MappingJSONDecoderClassBuilder(
+MultiplexedLibraryJSONEncoder = MappingJSONEncoderClassBuilder(
     MultiplexedLibrary, _multiplexd_library_json_mapping, (_NamedModelJSONEncoder, _InternalIdModelJSONEncoder)
 ).build()
 MultiplexedLibraryJSONDecoder = MappingJSONDecoderClassBuilder(
@@ -112,7 +111,7 @@ MultiplexedLibraryJSONDecoder = MappingJSONDecoderClassBuilder(
 
 # JSON encoder/decoder for `Well`
 _well_json_mapping = []
-WellJSONEncoder = MappingJSONDecoderClassBuilder(
+WellJSONEncoder = MappingJSONEncoderClassBuilder(
     Well, _well_json_mapping, (_NamedModelJSONEncoder, _InternalIdModelJSONEncoder)
 ).build()
 WellJSONDecoder = MappingJSONDecoderClassBuilder(

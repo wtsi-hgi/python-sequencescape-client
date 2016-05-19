@@ -3,3 +3,6 @@ from sequencescape.models import NamedModel, InternalIdModel, AccessionNumberMod
     MultiplexedLibrary
 from sequencescape.enums import Property
 from sequencescape.mappers import Mapper, LibraryMapper, MultiplexedLibraryMapper, SampleMapper, WellMapper, StudyMapper
+from sequencescape.json_converters import SampleJSONEncoder, SampleJSONDecoder, StudyJSONEncoder, StudyJSONDecoder,\
+    LibraryJSONEncoder, LibraryJSONDecoder, MultiplexedLibraryJSONEncoder, MultiplexedLibraryJSONDecoder, \
+    WellJSONEncoder, WellJSONDecoder
