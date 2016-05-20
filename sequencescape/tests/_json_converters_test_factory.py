@@ -60,15 +60,15 @@ class _TestJSONDecoder(unittest.TestCase):
         self.assertEqual(decoded, self.model)
 
 
-def create_json_converter_test(model_factory: Callable[[], Model], expected_json_properties: Iterable[str], encoder_type: type,
-                               decoder_type: type):
+def create_json_converter_test(model_factory: Callable[[], Model], expected_json_properties: Iterable[str],
+                               encoder_type: type, decoder_type: type):
     encoder_test_class_name = "Test%s" % encoder_type
     decoder_test_class_name = "Test%s" % decoder_type
 
     def init(self, *args, **kwargs):
         super(type(self), self).__init__(*self._SETUP, *args, **kwargs)
 
-    globals()[encoder_test_class_name] = type(
+    encoder_test_class = type(
         encoder_test_class_name,
         (_TestJSONEncoder, ),
         {
@@ -76,7 +76,7 @@ def create_json_converter_test(model_factory: Callable[[], Model], expected_json
             "__init__": init
         }
     )
-    globals()[decoder_test_class_name] = type(
+    decoder_test_class = type(
         decoder_test_class_name,
         (_TestJSONDecoder, ),
         {
@@ -84,3 +84,4 @@ def create_json_converter_test(model_factory: Callable[[], Model], expected_json
             "__init__": init
         }
     )
+    return encoder_test_class, decoder_test_class

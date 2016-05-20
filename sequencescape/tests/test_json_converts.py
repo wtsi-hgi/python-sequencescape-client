@@ -42,5 +42,6 @@ _setups = [(
 ]
 
 for _setup in _setups:
-    create_json_converter_test(*_setup)
-from sequencescape.tests._json_converters_test_factory import *
+    encoder_test_class, decoder_test_class = create_json_converter_test(*_setup)
+    globals()[encoder_test_class.__name__] = encoder_test_class
+    globals()[decoder_test_class.__name__] = decoder_test_class
