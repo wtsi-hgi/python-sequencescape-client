@@ -1,6 +1,6 @@
 import json
 import unittest
-from typing import Iterable, Callable
+from typing import Callable, Tuple, Sequence
 
 from sequencescape.models import Model
 
@@ -9,7 +9,7 @@ class _TestJSONEncoder(unittest.TestCase):
     """
     Tests for custom JSON encoders.
     """
-    def __init__(self, model_factory: Callable[[], Model], expected_json_properties: Iterable[str], encoder_type: type,
+    def __init__(self, model_factory: Callable[[], Model], expected_json_properties: Sequence[str], encoder_type: type,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model_factory = model_factory
@@ -23,12 +23,14 @@ class _TestJSONEncoder(unittest.TestCase):
         encoded_as_dict = self.encoder_type().default(self.model)
         for property in self.expected_json_properties:
             self.assertIn(property, encoded_as_dict)
+        self.assertEqual(len(encoded_as_dict), len(self.expected_json_properties))
 
     def test_with_json_dumps(self):
         encoded_as_string = json.dumps(self.model, cls=self.encoder_type)
         encoded_as_dict = json.loads(encoded_as_string)
         for property in self.expected_json_properties:
-            self.assertIn(property, encoded_as_dict)
+           self.assertIn(property, encoded_as_dict)
+        self.assertEqual(len(encoded_as_dict), len(self.expected_json_properties))
 
 
 class _TestJSONDecoder(unittest.TestCase):
@@ -60,8 +62,16 @@ class _TestJSONDecoder(unittest.TestCase):
         self.assertEqual(decoded, self.model)
 
 
-def create_json_converter_test(model_factory: Callable[[], Model], expected_json_properties: Iterable[str],
-                               encoder_type: type, decoder_type: type):
+def create_json_converter_test(model_factory: Callable[[], Model], expected_json_properties: Sequence[str],
+                               encoder_type: type, decoder_type: type) -> Tuple[unittest.TestCase, unittest.TestCase]:
+    """
+    Creates a unit tests for testing a JSON converter.
+    :param model_factory: factory that produces models that the converter deals with
+    :param expected_json_properties: the properties that are expected to be in the JSON
+    :param encoder_type: the JSON encoder type to test
+    :param decoder_type: the JSON decoder type to test
+    :return: tuple where the first element is a unit test for the encoder and the second is a unit test for the decoder
+    """
     encoder_test_class_name = "Test%s" % encoder_type
     decoder_test_class_name = "Test%s" % decoder_type
 
