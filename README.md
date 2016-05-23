@@ -55,12 +55,12 @@ api.sample.get_associated_with_study([study_1, study_2])  # type: List[Sample]
 ### Testing
 Using nosetests, in the project directory, run:
 ```bash
-$ nosetests -v
+$ nosetests -v --exclude-test=sequencescape.tests._json_converters_test_factory.create_json_converter_test
 ```
 
 To generate a test coverage report with nosetests:
 ```bash
-$ nosetests -v --with-coverage --cover-package=sequencescape --cover-inclusive
+$ nosetests -v --with-coverage --cover-package=sequencescape --cover-inclusive nosetests -v --with-coverage --cover-package=sequencescape --cover-inclusive --exclude-test=sequencescape.tests._json_converters_test_factory.create_json_converter_test
 ```
 
 
