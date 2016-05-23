@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wtsi-hgi/python-sequencescape-client.svg)](https://travis-ci.org/wtsi-hgi/python-sequencescape-client)
+[![Build Status](https://travis-ci.org/wtsi-hgi/python-sequencescape-db.svg)](https://travis-ci.org/wtsi-hgi/python-sequencescape-db)
 [![codecov.io](https://codecov.io/gh/wtsi-hgi/python-sequencescape-db/graph/badge.svg)](https://codecov.io/gh/wtsi-hgi/python-sequencescape-db/)
 
 # Python 3 Sequencescape Database Client
