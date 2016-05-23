@@ -72,11 +72,16 @@ def create_json_converter_test(model_factory: Callable[[], Model], expected_json
     :param decoder_type: the JSON decoder type to test
     :return: tuple where the first element is a unit test for the encoder and the second is a unit test for the decoder
     """
-    encoder_test_class_name = "Test%s" % encoder_type
-    decoder_test_class_name = "Test%s" % decoder_type
+    encoder_test_class_name = "Test%s" % encoder_type.__name__
+    decoder_test_class_name = "Test%s" % decoder_type.__name__
 
     def init(self, *args, **kwargs):
-        super(type(self), self).__init__(*self._SETUP, *args, **kwargs)
+        if "transplant_class" in str(type(self)):
+            # Fix for nosetest, which does some strange subclassing that results in the wrong super been used
+            self_type = type(self).mro()[1]
+        else:
+            self_type = type(self)
+        super(self_type, self).__init__(*self._SETUP, *args, **kwargs)
 
     encoder_test_class = type(
         encoder_test_class_name,

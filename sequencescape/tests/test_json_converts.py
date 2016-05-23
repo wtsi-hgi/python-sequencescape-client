@@ -10,6 +10,7 @@ from sequencescape.tests._helpers import create_stub_well, create_stub_multiplex
     create_stub_study, create_stub_sample
 from sequencescape.tests._json_converters_test_factory import create_json_converter_test
 
+
 _setups = [(
         create_stub_sample,
         [JSON_NAME_PROPERTY, JSON_INTERNAL_ID_PROPERTY, JSON_ACCESSION_NUMBER_PROPERTY, JSON_ORGANISM_PROPERTY,
@@ -42,6 +43,7 @@ _setups = [(
 ]
 
 for _setup in _setups:
-    encoder_test_class, decoder_test_class = create_json_converter_test(*_setup)
-    globals()[encoder_test_class.__name__] = encoder_test_class
-    globals()[decoder_test_class.__name__] = decoder_test_class
+    _encoder_test_class, _decoder_test_class = create_json_converter_test(*_setup)
+    globals()[_encoder_test_class.__name__] = _encoder_test_class
+    globals()[_decoder_test_class.__name__] = _decoder_test_class
+    del _encoder_test_class, _decoder_test_class
