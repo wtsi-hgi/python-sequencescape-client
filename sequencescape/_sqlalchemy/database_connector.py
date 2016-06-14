@@ -6,7 +6,7 @@ class SQLAlchemyDatabaseConnector:
     """
     Database connector for use with SQLAlchemy.
     """
-    def __init__(self, database_location : str):
+    def __init__(self, database_location: str):
         """
         Default constructor.
         :param database_location: the url of the database that connections can be made to.
